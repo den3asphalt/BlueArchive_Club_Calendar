@@ -1,0 +1,2 @@
+# BlueArchive_Club_Calendar
+日本版ブルアカのサークル募集カレンダーです
