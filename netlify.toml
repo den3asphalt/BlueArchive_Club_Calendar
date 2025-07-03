@@ -1,0 +1,8 @@
+[build]
+  # publish は、Netlifyがウェブサイトとして公開するファイルの場所を指定します。
+  # あなたの index.html がリポジトリのルートにある場合は "." とします。
+  publish = "." 
+
+  # functions は、Netlify Functionsのコードを配置するフォルダを指定します。
+  # 通常は "netlify/functions" とするのが一般的です。
+  functions = "netlify/functions"
