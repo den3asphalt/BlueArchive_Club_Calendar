@@ -26,6 +26,9 @@ exports.handler = async function(event, context) {
 
   const apiUrl = `https://www.googleapis.com/calendar/v3/calendars/${GOOGLE_CALENDAR_ID}/events?key=${GOOGLE_CALENDAR_API_KEY}&timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`;
 
+  console.log("DEBUG: Google Calendar API URL:", apiUrl); // ★この行を追加してください！
+
+
   try {
     const response = await fetch(apiUrl); // Node.js環境で利用可能なfetch APIを使用
     if (!response.ok) {
