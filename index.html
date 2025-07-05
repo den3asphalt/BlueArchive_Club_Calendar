@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>イベントカレンダー</title>
+    <title>公募カレンダー</title>
     
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' rel='stylesheet' />
     
@@ -11,7 +11,7 @@
 </head>
 <body>
     <header>
-        <h1>クラブイベントカレンダー</h1>
+        <h1>公募カレンダー</h1>
     </header>
 
     <main>
@@ -19,11 +19,26 @@
     </main>
 
     <footer>
-        <p>&copy; 2025 BlueArchive Club Calendar</p>
+        <p>&copy; 2025 BlueArchive Club 公募カレンダー</p>
     </footer>
+
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <p><strong>サークル名:</strong> <span id="modalCircleName"></span></p>
+            <p><strong>分類:</strong> <span id="modalCategory"></span></p>
+            <p><strong>期間:</strong> <span id="modalDuration"></span></p>
+            <p><strong>場所:</strong> <span id="modalLocation"></span></p>
+            <p><strong>関連情報:</strong> <span id="modalRelatedInfo"></span></p>
+            <div id="modalTweetEmbed" class="tweet-embed-container"></div>
+            <p id="modalTweetLink"></p> </div>
+    </div>
 
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
     
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
     <script src='./js/main.js'></script>
 </body>
 </html>
