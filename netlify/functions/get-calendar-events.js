@@ -13,8 +13,9 @@ exports.handler = async function(event, context) {
     const fs = require('fs/promises');
     const path = require('path');
 
-    // Netlify Functionsが実行される環境で、recruitment_info.jsonへの正しいパスを構築
-    const filePath = path.resolve(process.env.LAMBDA_TASK_ROOT, '..', '..', 'recruitment_info.json');
+    // ★この行を修正します★
+    // 同じフォルダ内にある recruitment_info.json を直接参照
+    const filePath = path.resolve(__dirname, 'recruitment_info.json'); 
 
     const rawData = await fs.readFile(filePath, 'utf8');
     const recruitmentData = JSON.parse(rawData);
