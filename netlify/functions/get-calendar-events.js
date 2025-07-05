@@ -44,7 +44,7 @@ exports.handler = async function(event, context) {
       end: event.end.dateTime || event.end.date,       // 同上
       description: event.description || '',             // 説明がなければ空文字列
       location: event.location || '',
-      url: event.htmlLink, // Googleカレンダー上のイベントへのリンク（クリック時の遷移に利用可能）
+      // url: event.htmlLink, // Googleカレンダー上のイベントへのリンク（クリック時の遷移に利用可能）
       // 拡張プロパティ：イベントの説明欄からカスタムデータをパースして格納
       extendedProps: {
           parsedDescription: parseDescription(event.description || '') 
