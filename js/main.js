@@ -164,25 +164,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
     calendar.render();
 
-    // 常時公募枠を表示する関数 (変更なし)
     function renderAlwaysOpenRecruitment(recruitmentItems) {
-        if (!alwaysOpenSection || !alwaysOpenList) return; 
+        console.log("DEBUG: renderAlwaysOpenRecruitment function called with items:", recruitmentItems); // ★追加
 
-        alwaysOpenList.innerHTML = ''; 
+        const alwaysOpenSection = document.getElementById('alwaysOpenRecruitmentSection');
+        const alwaysOpenList = document.getElementById('alwaysOpenRecruitmentList');
+        
+        if (!alwaysOpenSection || !alwaysOpenList) {
+            console.error("DEBUG: Always open section or list elements not found!"); // ★追加
+            return;
+        }
+
+        alwaysOpenList.innerHTML = ''; // リストをクリア
 
         if (recruitmentItems.length === 0) {
+            console.log("DEBUG: No always open items to display."); // ★追加
             alwaysOpenList.innerHTML = '<p style="text-align: center; color: #6c757d;">現在、常時公募枠はありません。</p>';
             alwaysOpenSection.style.display = 'block'; 
             return;
         }
 
         recruitmentItems.forEach(item => {
+            console.log("DEBUG: Rendering always open item:", item.title); // ★追加
+
             const itemDiv = document.createElement('div');
             itemDiv.classList.add('always-open-item'); 
 
-            const categoryText = item.extendedProps.category ? `<span class="always-open-category category-${item.extendedProps.category.replace(/\s/g, '-')}" style="margin-right: 8px;">${item.extendedProps.category}</span>` : '';
+            const categoryText = item.extendedProps.category ? `<span class="always-open-category category-${item.extendedProps.category.replace(/[^a-zA-Z0-9]/g, '-')}" style="margin-right: 8px;">${item.extendedProps.category}</span>` : ''; 
             const circleNameText = item.title || item.extendedProps.circleName || '不明なサークル';
-            const relatedInfoText = item.extendedProps.relatedInfo || ''; // そのまま表示
+            const relatedInfoText = item.extendedProps.relatedInfo || '';
 
             itemDiv.innerHTML = `
                 <h3 class="always-open-title">${categoryText}${circleNameText}</h3>
@@ -190,6 +200,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 ${item.extendedProps.tweetUrl ? `<p class="always-open-tweet-link"><a href="${item.extendedProps.tweetUrl}" target="_blank">公募ツイートを見る</a></p>` : ''}
             `;
             alwaysOpenList.appendChild(itemDiv);
+            console.log("DEBUG: Appended itemDiv for:", circleNameText); // ★追加
+
 
             // クリックでモーダル表示 (カレンダーイベントと同じロジックを再利用)
             itemDiv.addEventListener('click', () => {
@@ -206,7 +218,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
         });
-        alwaysOpenSection.style.display = 'block'; 
+        alwaysOpenSection.style.display = 'block'; // セクションを表示
+        console.log("DEBUG: Always open section set to display: block."); // ★追加
     }
 
     // モーダルを閉じるロジック (変更なし)
