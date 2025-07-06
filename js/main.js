@@ -70,7 +70,6 @@ document.addEventListener('DOMContentLoaded', function() {
             modalTitle.textContent = event.title; // サークル名がここに入る
             modalCircleName.textContent = props.circleName || '不明';
             modalCategory.textContent = props.category || '不明';
-            modalLocation.textContent = props.location || '場所未定'; // JSONにlocationがない場合
             modalRelatedInfo.textContent = props.relatedInfo || 'なし';
 
             // 期間の表示を整形
@@ -90,35 +89,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
             // ツイート埋め込みの処理
-            modalTweetEmbed.innerHTML = ''; // 前回の埋め込みをクリア
+            modalTweetEmbed.innerHTML = ''; // まず前回の埋め込みとメッセージをクリア
             modalTweetLink.innerHTML = '';  // リンク表示もクリア
 
             if (props.tweetUrl) {
                 const tweetIdMatch = props.tweetUrl.match(/\/status\/(\d+)/);
                 if (tweetIdMatch && window.twttr && window.twttr.widgets) {
-                    // TwitterウィジェットAPIを使って埋め込む
-                    modalTweetEmbed.textContent = 'ツイートを読み込み中...';
+                    modalTweetEmbed.textContent = 'ツイートを読み込み中...'; // ここで読み込み中メッセージを設定
+
                     window.twttr.widgets.createTweet(
                         tweetIdMatch[1], // ツイートID
                         modalTweetEmbed,
                         {
-                            theme: 'light', // 'dark' にもできます
-                            conversation: 'none', // 会話スレッドを非表示
-                            cards: 'hidden', // リンクカードを非表示 (画像表示を制御)
-                            width: '450' // 適切な幅に調整
+                            theme: 'light', 
+                            conversation: 'none', 
+                            cards: 'hidden', 
+                            width: '450' 
                         }
                     ).then(function (el) {
                         if (el) {
+                            // 埋め込み成功時：読み込み中メッセージは自動的に埋め込まれたツイートで置き換わるため、特別なクリアは不要
                             console.log('ツイート埋め込み成功！');
                         } else {
-                            modalTweetEmbed.innerHTML = `<p>ツイートの埋め込みに失敗しました。</p>`;
+                            // 埋め込み要素が返ってこなかった場合（例：ツイートが存在しないなど）
+                            modalTweetEmbed.innerHTML = `<p>ツイートが見つからないか、埋め込みに失敗しました。</p>`;
                         }
                     }).catch(function (error) {
+                        // 埋め込みエラー発生時
                         console.error('ツイート埋め込みエラー:', error);
                         modalTweetEmbed.innerHTML = `<p>ツイートの読み込み中にエラーが発生しました。</p>`;
                     });
                 } else {
-                    // widgets.jsがまだ読み込まれていないか、IDが抽出できない場合
+                    // widgets.jsがまだ読み込まれていないか、IDが抽出できない、またはURL形式が違う場合
+                    modalTweetEmbed.innerHTML = ''; // 念のためクリア
                     modalTweetLink.innerHTML = `ツイートURL: <a href="${props.tweetUrl}" target="_blank">${props.tweetUrl}</a>`;
                 }
             }
