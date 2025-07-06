@@ -12,11 +12,25 @@ body {
 header {
     background-color: #007bff; /* メインカラーを鮮やかな青に */
     color: white;
-    padding: 20px 40px; /* 左右にパディングを追加し、コンテンツの余白を確保 */
+    padding: 20px 40px; /* ヘッダー全体の上下左右のパディング */
     box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* より明確な影 */
     display: flex; /* flexboxを使って子要素を制御 */
     align-items: center; /* 垂直方向の中央揃え */
-    justify-content: flex-start; /* 要素を左寄せ */
+    justify-content: space-between; /* アイコンとh1は左、リンクは右に寄せる */
+}
+
+.header-left-content { /* アイコンとh1をまとめるためのクラス */
+    display: flex;
+    align-items: center;
+    gap: 25px; /* アイコンとh1の間のスペース */
+    /* margin-left: 20px; はheaderのpaddingで代替 */
+}
+
+.header-icon { /* アイコンのスタイル (imgタグにも適用) */
+    width: 36px; /* アイコンのサイズ */
+    height: 36px;
+    flex-shrink: 0; /* アイコンが縮まないように */
+    object-fit: contain; /* 画像が歪まないように */
 }
 
 h1 {
@@ -25,6 +39,24 @@ h1 {
     font-weight: 600; 
     letter-spacing: 0.05em; 
     color: white; /* ヘッダーのh1は白のまま */
+}
+
+.report-link { /* 「報告はこちら」リンクのスタイル */
+    background-color: rgba(255, 255, 255, 0.2); /* 半透明の白背景 */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px; /* 角丸を強くしてボタンのように */
+    text-decoration: none; /* 下線なし */
+    font-size: 1em;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    flex-shrink: 0; /* 縮まないように */
+    /* margin-right: 20px; はheaderのpaddingで代替 */
+}
+
+.report-link:hover {
+    background-color: rgba(255, 255, 255, 0.3); 
+    transform: translateY(-2px); 
 }
 
 main {
@@ -40,11 +72,11 @@ main {
 .fc .fc-toolbar-title {
     font-size: 2em; 
     font-weight: 600;
-    color: #007bff; /* カレンダータイトルもメインカラーの青に */
+    color: #007bff; 
 }
 
 .fc .fc-button-primary {
-    background-color: #007bff; /* ボタンの背景色も青に */
+    background-color: #007bff; 
     border-color: #007bff;
     color: white;
     padding: 8px 15px; 
@@ -54,7 +86,7 @@ main {
 }
 
 .fc .fc-button-primary:hover {
-    background-color: #0056b3; /* ホバー時は少し濃い青に */
+    background-color: #0056b3; 
     border-color: #0056b3;
 }
 
@@ -79,10 +111,10 @@ main {
 }
 
 /* カレンダーイベントのカテゴリ色 */
-.fc-event.category-交流 { background-color: #28a745; } /* 緑系 */
-.fc-event.category-チナトロ目標-維持 { background-color: #fd7e14; } /* オレンジ系 */
-.fc-event.category-上位狙い { background-color: #dc3545; } /* 赤系 */
-.fc-event.category-特殊 { background-color: #e0f2f7; } /* 薄い水色系 */
+.fc-event.category-交流 { background-color: #28a745; }
+.fc-event.category-チナトロ目標-維持 { background-color: #fd7e14; }
+.fc-event.category-上位狙い { background-color: #dc3545; }
+.fc-event.category-特殊 { background-color: #e0f2f7; }
 
 
 /* カレンダーグリッドの日付ヘッダー */
@@ -205,12 +237,13 @@ footer {
 
 /* カテゴリ色分け凡例のスタイル */
 #categoryLegendSection {
-    margin-top: 40px;
+    margin-top: 40px; 
     padding: 25px;
     background-color: #e0f8ff; 
     border-radius: 12px; 
     box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
     text-align: center;
+    margin-bottom: 40px; /* カレンダーとの間隔 */
 }
 
 #categoryLegendSection h2 {
@@ -253,9 +286,9 @@ footer {
 
 /* 常時公募枠セクションのスタイル */
 #alwaysOpenRecruitmentSection {
-    margin-top: 50px;
-    padding-top: 30px;
-    border-top: 1px dashed #e0e0e0;
+    margin-top: 40px; /* カレンダーとの間隔 */
+    padding-top: 40px; /* 上部パディングで区切り線からの間隔 */
+    border-top: 1px solid #e9ecef; /* ここが常時公募枠の上部の区切り線 */
 }
 
 #alwaysOpenRecruitmentSection h2 {
@@ -337,62 +370,4 @@ footer {
     background-color: #f0f0f0;
     color: #6c757d;
     width: 100%;
-}
-
-
-/* ★既存の #categoryLegendSection のマージンを調整 ★ */
-#categoryLegendSection {
-    margin-top: 40px; 
-    padding: 25px;
-    background-color: #e0f8ff; 
-    border-radius: 12px; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
-    text-align: center;
-    margin-bottom: 40px; /* ★カレンダーとの間隔★ */
-}
-
-/* ★カレンダー本体のスタイルを修正し、上の凡例との区切りを追加 ★ */
-#calendar {
-    max-width: 960px; /* mainと同じ最大幅だが、margin:autoはmainで処理済*/
-    margin: 0 auto; /* ★上下のマージンをリセット。区切り線とpaddingで間隔調整★ */
-    padding-top: 40px; /* ★上部パディングで区切り線からの間隔★ */
-    border-top: 1px solid #e9ecef; /* ★ここがカレンダーの上部の区切り線★ */
-}
-
-/* ★常時公募枠セクションのスタイルを修正し、上のカレンダーとの区切りを追加 ★ */
-#alwaysOpenRecruitmentSection {
-    margin-top: 40px; /* ★カレンダーとの間隔★ */
-    padding-top: 40px; /* ★上部パディングで区切り線からの間隔★ */
-    border-top: 1px solid #e9ecef; /* ★ここが常時公募枠の上部の区切り線★ */
-}
-
-/* css/style.css (header-iconのスタイル部分を以下に置き換え) */
-
-.header-icon { /* アイコンのスタイル (imgタグにも適用) */
-    width: 36px; /* アイコンのサイズを少し大きく */
-    height: 36px;
-    /* color: white; ★imgタグにはcolorは適用されないので削除★ */
-    flex-shrink: 0;
-    object-fit: contain; /* 画像が歪まないように */
-}
-
-
-.header-left-content {
-display: flex;
-align-items: center;
-gap: 25px; /* アイコンとh1の間のスペースを広げる /
-margin-left: 20px; / ヘッダー左端からの余白を追加 */
-}
-
-.report-link {
-background-color: rgba(255, 255, 255, 0.2);
-color: white;
-padding: 10px 20px;
-border-radius: 25px;
-text-decoration: none;
-font-size: 1em;
-font-weight: 600;
-transition: background-color 0.3s ease, transform 0.2s ease;
-flex-shrink: 0;
-margin-right: 20px; /* ヘッダー右端からの余白を追加 */
 }
