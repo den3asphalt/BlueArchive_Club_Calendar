@@ -1,10 +1,5 @@
 // netlify/functions/get-calendar-events.js
 
-// ★★★ この行を変更します ★★★
-// ファイルシステムモジュール（fs）やパスモジュール（path）は不要になりますが、
-// 以下のようにJSONファイルを直接 require します。
-const recruitmentData = require('./recruitment_info.json'); 
-
 exports.handler = async function(event, context) {
   if (event.httpMethod !== 'GET') {
     return {
@@ -15,20 +10,66 @@ exports.handler = async function(event, context) {
   }
 
   try {
+    // DatoCMSのAPIトークンを環境変数から取得
+    const DATOCMS_API_TOKEN = process.env.DATOCMS_READONLY_API_TOKEN;
 
-    // ... (ID生成ロジックはそのまま) ...
-    const formattedEventsForFullCalendar = recruitmentData.map((item, index) => {
-        // ID生成ロジック（変更なし）
-        const generatedId = item.id || `generated-${(item.extendedProps?.circleName || item.title || 'untitled').replace(/\s/g, '-')}-${(item.start || 'no-start').replace(/[^a-zA-Z0-9]/g, '')}-${index}`;
+    // DatoCMSのGraphQL APIエンドポイント
+    const DATOCMS_API_URL = 'https://graphql.datocms.com/';
+
+    // GraphQLクエリを定義
+    // ここでDatoCMSから取得したいフィールドを指定します
+    const query = `
+      query AllRecruitmentInfos {
+        allRecruitmentInfos {
+          id
+          circleName
+          startDateTime
+          endDateTime
+          category
+          tweetUrl
+          relatedInfo
+        }
+      }
+    `;
+
+    // DatoCMS GraphQL APIへのリクエスト
+    const response = await fetch(DATOCMS_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${DATOCMS_API_TOKEN}`,
+      },
+      body: JSON.stringify({ query }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`DatoCMS API error: ${response.status} ${response.statusText}`);
+    }
+
+    const jsonResponse = await response.json();
+    if (jsonResponse.errors) {
+      throw new Error(`GraphQL error: ${JSON.stringify(jsonResponse.errors)}`);
+    }
+
+    const datoEvents = jsonResponse.data.allRecruitmentInfos;
+
+    // DatoCMSのデータをFullCalendarが期待する形式に変換
+    const formattedEventsForFullCalendar = datoEvents.map(item => {
+        // DatoCMSはIDを自動で提供するので、それを使用
+        const id = item.id; 
 
         return {
-            id: generatedId,
-            title: item.extendedProps?.circleName || item.title || "サークル名不明", 
-            start: item.start,
-            end: item.end,
-            description: item.description, 
-            location: item.location,
-            extendedProps: item.extendedProps 
+            id: id,
+            title: item.circleName || "サークル名不明", // サークル名をカレンダーのタイトルとして使用
+            start: item.startDateTime, // DatoCMSからの日付時刻
+            end: item.endDateTime,     // DatoCMSからの日付時刻
+            extendedProps: { // 詳細情報はextendedPropsに格納
+                circleName: item.circleName,
+                category: item.category,
+                tweetUrl: item.tweetUrl,
+                relatedInfo: item.relatedInfo,
+            }
         };
     });
 
@@ -36,23 +77,34 @@ exports.handler = async function(event, context) {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'https://bluearchive-club-calendar.netlify.app' 
+        'Access-Control-Allow-Origin': 'https://bluearchive-club-calendar.netlify.app', // あなたのサイトのURLに合わせる
       },
-      body: JSON.stringify(formattedEventsForFullCalendar)
+      body: JSON.stringify(formattedEventsForFullCalendar),
     };
 
   } catch (error) {
-    console.error("Error fetching recruitment info from JSON file:", error); // エラーメッセージは変わる
+    console.error("Error fetching data from DatoCMS or processing:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message || "Failed to load events." }),
+      body: JSON.stringify({ error: error.message || "Failed to load recruitment info." }),
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'https://bluearchive-club-calendar.netlify.app'
+        'Access-Control-Allow-Origin': 'https://bluearchive-club-calendar.netlify.app',
       }
     };
   }
 };
 
-// parseDescription関数はそのまま
-function parseDescription(description) { /* ... */ return {}; }
+// parseDescription関数はもう不要ですが、エラーにならないように残しておきます。
+// 記述が邪魔であれば削除しても構いません。
+function parseDescription(description) {
+    try {
+        const jsonPartMatch = description.match(/\{[\s\S]*\}/s); 
+        if (jsonPartMatch) {
+            return JSON.parse(jsonPartMatch[0]);
+        }
+    } catch (e) {
+        console.warn("Failed to parse description as JSON:", e);
+    }
+    return {}; 
+}
