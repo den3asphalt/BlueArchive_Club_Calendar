@@ -13,7 +13,7 @@ header {
     background-color: #007bff; /* メインカラーを鮮やかな青に */
     color: white;
     padding: 20px 40px; /* 左右にパディングを追加し、コンテンツの余白を確保 */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* より明確な影 */
     display: flex; /* flexboxを使って子要素を制御 */
     align-items: center; /* 垂直方向の中央揃え */
     justify-content: flex-start; /* 要素を左寄せ */
@@ -24,7 +24,7 @@ h1 {
     font-size: 2.5em; 
     font-weight: 600; 
     letter-spacing: 0.05em; 
-    color: white;
+    color: white; /* ヘッダーのh1は白のまま */
 }
 
 main {
@@ -40,11 +40,11 @@ main {
 .fc .fc-toolbar-title {
     font-size: 2em; 
     font-weight: 600;
-    color: #007bff; 
+    color: #007bff; /* カレンダータイトルもメインカラーの青に */
 }
 
 .fc .fc-button-primary {
-    background-color: #007bff; 
+    background-color: #007bff; /* ボタンの背景色も青に */
     border-color: #007bff;
     color: white;
     padding: 8px 15px; 
@@ -54,7 +54,7 @@ main {
 }
 
 .fc .fc-button-primary:hover {
-    background-color: #0056b3; 
+    background-color: #0056b3; /* ホバー時は少し濃い青に */
     border-color: #0056b3;
 }
 
@@ -79,9 +79,10 @@ main {
 }
 
 /* カレンダーイベントのカテゴリ色 */
-.fc-event.category-交流 { background-color: #28a745; }
-.fc-event.category-チナトロ目標 { background-color: #fd7e14; }
-.fc-event.category-上位狙い { background-color: #dc3545; }
+.fc-event.category-交流 { background-color: #28a745; } /* 緑系 */
+.fc-event.category-チナトロ目標-維持 { background-color: #fd7e14; } /* オレンジ系 */
+.fc-event.category-上位狙い { background-color: #dc3545; } /* 赤系 */
+.fc-event.category-特殊 { background-color: #e0f2f7; } /* 薄い水色系 */
 
 
 /* カレンダーグリッドの日付ヘッダー */
@@ -121,6 +122,7 @@ main {
     width: 90%; 
     max-width: 550px; 
     border-radius: 15px; 
+    position: relative;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
     animation: fadeIn 0.3s ease-out; 
 }
@@ -201,6 +203,54 @@ footer {
 }
 
 
+/* カテゴリ色分け凡例のスタイル */
+#categoryLegendSection {
+    margin-top: 40px;
+    padding: 25px;
+    background-color: #e0f8ff; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
+    text-align: center;
+}
+
+#categoryLegendSection h2 {
+    font-size: 1.6em;
+    color: #007bff;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.legend-items {
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: center; 
+    gap: 25px; 
+}
+
+.legend-item {
+    display: flex;
+    align-items: center; 
+    font-size: 1em;
+    color: #343a40;
+    font-weight: 500;
+}
+
+.legend-color {
+    width: 24px; 
+    height: 24px;
+    border-radius: 50%; 
+    margin-right: 10px; 
+    border: 1px solid rgba(0,0,0,0.15); 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+}
+
+/* 凡例の色分けクラス（カレンダーイベント、常時公募枠と同じ定義を再利用） */
+.legend-color.category-交流 { background-color: #28a745; }
+.legend-color.category-チナトロ目標-維持 { background-color: #fd7e14; }
+.legend-color.category-上位狙い { background-color: #dc3545; }
+.legend-color.category-特殊 { background-color: #e0f2f7; }
+
+
 /* 常時公募枠セクションのスタイル */
 #alwaysOpenRecruitmentSection {
     margin-top: 50px;
@@ -220,31 +270,31 @@ footer {
 #alwaysOpenRecruitmentList {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px; /* 項目間の隙間 */
+    gap: 15px; 
     justify-content: center;
     margin-top: 20px;
 }
 
 /* 常時公募枠の各項目（カード） */
 .always-open-item {
-    background-color: #ffffff; /* デフォルトの背景色は白 */
+    background-color: #ffffff; 
     border: 1px solid #e9ecef;
     border-radius: 10px;
-    padding: 15px 20px; /* パディングを小さくしてコンパクトに */
+    padding: 15px 20px; 
     margin-bottom: 0;
     box-shadow: 0 4px 15px rgba(0,0,0,0.08);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
     display: flex;
-    flex-direction: column; /* 要素を縦に並べる */
-    gap: 5px; /* 要素間の隙間を小さく */
-    align-items: center; /* 垂直方向の中央揃え */
-    justify-content: center; /* 水平方向の中央揃え */
-    width: calc(33.33% - 15px); /* 3列で並べる場合 */
+    flex-direction: column; 
+    gap: 5px; 
+    align-items: center; 
+    justify-content: center; 
+    width: calc(33.33% - 15px); 
     min-width: 150px;
     max-width: 200px;
-    text-align: center; /* テキストを中央寄せ */
-    color: #343a40; /* テキストのデフォルト色 */
+    text-align: center; 
+    color: #343a40; 
 }
 
 .always-open-item:hover {
@@ -253,34 +303,29 @@ footer {
 }
 
 .always-open-item h3 {
-    font-size: 1.2em; /* サークル名を見やすく */
-    color: inherit; /* 親要素のテキスト色を継承 */
+    font-size: 1.2em; 
+    color: inherit; 
     margin-top: 0;
     margin-bottom: 0;
     font-weight: 700;
-    /* ここにカテゴリバッジのスタイルは直接含まれません、カード全体に色がつくため */
 }
 
 /* 常時公募枠の各項目（カード全体）の色分け */
 .always-open-item.category-交流 {
-    background-color: #e6ffe6; /* 薄い緑 */
+    background-color: #e6ffe6; 
     border-color: #a3e9a4;
 }
-.always-open-item.category-チナトロ目標 {
-    background-color: #fffbe6; /* 薄いオレンジ */
-    border-color: #ffd88a;
-}
-.always-open-item.category-チナトロ目標-維持 { /* もしこのクラス名を使うなら */
-    background-color: #fffbe6; /* 薄いオレンジ */
+.always-open-item.category-チナトロ目標-維持 { 
+    background-color: #fffbe6; 
     border-color: #ffd88a;
 }
 .always-open-item.category-上位狙い {
-    background-color: #ffe6e6; /* 薄い赤 */
+    background-color: #ffe6e6; 
     border-color: #ffb3b3;
 }
-.always-open-item.category-不明 { /* カテゴリがない場合の色 */
-    background-color: #f0f0f0; /* 薄いグレー */
-    border-color: #e0e0e0;
+.always-open-item.category-特殊 {
+    background-color: #e0f2f7; 
+    border-color: #81d4fa;
 }
 
 /* 常時公募枠がない場合のメッセージ */
@@ -292,11 +337,4 @@ footer {
     background-color: #f0f0f0;
     color: #6c757d;
     width: 100%;
-}
-
-/* css/style.css (常時公募枠のカテゴリ色分け定義に追加) */
-
-.always-open-item.category-特殊 {
-   background-color: #e0f2f7; /* 薄い水色系の色 */
-   border-color: #81d4fa;
 }
