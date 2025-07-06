@@ -192,8 +192,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             itemDiv.innerHTML = `
                 <h3 class="always-open-title">${categoryText}${circleNameText}</h3>
-                <p>${relatedInfoText}</p>
-                ${item.extendedProps.tweetUrl ? `<p class="always-open-tweet-link"><a href="${item.extendedProps.tweetUrl}" target="_blank">公募ツイートを見る</a></p>` : ''}
             `;
             alwaysOpenList.appendChild(itemDiv);
             console.log("DEBUG: Appended itemDiv for:", circleNameText); // 追加
