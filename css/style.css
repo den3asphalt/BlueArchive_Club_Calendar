@@ -338,3 +338,30 @@ footer {
     color: #6c757d;
     width: 100%;
 }
+
+
+/* ★既存の #categoryLegendSection のマージンを調整 ★ */
+#categoryLegendSection {
+    margin-top: 40px; 
+    padding: 25px;
+    background-color: #e0f8ff; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
+    text-align: center;
+    margin-bottom: 40px; /* ★カレンダーとの間隔★ */
+}
+
+/* ★カレンダー本体のスタイルを修正し、上の凡例との区切りを追加 ★ */
+#calendar {
+    max-width: 960px; /* mainと同じ最大幅だが、margin:autoはmainで処理済*/
+    margin: 0 auto; /* ★上下のマージンをリセット。区切り線とpaddingで間隔調整★ */
+    padding-top: 40px; /* ★上部パディングで区切り線からの間隔★ */
+    border-top: 1px solid #e9ecef; /* ★ここがカレンダーの上部の区切り線★ */
+}
+
+/* ★常時公募枠セクションのスタイルを修正し、上のカレンダーとの区切りを追加 ★ */
+#alwaysOpenRecruitmentSection {
+    margin-top: 40px; /* ★カレンダーとの間隔★ */
+    padding-top: 40px; /* ★上部パディングで区切り線からの間隔★ */
+    border-top: 1px solid #e9ecef; /* ★ここが常時公募枠の上部の区切り線★ */
+}
