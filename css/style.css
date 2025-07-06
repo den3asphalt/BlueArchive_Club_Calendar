@@ -214,8 +214,102 @@ footer {
 }
 
 
-/* 常時公募枠のカテゴリ色（jsで生成されるクラス名に合わせて追記） */
-.always-open-item .category-交流 { background-color: #28a745; }
-.always-open-item .category-チナトロ目標 { background-color: #fd7e14; }
-.always-open-item .category-チナトロ目標-維持 { background-color: #fd7e14; } /* もしこのクラス名を使うなら */
-.always-open-item .category-上位狙い { background-color: #dc3545; }
+/* css/style.css (ファイルの最後に追加) */
+
+#alwaysOpenRecruitmentSection {
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 1px dashed #e0e0e0; /* 細い点線に変更 */
+}
+
+#alwaysOpenRecruitmentSection h2 {
+    font-size: 2em; /* タイトルを少し大きく */
+    color: #007bff;
+    margin-bottom: 30px; /* 下のマージンを増やす */
+    text-align: center;
+    font-weight: 600;
+}
+
+.always-open-item {
+    background-color: #ffffff; /* 白い背景 */
+    border: 1px solid #e9ecef; /* 薄いグレーのボーダー */
+    border-radius: 10px; /* 角丸を強化 */
+    padding: 25px; /* パディングを増やす */
+    margin-bottom: 20px; /* アイテム間のマージン */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08); /* 影を強化 */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    display: flex; /* ★flexboxでレイアウト制御★ */
+    flex-direction: column; /* 要素を縦に並べる */
+    gap: 10px; /* 要素間の隙間 */
+}
+
+.always-open-item:hover {
+    transform: translateY(-5px); /* ホバーで少し浮き上がる */
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12); /* 影をさらに強く */
+}
+
+.always-open-item h3 {
+    font-size: 1.5em; /* タイトルを大きく */
+    color: #343a40;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-weight: 700; /* より太く */
+    display: flex; /* h3内もflexでカテゴリとサークル名を並べる */
+    align-items: center;
+    flex-wrap: wrap; /* 必要に応じて折り返し */
+}
+
+.always-open-item h3 .always-open-category {
+    font-size: 0.85em; /* カテゴリバッジのフォントサイズ */
+    font-weight: 600;
+    padding: 5px 10px; /* パディング */
+    border-radius: 20px; /* 角丸を強くしてバッジらしく */
+    color: white;
+    margin-right: 12px; /* サークル名との間隔 */
+    min-width: 80px; /* カテゴリの最小幅 */
+    text-align: center;
+    display: inline-flex; /* flexboxで中央寄せ */
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* バッジに影 */
+}
+
+.always-open-item p {
+    font-size: 1.05em; /* 詳細情報のフォントサイズ */
+    color: #555;
+    margin-bottom: 8px; /* パラグラフ間のマージン */
+}
+
+.always-open-item .always-open-tweet-link {
+    margin-top: 15px; /* 上のマージンを増やす */
+    text-align: right; /* リンクを右寄せ */
+}
+
+.always-open-item .always-open-tweet-link a {
+    display: inline-block; /* ボタンのように見せるため */
+    background-color: #007bff; /* ★青色のボタン★ */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1em;
+    font-weight: 600;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.always-open-item .always-open-tweet-link a:hover {
+    background-color: #0056b3; /* ホバーで濃い青 */
+    transform: translateY(-2px); /* わずかに浮き上がる */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* 常時公募枠がない場合のメッセージ */
+#alwaysOpenRecruitmentList p:last-child[style*="text-align: center"] {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px dashed #e0e0e0;
+    border-radius: 8px;
+    background-color: #f0f0f0;
+    color: #6c757d;
+}
