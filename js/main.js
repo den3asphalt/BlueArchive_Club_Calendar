@@ -3,14 +3,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const alwaysOpenSection = document.getElementById('alwaysOpenRecruitmentSection');
     const alwaysOpenList = document.getElementById('alwaysOpenRecruitmentList');
 
-    // ★★★ モーダル表示ロジックを独立した関数として定義 ★★★
     function displayEventModal(eventData) {
         const modal = document.getElementById('eventModal');
         const modalTitle = document.getElementById('modalTitle');
         const modalCircleName = document.getElementById('modalCircleName');
         const modalCategory = document.getElementById('modalCategory');
         const modalDuration = document.getElementById('modalDuration');
-        const modalLocation = document.getElementById('modalLocation'); // index.htmlに要素がある前提
         const modalRelatedInfo = document.getElementById('modalRelatedInfo');
         const modalTweetEmbed = document.getElementById('modalTweetEmbed');
         const modalTweetLink = document.getElementById('modalTweetLink');
@@ -21,9 +19,11 @@ document.addEventListener('DOMContentLoaded', function() {
         modalTitle.textContent = eventData.title; // サークル名
         modalCircleName.textContent = props.circleName || '不明';
         modalCategory.textContent = props.category || '不明';
-        
-        // 期間の表示を整形
-        let durationText = '未設定';
+        modalRelatedInfo.innerHTML = props.relatedInfo ? marked.parse(props.relatedInfo) : 'なし'; // Markdownパース
+
+        // 期間の表示を整形し、未設定の場合は非表示にする
+        const durationParagraph = modalDuration.closest('p');
+        let durationText = '';
         if (eventData.start && eventData.end) {
             if (eventData.start.toDateString() !== eventData.end.toDateString()) {
                 durationText = `${eventData.start.toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })} - ${eventData.end.toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
@@ -39,27 +39,27 @@ document.addEventListener('DOMContentLoaded', function() {
                  durationText += ' (終日)';
             }
         }
-        modalDuration.textContent = durationText;
+        
+        if (durationText) { // 期間テキストがあれば表示
+            modalDuration.textContent = durationText;
+            durationParagraph.style.display = 'block';
+        } else { // なければ非表示
+            durationParagraph.style.display = 'none';
+        }
 
-        // 場所の条件表示 (もしindex.htmlに要素があり、DatoCMSにLocationフィールドを追加している場合)
-        if (modalLocation) { // 要素が存在するか確認
-            const locationParagraph = modalLocation.closest('p'); 
+        // 場所の表示 (index.htmlに要素があり、DatoCMSにLocationフィールドがある場合)
+        const modalLocationElement = document.getElementById('modalLocation'); 
+        if (modalLocationElement) {
+            const locationParagraph = modalLocationElement.closest('p'); 
             if (props.location) { 
-                modalLocation.textContent = props.location;
+                modalLocationElement.textContent = props.location;
                 locationParagraph.style.display = 'block';
             } else {
                 locationParagraph.style.display = 'none';
             }
         }
         
-        // 関連情報をMarkdownとしてパースして表示
-        if (props.relatedInfo) {
-            modalRelatedInfo.innerHTML = marked.parse(props.relatedInfo);
-        } else {
-            modalRelatedInfo.innerHTML = 'なし';
-        }
-
-        // ツイート埋め込みの処理 (変更なし)
+        // ツイート埋め込みの処理
         modalTweetEmbed.innerHTML = ''; 
         modalTweetLink.innerHTML = '';  
 
@@ -101,7 +101,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
-    // FullCalendarの初期化
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'ja',
@@ -136,8 +135,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 const data = await response.json();
                 
-                successCallback(data.calendarEvents); // FullCalendarにはカレンダーイベントのみを渡す
-                renderAlwaysOpenRecruitment(data.alwaysOpenRecruitment); // 常時公募枠を表示
+                successCallback(data.calendarEvents); 
+                renderAlwaysOpenRecruitment(data.alwaysOpenRecruitment);
 
             } catch (error) {
                 console.error("Error fetching events:", error);
@@ -157,16 +156,15 @@ document.addEventListener('DOMContentLoaded', function() {
             return safeCategory ? ['category-' + safeCategory] : [];
         },
 
-        // ★★★ FullCalendarのeventClickをdisplayEventModalに接続 ★★★
         eventClick: function(info) {
-            info.jsEvent.preventDefault(); // デフォルトのリンク遷移を防ぐ
-            displayEventModal(info.event); // 新しい関数を呼び出す
+            info.jsEvent.preventDefault();
+            displayEventModal(info.event);
         }
     });
 
-    calendar.render(); // カレンダーを描画
+    calendar.render();
 
-    // ★★★ 常時公募枠を表示する関数 (変更なし) ★★★
+    // 常時公募枠を表示する関数
     function renderAlwaysOpenRecruitment(recruitmentItems) {
         if (!alwaysOpenSection || !alwaysOpenList) {
             console.error("DEBUG: Always open section or list elements not found!");
@@ -182,31 +180,38 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         recruitmentItems.forEach(item => {
-            console.log("DEBUG: Rendering always open item:", item.title); // 追加
+            console.log("DEBUG: Rendering always open item:", item.title);
             const itemDiv = document.createElement('div');
             itemDiv.classList.add('always-open-item'); 
 
-            const categoryText = item.extendedProps.category ? `<span class="always-open-category category-${item.extendedProps.category.replace(/[^a-zA-Z0-9]/g, '-')}" style="margin-right: 8px;">${item.extendedProps.category}</span>` : ''; 
+            // ★★★ ここを変更：カテゴリバッジを削除し、サークル名のみにする ★★★
+            // カテゴリのクラスはitemDiv全体に付ける
+            const safeCategory = item.extendedProps.category ? item.extendedProps.category.replace(/[^a-zA-Z0-9]/g, '-') : '';
+            if (safeCategory) {
+                itemDiv.classList.add('category-' + safeCategory);
+            } else {
+                itemDiv.classList.add('category-不明'); // カテゴリがない場合のデフォルトクラス
+            }
+            
             const circleNameText = item.title || item.extendedProps.circleName || '不明なサークル';
-            const relatedInfoText = item.extendedProps.relatedInfo || '';
 
             itemDiv.innerHTML = `
-                <h3 class="always-open-title">${categoryText}${circleNameText}</h3>
+                <h3 class="always-open-title">${circleNameText}</h3>
             `;
             alwaysOpenList.appendChild(itemDiv);
-            console.log("DEBUG: Appended itemDiv for:", circleNameText); // 追加
+            console.log("DEBUG: Appended itemDiv for:", circleNameText);
 
 
-            // ★★★ 常時公募枠のクリックイベントもdisplayEventModalに接続 ★★★
+            // クリックでモーダル表示 (カレンダーイベントと同じロジックを再利用)
             itemDiv.addEventListener('click', () => {
-                displayEventModal(item); // 直接 item データを渡す
+                displayEventModal(item); 
             });
         });
         alwaysOpenSection.style.display = 'block'; 
-        console.log("DEBUG: Always open section set to display: block."); // 追加
+        console.log("DEBUG: Always open section set to display: block.");
     }
 
-    // モーダルを閉じるロジック (変更なし)
+    // モーダルを閉じるロジック
     const modal = document.getElementById('eventModal');
     const closeButton = document.querySelector('.close-button');
 
