@@ -10,31 +10,23 @@ exports.handler = async function(event, context) {
   }
 
   try {
-    // DatoCMSのAPIトークンを環境変数から取得
     const DATOCMS_API_TOKEN = process.env.DATOCMS_READONLY_API_TOKEN;
-
-    // DatoCMSのGraphQL APIエンドポイント
     const DATOCMS_API_URL = 'https://graphql.datocms.com/';
 
-    // GraphQLクエリを定義
-    // ここでDatoCMSから取得したいフィールドを指定します
-const query = `
-  query AllRecruitmentInfos {
-    allRecruitmentInfos {
-      id
-      club_name
-      start_date_time
-      end_date_time
-      category
-      tweet_url
-      related_info
-    }
-  }
-`;
+    const query = `
+      query AllRecruitmentInfos {
+        allRecruitmentInfos {
+          id
+          clubName
+          startDateTime
+          endDateTime
+          category
+          tweetUrl
+          relatedInfo
+        }
+      }
+    `;
 
-    console.log("DEBUG: GraphQL Query being sent:", query);
-
-    // DatoCMS GraphQL APIへのリクエスト
     const response = await fetch(DATOCMS_API_URL, {
       method: 'POST',
       headers: {
@@ -58,19 +50,19 @@ const query = `
 
     // DatoCMSのデータをFullCalendarが期待する形式に変換
     const formattedEventsForFullCalendar = datoEvents.map(item => {
-        // DatoCMSはIDを自動で提供するので、それを使用
         const id = item.id; 
 
         return {
             id: id,
-            title: item.club_name || "サークル名不明", // サークル名をカレンダーのタイトルとして使用
-            start: item.start_date_time, // DatoCMSからの日付時刻
-            end: item.end_date_time,     // DatoCMSからの日付時刻
+            // ★★★ ここも最終修正点！item.の後ろのプロパティ名を「キャメルケース」に修正します ★★★
+            title: item.clubName || "サークル名不明", // キャメルケース
+            start: item.startDateTime, // キャメルケース
+            end: item.endDateTime,     // キャメルケース
             extendedProps: { // 詳細情報はextendedPropsに格納
-                clubName: item.club_name,
+                circleName: item.clubName, // キャメルケース
                 category: item.category,
-                tweetUrl: item.tweet_url,
-                relatedInfo: item.related_info,
+                tweetUrl: item.tweetUrl,
+                relatedInfo: item.relatedInfo,
             }
         };
     });
@@ -97,8 +89,7 @@ const query = `
   }
 };
 
-// parseDescription関数はもう不要ですが、エラーにならないように残しておきます。
-// 記述が邪魔であれば削除しても構いません。
+// parseDescription関数は変更なし
 function parseDescription(description) {
     try {
         const jsonPartMatch = description.match(/\{[\s\S]*\}/s); 
