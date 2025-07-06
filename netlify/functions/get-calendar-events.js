@@ -22,7 +22,7 @@ const query = `
   query AllRecruitmentInfos {
     allRecruitmentInfos {
       id
-      circle_name
+      club_name
       start_date_time
       end_date_time
       category
@@ -61,14 +61,14 @@ const query = `
 
         return {
             id: id,
-            title: item.circleName || "サークル名不明", // サークル名をカレンダーのタイトルとして使用
-            start: item.startDateTime, // DatoCMSからの日付時刻
-            end: item.endDateTime,     // DatoCMSからの日付時刻
+            title: item.club_name || "サークル名不明", // サークル名をカレンダーのタイトルとして使用
+            start: item.start_date_time, // DatoCMSからの日付時刻
+            end: item.end_date_time,     // DatoCMSからの日付時刻
             extendedProps: { // 詳細情報はextendedPropsに格納
-                circleName: item.circleName,
+                clubName: item.club_name,
                 category: item.category,
-                tweetUrl: item.tweetUrl,
-                relatedInfo: item.relatedInfo,
+                tweetUrl: item.tweet_url,
+                relatedInfo: item.related_info,
             }
         };
     });
