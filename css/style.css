@@ -350,3 +350,81 @@ footer {
 }
 
 /* (以前の常時公募枠のスタイル定義も合わせて確認してください) */
+/* css/style.css (ファイルの最後に追加または既存を修正) */
+
+/* 常時公募枠のリストコンテナ */
+#alwaysOpenRecruitmentList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.always-open-item {
+    background-color: #ffffff; /* デフォルトの背景色は白 */
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin-bottom: 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;
+    width: calc(33.33% - 15px); /* 3列で並べる場合 */
+    min-width: 150px;
+    max-width: 200px;
+    text-align: center;
+    color: #343a40; /* テキストのデフォルト色 */
+}
+
+.always-open-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+
+.always-open-item h3 {
+    font-size: 1.2em; /* サークル名を見やすく */
+    color: inherit; /* 親要素のテキスト色を継承 */
+    margin-top: 0;
+    margin-bottom: 0;
+    font-weight: 700;
+    /* flexbox関連のスタイルは削除、h3は単独要素に */
+}
+
+/* ★★★ 常時公募枠の各項目（カード全体）の色分け ★★★ */
+.always-open-item.category-交流 {
+    background-color: #e6ffe6; /* 薄い緑 */
+    border-color: #a3e9a4;
+}
+.always-open-item.category-チナトロ目標 {
+    background-color: #fffbe6; /* 薄いオレンジ */
+    border-color: #ffd88a;
+}
+.always-open-item.category-チナトロ目標-維持 { /* もしこのクラス名を使うなら */
+    background-color: #fffbe6; /* 薄いオレンジ */
+    border-color: #ffd88a;
+}
+.always-open-item.category-上位狙い {
+    background-color: #ffe6e6; /* 薄い赤 */
+    border-color: #ffb3b3;
+}
+.always-open-item.category-不明 { /* カテゴリがない場合の色 */
+    background-color: #f0f0f0; /* 薄いグレー */
+    border-color: #e0e0e0;
+}
+
+/* 常時公募枠がない場合のメッセージ */
+#alwaysOpenRecruitmentList p:last-child[style*="text-align: center"] {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px dashed #e0e0e0;
+    border-radius: 8px;
+    background-color: #f0f0f0;
+    color: #6c757d;
+    width: 100%;
+}
