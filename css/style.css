@@ -212,3 +212,10 @@ footer {
     margin-top: 50px; 
     background-color: #007bff; /* ★フッターの背景色もメインカラーの青に★ */
 }
+
+
+/* 常時公募枠のカテゴリ色（jsで生成されるクラス名に合わせて追記） */
+.always-open-item .category-交流 { background-color: #28a745; }
+.always-open-item .category-チナトロ目標 { background-color: #fd7e14; }
+.always-open-item .category-チナトロ目標-維持 { background-color: #fd7e14; } /* もしこのクラス名を使うなら */
+.always-open-item .category-上位狙い { background-color: #dc3545; }
