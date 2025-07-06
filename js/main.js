@@ -3,6 +3,105 @@ document.addEventListener('DOMContentLoaded', function() {
     const alwaysOpenSection = document.getElementById('alwaysOpenRecruitmentSection');
     const alwaysOpenList = document.getElementById('alwaysOpenRecruitmentList');
 
+    // ★★★ モーダル表示ロジックを独立した関数として定義 ★★★
+    function displayEventModal(eventData) {
+        const modal = document.getElementById('eventModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalCircleName = document.getElementById('modalCircleName');
+        const modalCategory = document.getElementById('modalCategory');
+        const modalDuration = document.getElementById('modalDuration');
+        const modalLocation = document.getElementById('modalLocation'); // index.htmlに要素がある前提
+        const modalRelatedInfo = document.getElementById('modalRelatedInfo');
+        const modalTweetEmbed = document.getElementById('modalTweetEmbed');
+        const modalTweetLink = document.getElementById('modalTweetLink');
+        
+        const props = eventData.extendedProps;
+
+        // モーダル情報を設定
+        modalTitle.textContent = eventData.title; // サークル名
+        modalCircleName.textContent = props.circleName || '不明';
+        modalCategory.textContent = props.category || '不明';
+        
+        // 期間の表示を整形
+        let durationText = '未設定';
+        if (eventData.start && eventData.end) {
+            if (eventData.start.toDateString() !== eventData.end.toDateString()) {
+                durationText = `${eventData.start.toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })} - ${eventData.end.toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
+            } else { 
+                durationText = `${eventData.start.toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })} ${eventData.start.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+                if (eventData.end && eventData.start.getTime() !== eventData.end.getTime()) {
+                    durationText += ` - ${eventData.end.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+                }
+            }
+        } else if (eventData.start) {
+            durationText = eventData.start.toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+            if (eventData.allDay) {
+                 durationText += ' (終日)';
+            }
+        }
+        modalDuration.textContent = durationText;
+
+        // 場所の条件表示 (もしindex.htmlに要素があり、DatoCMSにLocationフィールドを追加している場合)
+        if (modalLocation) { // 要素が存在するか確認
+            const locationParagraph = modalLocation.closest('p'); 
+            if (props.location) { 
+                modalLocation.textContent = props.location;
+                locationParagraph.style.display = 'block';
+            } else {
+                locationParagraph.style.display = 'none';
+            }
+        }
+        
+        // 関連情報をMarkdownとしてパースして表示
+        if (props.relatedInfo) {
+            modalRelatedInfo.innerHTML = marked.parse(props.relatedInfo);
+        } else {
+            modalRelatedInfo.innerHTML = 'なし';
+        }
+
+        // ツイート埋め込みの処理 (変更なし)
+        modalTweetEmbed.innerHTML = ''; 
+        modalTweetLink.innerHTML = '';  
+
+        if (props.tweetUrl) {
+            const tweetIdMatch = props.tweetUrl.match(/\/status\/(\d+)/);
+            if (tweetIdMatch && window.twttr && window.twttr.widgets) {
+                const loadingMessageElement = document.createElement('p');
+                loadingMessageElement.style.textAlign = 'center';
+                loadingMessageElement.textContent = 'Twitterコンテンツを読み込み中...';
+                modalTweetEmbed.appendChild(loadingMessageElement); 
+
+                window.twttr.widgets.createTweet(
+                    tweetIdMatch[1], 
+                    modalTweetEmbed, 
+                    { theme: 'light', conversation: 'none', cards: 'hidden', width: '450' }
+                ).then(function (el) {
+                    if (loadingMessageElement && loadingMessageElement.parentNode) {
+                        loadingMessageElement.remove(); 
+                    }
+                    if (!el) { 
+                        modalTweetEmbed.innerHTML = '<p style="color:red; text-align: center;">指定されたツイートは存在しないか、非公開です。<br>または、ブラウザの拡張機能（広告ブロッカー等）によってコンテンツがブロックされている可能性があります。</p>';
+                    }
+                }).catch(function (error) {
+                    if (loadingMessageElement && loadingMessageElement.parentNode) {
+                        loadingMessageElement.remove();
+                    }
+                    console.error('Twitterコンテンツ埋め込みエラー:', error);
+                    modalTweetEmbed.innerHTML = '<p style="color:red; text-align: center;">Twitterコンテンツの読み込み中にエラーが発生しました。<br>ネットワーク接続やブラウザの拡張機能をご確認ください。</p>';
+                });
+            } else {
+                modalTweetLink.innerHTML = `<p>ツイートURL: <a href="${props.tweetUrl}" target="_blank">${props.tweetUrl}</a></p>`;
+            }
+        } else {
+            modalTweetEmbed.innerHTML = '<p style="text-align: center; color: #666;">公募ツイートのURLが提供されていません。</p>';
+        }
+
+        // モーダルを表示
+        modal.style.display = 'block';
+    }
+
+
+    // FullCalendarの初期化
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'ja',
@@ -36,13 +135,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-
-                console.log("DEBUG: Data received from Netlify Function:", data);
-                console.log("DEBUG: Type of data.calendarEvents:", typeof data.calendarEvents, data.calendarEvents);
-                console.log("DEBUG: Type of data.alwaysOpenRecruitment:", typeof data.alwaysOpenRecruitment, data.alwaysOpenRecruitment);
                 
-                successCallback(data.calendarEvents); 
-                renderAlwaysOpenRecruitment(data.alwaysOpenRecruitment);
+                successCallback(data.calendarEvents); // FullCalendarにはカレンダーイベントのみを渡す
+                renderAlwaysOpenRecruitment(data.alwaysOpenRecruitment); // 常時公募枠を表示
 
             } catch (error) {
                 console.error("Error fetching events:", error);
@@ -62,131 +157,32 @@ document.addEventListener('DOMContentLoaded', function() {
             return safeCategory ? ['category-' + safeCategory] : [];
         },
 
+        // ★★★ FullCalendarのeventClickをdisplayEventModalに接続 ★★★
         eventClick: function(info) {
-            info.jsEvent.preventDefault();
-
-            const event = info.event;
-            const props = event.extendedProps;
-
-            const modal = document.getElementById('eventModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalCircleName = document.getElementById('modalCircleName');
-            const modalCategory = document.getElementById('modalCategory');
-            const modalDuration = document.getElementById('modalDuration');
-            const modalRelatedInfo = document.getElementById('modalRelatedInfo'); // これが変更対象
-            const modalTweetEmbed = document.getElementById('modalTweetEmbed');
-            const modalTweetLink = document.getElementById('modalTweetLink');
-            
-            // モーダル情報を設定
-            modalTitle.textContent = event.title;
-            modalCircleName.textContent = props.circleName || '不明';
-            modalCategory.textContent = props.category || '不明';
-            
-            // ★★★ 関連情報をMarkdownとしてパースして表示 ★★★
-            if (props.relatedInfo) {
-                // Marked.jsを使ってMarkdownをHTMLに変換
-                modalRelatedInfo.innerHTML = marked.parse(props.relatedInfo);
-            } else {
-                modalRelatedInfo.innerHTML = 'なし';
-            }
-            
-            // 期間の表示を整形
-            let durationText = '未設定';
-            if (event.start && event.end) {
-                if (event.start.toDateString() !== event.end.toDateString()) {
-                    durationText = `${event.start.toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })} - ${event.end.toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
-                } else {
-                    durationText = `${event.start.toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })} ${event.start.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
-                    if (event.end && event.start.getTime() !== event.end.getTime()) {
-                        durationText += ` - ${event.end.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
-                    }
-                }
-            } else if (event.start) {
-                durationText = event.start.toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
-                if (event.allDay) {
-                     durationText += ' (終日)';
-                }
-            }
-            modalDuration.textContent = durationText;
-
-            // 場所の表示 (もしDatoCMSにLocationフィールドを追加していて、かつ表示したい場合)
-            const modalLocationElement = document.getElementById('modalLocation'); 
-            if (modalLocationElement) { // index.htmlに要素がある前提
-                const locationParagraph = modalLocationElement.closest('p'); 
-                if (props.location) { // locationデータが存在する場合
-                    modalLocationElement.textContent = props.location;
-                    locationParagraph.style.display = 'block';
-                } else {
-                    locationParagraph.style.display = 'none';
-                }
-            }
-            
-            // ツイート埋め込みの処理
-            modalTweetEmbed.innerHTML = ''; 
-            modalTweetLink.innerHTML = '';  
-
-            if (props.tweetUrl) {
-                const tweetIdMatch = props.tweetUrl.match(/\/status\/(\d+)/);
-                if (tweetIdMatch && window.twttr && window.twttr.widgets) {
-                    const loadingMessageElement = document.createElement('p');
-                    loadingMessageElement.style.textAlign = 'center';
-                    loadingMessageElement.textContent = 'Twitterコンテンツを読み込み中...';
-                    modalTweetEmbed.appendChild(loadingMessageElement); 
-
-                    window.twttr.widgets.createTweet(
-                        tweetIdMatch[1], 
-                        modalTweetEmbed, 
-                        { theme: 'light', conversation: 'none', cards: 'hidden', width: '450' }
-                    ).then(function (el) {
-                        if (loadingMessageElement && loadingMessageElement.parentNode) {
-                            loadingMessageElement.remove(); 
-                        }
-                        if (!el) { 
-                            modalTweetEmbed.innerHTML = '<p style="color:red; text-align: center;">指定されたツイートは存在しないか、非公開です。<br>または、ブラウザの拡張機能（広告ブロッカー等）によってコンテンツがブロックされている可能性があります。</p>';
-                        }
-                    }).catch(function (error) {
-                        if (loadingMessageElement && loadingMessageElement.parentNode) {
-                            loadingMessageElement.remove();
-                        }
-                        console.error('Twitterコンテンツ埋め込みエラー:', error);
-                        modalTweetEmbed.innerHTML = '<p style="color:red; text-align: center;">Twitterコンテンツの読み込み中にエラーが発生しました。<br>ネットワーク接続やブラウザの拡張機能をご確認ください。</p>';
-                    });
-                } else {
-                    modalTweetLink.innerHTML = `<p>ツイートURL: <a href="${props.tweetUrl}" target="_blank">${props.tweetUrl}</a></p>`;
-                }
-            } else {
-                modalTweetEmbed.innerHTML = '<p style="text-align: center; color: #666;">公募ツイートのURLが提供されていません。</p>';
-            }
-
-            modal.style.display = 'block';
+            info.jsEvent.preventDefault(); // デフォルトのリンク遷移を防ぐ
+            displayEventModal(info.event); // 新しい関数を呼び出す
         }
     });
 
-    calendar.render();
+    calendar.render(); // カレンダーを描画
 
+    // ★★★ 常時公募枠を表示する関数 (変更なし) ★★★
     function renderAlwaysOpenRecruitment(recruitmentItems) {
-        console.log("DEBUG: renderAlwaysOpenRecruitment function called with items:", recruitmentItems); // ★追加
-
-        const alwaysOpenSection = document.getElementById('alwaysOpenRecruitmentSection');
-        const alwaysOpenList = document.getElementById('alwaysOpenRecruitmentList');
-        
         if (!alwaysOpenSection || !alwaysOpenList) {
-            console.error("DEBUG: Always open section or list elements not found!"); // ★追加
-            return;
+            console.error("DEBUG: Always open section or list elements not found!");
+            return; 
         }
 
-        alwaysOpenList.innerHTML = ''; // リストをクリア
+        alwaysOpenList.innerHTML = ''; 
 
         if (recruitmentItems.length === 0) {
-            console.log("DEBUG: No always open items to display."); // ★追加
             alwaysOpenList.innerHTML = '<p style="text-align: center; color: #6c757d;">現在、常時公募枠はありません。</p>';
             alwaysOpenSection.style.display = 'block'; 
             return;
         }
 
         recruitmentItems.forEach(item => {
-            console.log("DEBUG: Rendering always open item:", item.title); // ★追加
-
+            console.log("DEBUG: Rendering always open item:", item.title); // 追加
             const itemDiv = document.createElement('div');
             itemDiv.classList.add('always-open-item'); 
 
@@ -200,26 +196,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 ${item.extendedProps.tweetUrl ? `<p class="always-open-tweet-link"><a href="${item.extendedProps.tweetUrl}" target="_blank">公募ツイートを見る</a></p>` : ''}
             `;
             alwaysOpenList.appendChild(itemDiv);
-            console.log("DEBUG: Appended itemDiv for:", circleNameText); // ★追加
+            console.log("DEBUG: Appended itemDiv for:", circleNameText); // 追加
 
 
-            // クリックでモーダル表示 (カレンダーイベントと同じロジックを再利用)
+            // ★★★ 常時公募枠のクリックイベントもdisplayEventModalに接続 ★★★
             itemDiv.addEventListener('click', () => {
-                calendar.options.eventClick({
-                    jsEvent: { preventDefault: () => {} }, 
-                    event: {
-                        id: item.id,
-                        title: item.title,
-                        start: item.start ? new Date(item.start) : null, 
-                        end: item.end ? new Date(item.end) : null,
-                        allDay: item.allDay,
-                        extendedProps: item.extendedProps,
-                    }
-                });
+                displayEventModal(item); // 直接 item データを渡す
             });
         });
-        alwaysOpenSection.style.display = 'block'; // セクションを表示
-        console.log("DEBUG: Always open section set to display: block."); // ★追加
+        alwaysOpenSection.style.display = 'block'; 
+        console.log("DEBUG: Always open section set to display: block."); // 追加
     }
 
     // モーダルを閉じるロジック (変更なし)
