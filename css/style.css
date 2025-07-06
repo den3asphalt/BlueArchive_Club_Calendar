@@ -365,3 +365,13 @@ footer {
     padding-top: 40px; /* ★上部パディングで区切り線からの間隔★ */
     border-top: 1px solid #e9ecef; /* ★ここが常時公募枠の上部の区切り線★ */
 }
+
+/* css/style.css (header-iconのスタイル部分を以下に置き換え) */
+
+.header-icon { /* アイコンのスタイル (imgタグにも適用) */
+    width: 36px; /* アイコンのサイズを少し大きく */
+    height: 36px;
+    /* color: white; ★imgタグにはcolorは適用されないので削除★ */
+    flex-shrink: 0;
+    object-fit: contain; /* 画像が歪まないように */
+}
