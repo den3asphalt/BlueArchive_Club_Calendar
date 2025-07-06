@@ -18,19 +18,19 @@ exports.handler = async function(event, context) {
 
     // GraphQLクエリを定義
     // ここでDatoCMSから取得したいフィールドを指定します
-    const query = `
-      query AllRecruitmentInfos {
-        allRecruitmentInfos {
-          id
-          circleName
-          startDateTime
-          endDateTime
-          category
-          tweetUrl
-          relatedInfo
-        }
-      }
-    `;
+const query = `
+  query AllRecruitmentInfos {
+    allRecruitmentInfos {
+      id
+      circle_name
+      start_date_time
+      end_date_time
+      category
+      tweet_url
+      related_info
+    }
+  }
+`;
 
     // DatoCMS GraphQL APIへのリクエスト
     const response = await fetch(DATOCMS_API_URL, {
