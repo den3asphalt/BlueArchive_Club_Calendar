@@ -2,170 +2,214 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-    background-color: #f0f2f5;
-    color: #333;
+    /* ★Google Fontsを適用★ */
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    background-color: #f8f9fa; /* 非常に明るいグレー */
+    color: #343a40; /* 濃いめのグレー */
     line-height: 1.6;
+    font-size: 16px;
 }
 
 header {
-    background-color: #4CAF50; /* 緑系の色 */
+    background-color: #6f42c1; /* 落ち着いた紫色 */
     color: white;
-    padding: 15px 0;
+    padding: 20px 0; /* 上下のパディングを増やす */
     text-align: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* より明確な影 */
 }
 
 h1 {
     margin: 0;
-    font-size: 2em;
+    font-size: 2.5em; /* フォントサイズを大きく */
+    font-weight: 600; /* 太めのフォント */
+    letter-spacing: 0.05em; /* 文字間隔を少し開ける */
 }
 
 main {
-    max-width: 900px;
-    margin: 30px auto;
-    padding: 20px;
+    max-width: 960px; /* メインコンテンツの幅を少し広げる */
+    margin: 40px auto; /* 上下のマージンを増やす */
+    padding: 30px; /* パディングを増やす */
     background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border-radius: 12px; /* 角丸を大きく */
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1); /* より柔らかく深い影 */
 }
 
-#calendar {
-    /* FullCalendarのコンテナに対するスタイル調整 */
-}
-
-/* FullCalendarのデフォルトスタイルを上書きする場合の例 */
+/* FullCalendarのカスタムスタイル */
 .fc .fc-toolbar-title {
-    font-size: 1.8em;
-    color: #333;
+    font-size: 2em; /* カレンダータイトルのフォントサイズを大きく */
+    font-weight: 600;
+    color: #495057; /* 濃いめの色 */
 }
 
 .fc .fc-button-primary {
-    background-color: #007bff;
-    border-color: #007bff;
+    background-color: #6f42c1; /* 紫色 */
+    border-color: #6f42c1;
+    color: white;
+    padding: 8px 15px; /* ボタンのパディング */
+    border-radius: 6px; /* ボタンの角丸 */
+    font-weight: 400;
+    transition: background-color 0.2s ease; /* ホバーアニメーション */
 }
 
 .fc .fc-button-primary:hover {
-    background-color: #0056b3;
-    border-color: #0056b3;
+    background-color: #5a34a8; /* ホバー時の色 */
+    border-color: #5a34a8;
 }
 
 /* イベントの基本スタイル */
 .fc-event {
-    border-radius: 3px;
-    font-size: 0.85em;
-    padding: 1px 3px;
-    color: white; /* テキスト色を白に */
-    border: none; /* デフォルトのボーダーを削除 */
+    border-radius: 4px; /* 角丸を少し大きく */
+    font-size: 0.9em;
+    padding: 3px 5px; /* パディングを増やす */
+    color: white; 
+    border: none; 
+    font-weight: 500;
+    margin-bottom: 2px; /* イベント間の余白 */
+    overflow: hidden; /* タイトルが長い場合は隠す */
+    text-overflow: ellipsis; /* 省略記号 */
+    white-space: nowrap; /* 折り返しなし */
+    transition: transform 0.1s ease-in-out; /* ホバーアニメーション */
 }
 
-/* ★カテゴリに応じたイベントの色分け★ */
+.fc-event:hover {
+    transform: translateY(-2px); /* ホバーで少し浮き上がる */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* カテゴリに応じたイベントの色分け */
 .fc-event.category-交流 {
     background-color: #28a745; /* 緑 */
 }
 
 .fc-event.category-チナトロ目標 {
-    background-color: #ffc107; /* 黄色 */
-    color: #333; /* 文字色を黒に */
+    background-color: #fd7e14; /* オレンジ */
 }
 
 .fc-event.category-上位狙い {
     background-color: #dc3545; /* 赤 */
 }
 
-/* 未分類の場合のデフォルト色 */
 .fc-event.category-不明,
 .fc-event:not([class*="category-"]) {
     background-color: #6c757d; /* グレー */
 }
 
-
-/* レスポンシブ対応の例 */
-@media (max-width: 768px) {
-    h1 {
-        font-size: 1.5em;
-    }
-    main {
-        margin: 15px;
-        padding: 15px;
-    }
-    .fc .fc-toolbar-title {
-        font-size: 1.2em;
-    }
+/* カレンダーグリッドの日付ヘッダー */
+.fc .fc-col-header-cell-cushion {
+    padding: 8px;
+    font-weight: 600;
+    color: #495057;
 }
 
-footer {
-    text-align: center;
-    padding: 20px;
-    color: #666;
-    font-size: 0.9em;
-    margin-top: 40px;
+/* カレンダーのセル内の日付 */
+.fc-daygrid-day-number {
+    padding: 5px;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #495057;
 }
 
-/* ★モーダルウィンドウのスタイル★ */
+/* モーダルウィンドウのスタイル */
 .modal {
-    display: none; /* 初期状態では非表示 */
-    position: fixed; /* 画面に固定 */
-    z-index: 1; /* 最前面に表示 */
+    display: none; 
+    position: fixed; 
+    z-index: 1000; /* z-indexを高く */
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto; /* コンテンツがはみ出したらスクロール */
-    background-color: rgba(0,0,0,0.4); /* 半透明の黒い背景 */
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.6); /* より濃い半透明背景 */
+    backdrop-filter: blur(5px); /* 背景をぼかす（対応ブラウザのみ） */
 }
 
 .modal-content {
     background-color: #fefefe;
-    margin: 10% auto; /* 画面中央に配置 */
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%; /* 幅を調整 */
-    max-width: 500px; /* 最大幅 */
-    border-radius: 10px;
+    margin: 8vh auto; /* 画面上部からのマージンを調整 */
+    padding: 30px; /* パディングを増やす */
+    border: none; /* ボーダーなし */
+    width: 90%; 
+    max-width: 550px; /* 最大幅を少し広げる */
+    border-radius: 15px; /* 角丸を大きく */
     position: relative;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3); /* より深い影 */
+    animation: fadeIn 0.3s ease-out; /* フェードインアニメーション */
+}
+
+/* モーダル表示時のアニメーション */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .close-button {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
+    color: #888;
+    position: absolute; /* 絶対配置 */
+    top: 15px;
+    right: 15px;
+    font-size: 32px; /* 大きく */
+    font-weight: normal; /* 太さを通常に */
     cursor: pointer;
+    transition: color 0.2s ease;
 }
 
 .close-button:hover,
 .close-button:focus {
-    color: black;
-    text-decoration: none;
+    color: #333;
 }
 
 .modal-content h2 {
     margin-top: 0;
-    color: #4CAF50;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
+    color: #6f42c1; /* 紫色 */
+    border-bottom: 2px solid #e9ecef; /* 細い区切り線 */
+    padding-bottom: 15px;
     margin-bottom: 20px;
+    font-size: 1.8em;
+    font-weight: 600;
 }
 
 .modal-content p {
-    margin-bottom: 10px;
+    margin-bottom: 12px; /* 行間の余白を調整 */
+    font-size: 1.05em;
 }
 
 .modal-content strong {
-    color: #555;
+    color: #495057;
+    display: inline-block; /* ラベルと値の整列のため */
+    min-width: 80px; /* ラベルの幅を揃える（任意） */
 }
 
 .tweet-embed-container {
-    margin-top: 20px;
-    border-top: 1px dashed #eee;
-    padding-top: 20px;
-    text-align: center; /* 埋め込みツイートを中央寄せ */
+    margin-top: 25px;
+    border-top: 1px solid #e9ecef; /* 実線に変更 */
+    padding-top: 25px;
+    text-align: center;
 }
 
 /* 埋め込みツイートの表示調整 (必要に応じて) */
 .twitter-tweet {
     margin-left: auto !important;
     margin-right: auto !important;
+    max-width: 100% !important; /* 親要素からはみ出さないように */
+    height: auto !important;
+}
+
+.tweet-embed-container p {
+    font-size: 0.9em;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+/* ツイート埋め込みエラーメッセージ */
+.tweet-embed-container p[style*="color:red"] {
+    font-weight: 600;
+}
+
+footer {
+    text-align: center;
+    padding: 25px; /* パディングを増やす */
+    color: #6c757d;
+    font-size: 0.9em;
+    margin-top: 50px; /* 上のマージンを増やす */
+    background-color: #e9ecef; /* フッターの背景色 */
 }
