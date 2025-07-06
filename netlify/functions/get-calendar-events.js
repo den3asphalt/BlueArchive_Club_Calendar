@@ -24,7 +24,7 @@ exports.handler = async function(event, context) {
           category
           tweetUrl
           relatedInfo
-          recruitmentType  // ★このフィールドがDatoCMSモデルにあることを確認★
+          recruitmentType
         }
       }
     `;
