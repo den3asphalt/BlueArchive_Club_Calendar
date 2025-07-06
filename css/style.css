@@ -10,22 +10,21 @@ body {
 }
 
 header {
-    background-color: #007bff; /* ★メインカラーを鮮やかな青に★ */
+    background-color: #007bff; /* メインカラーを鮮やかな青に */
     color: white;
-    padding: 20px 40px; /* ★左右にパディングを追加し、コンテンツの余白を確保★ */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* 影はそのまま */
-    display: flex; /* ★flexboxを使って子要素を制御★ */
-    align-items: center; /* ★垂直方向の中央揃え★ */
-    justify-content: flex-start; /* ★要素を左寄せ★ */
+    padding: 20px 40px; /* 左右にパディングを追加し、コンテンツの余白を確保 */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    display: flex; /* flexboxを使って子要素を制御 */
+    align-items: center; /* 垂直方向の中央揃え */
+    justify-content: flex-start; /* 要素を左寄せ */
 }
 
 h1 {
-    margin: 0; /* デフォルトマージンを削除 */
+    margin: 0;
     font-size: 2.5em; 
     font-weight: 600; 
     letter-spacing: 0.05em; 
-    /* text-align: center; はheaderのflexboxで上書きされる */
-    color: white; /* ヘッダーのh1は白のまま */
+    color: white;
 }
 
 main {
@@ -41,11 +40,11 @@ main {
 .fc .fc-toolbar-title {
     font-size: 2em; 
     font-weight: 600;
-    color: #007bff; /* ★カレンダータイトルもメインカラーの青に★ */
+    color: #007bff; 
 }
 
 .fc .fc-button-primary {
-    background-color: #007bff; /* ★ボタンの背景色も青に★ */
+    background-color: #007bff; 
     border-color: #007bff;
     color: white;
     padding: 8px 15px; 
@@ -55,7 +54,7 @@ main {
 }
 
 .fc .fc-button-primary:hover {
-    background-color: #0056b3; /* ★ホバー時は少し濃い青に★ */
+    background-color: #0056b3; 
     border-color: #0056b3;
 }
 
@@ -79,23 +78,11 @@ main {
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* ★カテゴリに応じたイベントの色分け（変更なし、青基調に合うか確認）★ */
-.fc-event.category-交流 {
-    background-color: #28a745; /* 緑系 */
-}
+/* カレンダーイベントのカテゴリ色 */
+.fc-event.category-交流 { background-color: #28a745; }
+.fc-event.category-チナトロ目標 { background-color: #fd7e14; }
+.fc-event.category-上位狙い { background-color: #dc3545; }
 
-.fc-event.category-チナトロ目標 {
-    background-color: #fd7e14; /* オレンジ系 */
-}
-
-.fc-event.category-上位狙い {
-    background-color: #dc3545; /* 赤系 */
-}
-
-.fc-event.category-不明,
-.fc-event:not([class*="category-"]) {
-    background-color: #6c757d; /* グレー系 */
-}
 
 /* カレンダーグリッドの日付ヘッダー */
 .fc .fc-col-header-cell-cushion {
@@ -161,7 +148,7 @@ main {
 
 .modal-content h2 {
     margin-top: 0;
-    color: #007bff; /* ★モーダルのタイトルもメインカラーの青に★ */
+    color: #007bff; 
     border-bottom: 2px solid #e9ecef; 
     padding-bottom: 15px;
     margin-bottom: 20px;
@@ -207,178 +194,56 @@ main {
 footer {
     text-align: center;
     padding: 25px; 
-    color: white; /* ★フッターのテキストを白に★ */
+    color: white; 
     font-size: 0.9em;
     margin-top: 50px; 
-    background-color: #007bff; /* ★フッターの背景色もメインカラーの青に★ */
+    background-color: #007bff; 
 }
 
 
-/* css/style.css (ファイルの最後に追加) */
-
+/* 常時公募枠セクションのスタイル */
 #alwaysOpenRecruitmentSection {
     margin-top: 50px;
     padding-top: 30px;
-    border-top: 1px dashed #e0e0e0; /* 細い点線に変更 */
+    border-top: 1px dashed #e0e0e0;
 }
 
 #alwaysOpenRecruitmentSection h2 {
-    font-size: 2em; /* タイトルを少し大きく */
+    font-size: 2em; 
     color: #007bff;
-    margin-bottom: 30px; /* 下のマージンを増やす */
+    margin-bottom: 30px; 
     text-align: center;
     font-weight: 600;
 }
-
-.always-open-item {
-    background-color: #ffffff; /* 白い背景 */
-    border: 1px solid #e9ecef; /* 薄いグレーのボーダー */
-    border-radius: 10px; /* 角丸を強化 */
-    padding: 25px; /* パディングを増やす */
-    margin-bottom: 20px; /* アイテム間のマージン */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08); /* 影を強化 */
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    cursor: pointer;
-    display: flex; /* ★flexboxでレイアウト制御★ */
-    flex-direction: column; /* 要素を縦に並べる */
-    gap: 10px; /* 要素間の隙間 */
-}
-
-.always-open-item:hover {
-    transform: translateY(-5px); /* ホバーで少し浮き上がる */
-    box-shadow: 0 6px 20px rgba(0,0,0,0.12); /* 影をさらに強く */
-}
-
-.always-open-item h3 {
-    font-size: 1.5em; /* タイトルを大きく */
-    color: #343a40;
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-weight: 700; /* より太く */
-    display: flex; /* h3内もflexでカテゴリとサークル名を並べる */
-    align-items: center;
-    flex-wrap: wrap; /* 必要に応じて折り返し */
-}
-
-.always-open-item h3 .always-open-category {
-    font-size: 0.85em; /* カテゴリバッジのフォントサイズ */
-    font-weight: 600;
-    padding: 5px 10px; /* パディング */
-    border-radius: 20px; /* 角丸を強くしてバッジらしく */
-    color: white;
-    margin-right: 12px; /* サークル名との間隔 */
-    min-width: 80px; /* カテゴリの最小幅 */
-    text-align: center;
-    display: inline-flex; /* flexboxで中央寄せ */
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* バッジに影 */
-}
-
-.always-open-item p {
-    font-size: 1.05em; /* 詳細情報のフォントサイズ */
-    color: #555;
-    margin-bottom: 8px; /* パラグラフ間のマージン */
-}
-
-.always-open-item .always-open-tweet-link {
-    margin-top: 15px; /* 上のマージンを増やす */
-    text-align: right; /* リンクを右寄せ */
-}
-
-.always-open-item .always-open-tweet-link a {
-    display: inline-block; /* ボタンのように見せるため */
-    background-color: #007bff; /* ★青色のボタン★ */
-    color: white;
-    padding: 10px 20px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 1em;
-    font-weight: 600;
-    transition: background-color 0.2s ease, transform 0.2s ease;
-}
-
-.always-open-item .always-open-tweet-link a:hover {
-    background-color: #0056b3; /* ホバーで濃い青 */
-    transform: translateY(-2px); /* わずかに浮き上がる */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
-/* 常時公募枠がない場合のメッセージ */
-#alwaysOpenRecruitmentList p:last-child[style*="text-align: center"] {
-    margin-top: 20px;
-    padding: 20px;
-    border: 1px dashed #e0e0e0;
-    border-radius: 8px;
-    background-color: #f0f0f0;
-    color: #6c757d;
-}
-
-
-/* css/style.css (カテゴリ色の定義セクションに追記) */
-
-/* カレンダーイベントのカテゴリ色 (既存の定義) */
-.fc-event.category-交流 { background-color: #28a745; }
-.fc-event.category-チナトロ目標 { background-color: #fd7e14; }
-.fc-event.category-上位狙い { background-color: #dc3545; }
-/* .fc-event.category-不明 { background-color: #6c757d; } (不明カテゴリを削除済みなら不要) */
-
-
-/* ★★★ 常時公募枠のカテゴリ色を追加 ★★★ */
-/* always-open-item 内の category-クラスを持つ span に色を適用 */
-.always-open-item h3 .always-open-category.category-交流 {
-    background-color: #28a745; /* 緑系 */
-}
-
-.always-open-item h3 .always-open-category.category-チナトロ目標 {
-    background-color: #fd7e14; /* オレンジ系 */
-}
-
-.always-open-item h3 .always-open-category.category-上位狙い {
-    background-color: #dc3545; /* 赤系 */
-}
-
-/* もし「チナトロ目標・維持」のような特殊なカテゴリ名がある場合も追加 */
-/* jsで安全なクラス名に変換されるので、それに合わせて定義します */
-.always-open-item h3 .always-open-category.category-チナトロ目標-維持 {
-    background-color: #fd7e14; /* チナトロ目標と同じ色 */
-}
-
-/* ★カテゴリが設定されていない場合の常時公募枠の色（以前の「不明」の代替）★ */
-.always-open-item h3 .always-open-category.category-不明 { /* (jsでsafeCategoryが空の場合に'不明'になるか、空文字列になるかで調整) */
-    background-color: #6c757d; /* グレー系 */
-}
-
-/* (以前の常時公募枠のスタイル定義も合わせて確認してください) */
-/* css/style.css (ファイルの最後に追加または既存を修正) */
 
 /* 常時公募枠のリストコンテナ */
 #alwaysOpenRecruitmentList {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 15px; /* 項目間の隙間 */
     justify-content: center;
     margin-top: 20px;
 }
 
+/* 常時公募枠の各項目（カード） */
 .always-open-item {
     background-color: #ffffff; /* デフォルトの背景色は白 */
     border: 1px solid #e9ecef;
     border-radius: 10px;
-    padding: 15px 20px;
+    padding: 15px 20px; /* パディングを小さくしてコンパクトに */
     margin-bottom: 0;
     box-shadow: 0 4px 15px rgba(0,0,0,0.08);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
     display: flex;
-    flex-direction: column;
-    gap: 5px;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column; /* 要素を縦に並べる */
+    gap: 5px; /* 要素間の隙間を小さく */
+    align-items: center; /* 垂直方向の中央揃え */
+    justify-content: center; /* 水平方向の中央揃え */
     width: calc(33.33% - 15px); /* 3列で並べる場合 */
     min-width: 150px;
     max-width: 200px;
-    text-align: center;
+    text-align: center; /* テキストを中央寄せ */
     color: #343a40; /* テキストのデフォルト色 */
 }
 
@@ -393,10 +258,10 @@ footer {
     margin-top: 0;
     margin-bottom: 0;
     font-weight: 700;
-    /* flexbox関連のスタイルは削除、h3は単独要素に */
+    /* ここにカテゴリバッジのスタイルは直接含まれません、カード全体に色がつくため */
 }
 
-/* ★★★ 常時公募枠の各項目（カード全体）の色分け ★★★ */
+/* 常時公募枠の各項目（カード全体）の色分け */
 .always-open-item.category-交流 {
     background-color: #e6ffe6; /* 薄い緑 */
     border-color: #a3e9a4;
