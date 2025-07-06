@@ -3,14 +3,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ブルアカ サークル 公募カレンダー</title>
+    <title>公募カレンダー</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Noto+Sans+JP:wght@300;400;600&display=swap" rel="stylesheet">
     
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' rel='stylesheet' />
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
     <link href='./css/style.css' rel='stylesheet' />
 </head>
@@ -21,6 +20,17 @@
 
     <main>
         <div id='calendar'></div>
+
+        <section id="categoryLegendSection">
+            <h2>カテゴリ色分け凡例</h2>
+            <div class="legend-items">
+                <div class="legend-item"><span class="legend-color category-交流"></span> 交流</div>
+                <div class="legend-item"><span class="legend-color category-チナトロ目標-維持"></span> チナトロ目標・維持</div>
+                <div class="legend-item"><span class="legend-color category-上位狙い"></span> 上位狙い</div>
+                <div class="legend-item"><span class="legend-color category-特殊"></span> 特殊</div>
+            </div>
+        </section>
+
         <section id="alwaysOpenRecruitmentSection" style="display: none;">
             <h2>常時公募枠</h2>
             <div id="alwaysOpenRecruitmentList">
@@ -30,7 +40,7 @@
     </main>
 
     <footer>
-        <p>&copy; 2025 ブルアカサークル公募カレンダー</p>
+        <p>&copy; 2025 BlueArchive Club 公募カレンダー</p>
     </footer>
 
     <div id="eventModal" class="modal">
@@ -42,12 +52,15 @@
             <p><strong>期間:</strong> <span id="modalDuration"></span></p>
             <p><strong>関連情報:</strong> <span id="modalRelatedInfo"></span></p>
             <div id="modalTweetEmbed" class="tweet-embed-container"></div>
-            <p id="modalTweetLink"></p> </div>
+            <p id="modalTweetLink"></p>
+        </div>
     </div>
 
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
     
     <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <script src='./js/main.js'></script>
 </body>
