@@ -58,7 +58,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         eventClassNames: function(arg) {
             const category = arg.event.extendedProps.category;
-            return category ? ['category-' + category.replace(/\s/g, '-')] : ['category-不明'];
+            const safeCategory = category ? category.replace(/[^a-zA-Z0-9]/g, '-') : ''; 
+            return safeCategory ? ['category-' + safeCategory] : [];
         },
 
         eventClick: function(info) {
