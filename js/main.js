@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
         modalCategory.textContent = props.category || '不明';
         modalRelatedInfo.innerHTML = props.relatedInfo ? marked.parse(props.relatedInfo) : 'なし';
         
-        let durationText = '未設定';
+        let durationText = '';
         if (eventData.start && eventData.end) {
             if (eventData.start.toDateString() !== eventData.end.toDateString()) {
                 durationText = `${eventData.start.toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })} - ${eventData.end.toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const modalLocationElement = document.getElementById('modalLocation'); 
-        if (modalLocationElement) { // index.htmlに要素がある前提
+        if (modalLocationElement) {
             const locationParagraph = modalLocationElement.closest('p'); 
             if (props.location) { 
                 modalLocationElement.textContent = props.location;
@@ -147,7 +147,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         eventClassNames: function(arg) {
             const category = arg.event.extendedProps.category;
-            const safeCategory = category ? category.replace(/[^a-zA-Z0-9]/g, '-') : ''; 
+            // ★★★ ここを修正！日本語文字を許可する正規表現に変更 ★★★
+            // \p{L} はあらゆる言語の文字、\p{N} はあらゆる数字にマッチします。uフラグが必須です。
+            const safeCategory = category ? category.replace(/[^\p{L}\p{N}_-]/gu, '-') : ''; 
             return safeCategory ? ['category-' + safeCategory] : [];
         },
 
@@ -179,10 +181,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const itemDiv = document.createElement('div');
             itemDiv.classList.add('always-open-item'); 
 
-            // ★★★ ここを修正：カテゴリバッジとその他の詳細を削除し、サークル名のみのh3にする ★★★
-            const safeCategory = item.extendedProps.category ? item.extendedProps.category.replace(/[^a-zA-Z0-9]/g, '-') : '';
+            // カテゴリのクラスをカード全体に付与 (日本語対応)
+            const safeCategory = item.extendedProps.category ? item.extendedProps.category.replace(/[^\p{L}\p{N}_-]/gu, '-') : ''; 
             if (safeCategory) {
-                itemDiv.classList.add('category-' + safeCategory); // カード全体にカテゴリクラスを付与
+                itemDiv.classList.add('category-' + safeCategory); 
             } else {
                 itemDiv.classList.add('category-不明'); // カテゴリがない場合のデフォルトクラス
             }
@@ -191,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             itemDiv.innerHTML = `
                 <h3 class="always-open-title">${circleNameText}</h3>
-            `; // h3タグのみでサークル名を表示
+            `; 
 
             alwaysOpenList.appendChild(itemDiv);
             console.log("DEBUG: Appended itemDiv for:", circleNameText, " with class:", itemDiv.className);
