@@ -1,5 +1,10 @@
 // netlify/functions/get-calendar-events.js
 
+// ★★★ この行を変更します ★★★
+// ファイルシステムモジュール（fs）やパスモジュール（path）は不要になりますが、
+// 以下のようにJSONファイルを直接 require します。
+const recruitmentData = require('./recruitment_info.json'); 
+
 exports.handler = async function(event, context) {
   if (event.httpMethod !== 'GET') {
     return {
@@ -10,34 +15,37 @@ exports.handler = async function(event, context) {
   }
 
   try {
-    const fs = require('fs/promises');
-    const path = require('path');
 
-    // ★この行を修正します★
-    // 同じフォルダ内にある recruitment_info.json を直接参照
-    const filePath = path.resolve(__dirname, 'recruitment_info.json'); 
+    // ... (ID生成ロジックはそのまま) ...
+    const formattedEventsForFullCalendar = recruitmentData.map((item, index) => {
+        // ID生成ロジック（変更なし）
+        const generatedId = item.id || `generated-${(item.extendedProps?.circleName || item.title || 'untitled').replace(/\s/g, '-')}-${(item.start || 'no-start').replace(/[^a-zA-Z0-9]/g, '')}-${index}`;
 
-    const rawData = await fs.readFile(filePath, 'utf8');
-    const recruitmentData = JSON.parse(rawData);
-
-    // recruitment_info.json がFullCalendarが期待する形式（id, title, start, endなど）で書かれていることを前提とします。
-    // そのため、ここでは特別な変換は行わず、そのまま返します。
+        return {
+            id: generatedId,
+            title: item.extendedProps?.circleName || item.title || "サークル名不明", 
+            start: item.start,
+            end: item.end,
+            description: item.description, 
+            location: item.location,
+            extendedProps: item.extendedProps 
+        };
+    });
 
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
-        // あなたのサイトのURLに合わせる（例: https://bluearchive-club-calendar.netlify.app）
         'Access-Control-Allow-Origin': 'https://bluearchive-club-calendar.netlify.app' 
       },
-      body: JSON.stringify(recruitmentData) // JSONファイルから読み込んだデータをそのまま返す
+      body: JSON.stringify(formattedEventsForFullCalendar)
     };
 
   } catch (error) {
-    console.error("Error fetching recruitment info from JSON file:", error);
+    console.error("Error fetching recruitment info from JSON file:", error); // エラーメッセージは変わる
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message || "Failed to load recruitment info." }),
+      body: JSON.stringify({ error: error.message || "Failed to load events." }),
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': 'https://bluearchive-club-calendar.netlify.app'
@@ -46,17 +54,5 @@ exports.handler = async function(event, context) {
   }
 };
 
-// parseDescription関数は、もしdescription内にJSON形式のデータを含める場合に必要です。
-// 今回のrecruitment_info.jsonの例では、extendedPropsに直接情報を入れているため、
-// descriptionをJSONパースする必要がなければ、この関数は削除しても構いません。
-function parseDescription(description) {
-    try {
-        const jsonPartMatch = description.match(/\{[\s\S]*\}/s); 
-        if (jsonPartMatch) {
-            return JSON.parse(jsonPartMatch[0]);
-        }
-    } catch (e) {
-        console.warn("Failed to parse description as JSON:", e);
-    }
-    return {}; 
-}
+// parseDescription関数はそのまま
+function parseDescription(description) { /* ... */ return {}; }
