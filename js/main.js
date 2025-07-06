@@ -15,15 +15,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const props = eventData.extendedProps;
 
-        // モーダル情報を設定
-        modalTitle.textContent = eventData.title; // サークル名
+        modalTitle.textContent = eventData.title;
         modalCircleName.textContent = props.circleName || '不明';
         modalCategory.textContent = props.category || '不明';
-        modalRelatedInfo.innerHTML = props.relatedInfo ? marked.parse(props.relatedInfo) : 'なし'; // Markdownパース
-
-        // 期間の表示を整形し、未設定の場合は非表示にする
-        const durationParagraph = modalDuration.closest('p');
-        let durationText = '';
+        modalRelatedInfo.innerHTML = props.relatedInfo ? marked.parse(props.relatedInfo) : 'なし';
+        
+        let durationText = '未設定';
         if (eventData.start && eventData.end) {
             if (eventData.start.toDateString() !== eventData.end.toDateString()) {
                 durationText = `${eventData.start.toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })} - ${eventData.end.toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
@@ -40,16 +37,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        if (durationText) { // 期間テキストがあれば表示
+        const durationParagraph = modalDuration.closest('p');
+        if (durationText && durationText !== '未設定') {
             modalDuration.textContent = durationText;
             durationParagraph.style.display = 'block';
-        } else { // なければ非表示
+        } else {
             durationParagraph.style.display = 'none';
         }
 
-        // 場所の表示 (index.htmlに要素があり、DatoCMSにLocationフィールドがある場合)
         const modalLocationElement = document.getElementById('modalLocation'); 
-        if (modalLocationElement) {
+        if (modalLocationElement) { // index.htmlに要素がある前提
             const locationParagraph = modalLocationElement.closest('p'); 
             if (props.location) { 
                 modalLocationElement.textContent = props.location;
@@ -59,7 +56,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // ツイート埋め込みの処理
         modalTweetEmbed.innerHTML = ''; 
         modalTweetLink.innerHTML = '';  
 
@@ -96,7 +92,6 @@ document.addEventListener('DOMContentLoaded', function() {
             modalTweetEmbed.innerHTML = '<p style="text-align: center; color: #666;">公募ツイートのURLが提供されていません。</p>';
         }
 
-        // モーダルを表示
         modal.style.display = 'block';
     }
 
@@ -184,11 +179,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const itemDiv = document.createElement('div');
             itemDiv.classList.add('always-open-item'); 
 
-            // ★★★ ここを変更：カテゴリバッジを削除し、サークル名のみにする ★★★
-            // カテゴリのクラスはitemDiv全体に付ける
+            // ★★★ ここを修正：カテゴリバッジとその他の詳細を削除し、サークル名のみのh3にする ★★★
             const safeCategory = item.extendedProps.category ? item.extendedProps.category.replace(/[^a-zA-Z0-9]/g, '-') : '';
             if (safeCategory) {
-                itemDiv.classList.add('category-' + safeCategory);
+                itemDiv.classList.add('category-' + safeCategory); // カード全体にカテゴリクラスを付与
             } else {
                 itemDiv.classList.add('category-不明'); // カテゴリがない場合のデフォルトクラス
             }
@@ -197,12 +191,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             itemDiv.innerHTML = `
                 <h3 class="always-open-title">${circleNameText}</h3>
-            `;
+            `; // h3タグのみでサークル名を表示
+
             alwaysOpenList.appendChild(itemDiv);
-            console.log("DEBUG: Appended itemDiv for:", circleNameText);
+            console.log("DEBUG: Appended itemDiv for:", circleNameText, " with class:", itemDiv.className);
 
 
-            // クリックでモーダル表示 (カレンダーイベントと同じロジックを再利用)
             itemDiv.addEventListener('click', () => {
                 displayEventModal(item); 
             });
