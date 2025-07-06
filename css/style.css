@@ -293,3 +293,10 @@ footer {
     color: #6c757d;
     width: 100%;
 }
+
+/* css/style.css (常時公募枠のカテゴリ色分け定義に追加) */
+
+.always-open-item.category-特殊 {
+   background-color: #e0f2f7; /* 薄い水色系の色 */
+   border-color: #81d4fa;
+}
