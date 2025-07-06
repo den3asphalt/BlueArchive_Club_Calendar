@@ -36,6 +36,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
+
+                console.log("DEBUG: Data received from Netlify Function:", data);
+                console.log("DEBUG: Type of data.calendarEvents:", typeof data.calendarEvents, data.calendarEvents);
+                console.log("DEBUG: Type of data.alwaysOpenRecruitment:", typeof data.alwaysOpenRecruitment, data.alwaysOpenRecruitment);
                 
                 successCallback(data.calendarEvents); 
                 renderAlwaysOpenRecruitment(data.alwaysOpenRecruitment);
