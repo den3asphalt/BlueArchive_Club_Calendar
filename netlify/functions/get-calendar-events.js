@@ -32,6 +32,8 @@ const query = `
   }
 `;
 
+    console.log("DEBUG: GraphQL Query being sent:", query);
+
     // DatoCMS GraphQL APIへのリクエスト
     const response = await fetch(DATOCMS_API_URL, {
       method: 'POST',
