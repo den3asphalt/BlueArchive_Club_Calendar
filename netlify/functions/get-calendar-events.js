@@ -13,13 +13,12 @@ exports.handler = async function(event, context) {
     const DATOCMS_API_TOKEN = process.env.DATOCMS_READONLY_API_TOKEN;
     const DATOCMS_API_URL = 'https://graphql.datocms.com/';
 
-    // ★★★ ここが最終修正点！query文字列内に一切コメントはありません ★★★
-    // YOUR_LINK_FIELD_API_ID は、Recruitment InfoモデルのLinkフィールドのAPI IDに置き換えてください
+    // ★★★ ここが最終修正点！YOUR_LINK_FIELD_API_ID を「club」に置き換えました ★★★
     const query = `
       query AllRecruitmentInfos {
         allRecruitmentInfos {
           id
-          YOUR_LINK_FIELD_API_ID {
+          club {
             clubName
           }
           startDateTime
@@ -57,7 +56,8 @@ exports.handler = async function(event, context) {
     const alwaysOpenRecruitment = [];
 
     datoEvents.forEach(item => {
-        const circleNameFromLinkedClub = item.YOUR_LINK_FIELD_API_ID ? item.YOUR_LINK_FIELD_API_ID.clubName : "サークル名不明";
+        // ★★★ ここも最終修正点！item.YOUR_LINK_FIELD_API_ID を「item.club」に置き換えました ★★★
+        const circleNameFromLinkedClub = item.club ? item.club.clubName : "サークル名不明";
 
         const formattedItem = {
             id: item.id,
