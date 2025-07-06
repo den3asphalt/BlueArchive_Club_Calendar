@@ -375,3 +375,24 @@ footer {
     flex-shrink: 0;
     object-fit: contain; /* 画像が歪まないように */
 }
+
+
+.header-left-content {
+display: flex;
+align-items: center;
+gap: 25px; /* アイコンとh1の間のスペースを広げる /
+margin-left: 20px; / ヘッダー左端からの余白を追加 */
+}
+
+.report-link {
+background-color: rgba(255, 255, 255, 0.2);
+color: white;
+padding: 10px 20px;
+border-radius: 25px;
+text-decoration: none;
+font-size: 1em;
+font-weight: 600;
+transition: background-color 0.3s ease, transform 0.2s ease;
+flex-shrink: 0;
+margin-right: 20px; /* ヘッダー右端からの余白を追加 */
+}
