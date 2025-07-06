@@ -313,3 +313,40 @@ footer {
     background-color: #f0f0f0;
     color: #6c757d;
 }
+
+
+/* css/style.css (カテゴリ色の定義セクションに追記) */
+
+/* カレンダーイベントのカテゴリ色 (既存の定義) */
+.fc-event.category-交流 { background-color: #28a745; }
+.fc-event.category-チナトロ目標 { background-color: #fd7e14; }
+.fc-event.category-上位狙い { background-color: #dc3545; }
+/* .fc-event.category-不明 { background-color: #6c757d; } (不明カテゴリを削除済みなら不要) */
+
+
+/* ★★★ 常時公募枠のカテゴリ色を追加 ★★★ */
+/* always-open-item 内の category-クラスを持つ span に色を適用 */
+.always-open-item h3 .always-open-category.category-交流 {
+    background-color: #28a745; /* 緑系 */
+}
+
+.always-open-item h3 .always-open-category.category-チナトロ目標 {
+    background-color: #fd7e14; /* オレンジ系 */
+}
+
+.always-open-item h3 .always-open-category.category-上位狙い {
+    background-color: #dc3545; /* 赤系 */
+}
+
+/* もし「チナトロ目標・維持」のような特殊なカテゴリ名がある場合も追加 */
+/* jsで安全なクラス名に変換されるので、それに合わせて定義します */
+.always-open-item h3 .always-open-category.category-チナトロ目標-維持 {
+    background-color: #fd7e14; /* チナトロ目標と同じ色 */
+}
+
+/* ★カテゴリが設定されていない場合の常時公募枠の色（以前の「不明」の代替）★ */
+.always-open-item h3 .always-open-category.category-不明 { /* (jsでsafeCategoryが空の場合に'不明'になるか、空文字列になるかで調整) */
+    background-color: #6c757d; /* グレー系 */
+}
+
+/* (以前の常時公募枠のスタイル定義も合わせて確認してください) */
