@@ -59,7 +59,7 @@ exports.handler = async function(event, context) {
 
         const formattedItem = {
             id: item.id,
-            title: circleNameFromLinkedClub,
+            title: item.club.clubName,
             start: item.startDateTime, 
             end: item.endDateTime,
             extendedProps: { 
