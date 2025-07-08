@@ -56,8 +56,6 @@ exports.handler = async function(event, context) {
     const alwaysOpenRecruitment = [];
 
     datoEvents.forEach(item => {
-        // ★★★ ここも最終修正点！item.YOUR_LINK_FIELD_API_ID を「item.club」に置き換えました ★★★
-        const circleNameFromLinkedClub = item.club ? item.club.clubName : "サークル名不明";
 
         const formattedItem = {
             id: item.id,
@@ -65,8 +63,8 @@ exports.handler = async function(event, context) {
             start: item.startDateTime, 
             end: item.endDateTime,
             extendedProps: { 
-                circleName: circleNameFromLinkedClub,
-                category: item.category,
+                circleName: item.club.clubName,
+                category: item.club.category,
                 tweetUrl: item.tweetUrl,
                 relatedInfo: item.relatedInfo,
                 recruitmentType: item.recruitmentType,
