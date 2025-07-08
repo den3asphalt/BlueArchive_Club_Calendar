@@ -371,3 +371,104 @@ footer {
     color: #6c757d;
     width: 100%;
 }
+
+
+/* スマートフォン向けのスタイル */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column; /* ヘッダーの要素を縦に並べる */
+        align-items: center; /* 中央揃え */
+        padding: 15px; /* パディングを小さく */
+        text-align: center; /* テキストを中央揃え */
+    }
+
+    .header-left-content {
+        flex-direction: row; /* アイコンとタイトルは横並びに戻す */
+        justify-content: center; /* 中央揃え */
+        margin-left: 0; /* 左マージンを削除 */
+        gap: 10px; /* アイコンとタイトルの間隔を調整 */
+        margin-bottom: 10px; /* 下マージンを追加して「報告はこちら」との間隔を作る */
+    }
+
+    .header-icon {
+        width: 24px; /* アイコンを小さく */
+        height: 24px;
+    }
+
+    h1 {
+        font-size: 1.5em; /* タイトルを小さく */
+    }
+
+    .report-link {
+        width: 80%; /* ボタンの幅を画面に合わせて調整 */
+        padding: 8px 15px; /* パディングを小さく */
+        font-size: 0.9em; /* フォントサイズを小さく */
+        margin-right: 0; /* 右マージンを削除 */
+    }
+
+    #categoryLegendSection .legend-items {
+        flex-direction: column; /* 凡例のアイテムを縦に並べる */
+        align-items: flex-start; /* 左寄せ */
+    }
+
+    .legend-item {
+        margin-bottom: 10px; /* アイテム間のスペース */
+    }
+
+    .legend-color {
+        width: 20px; /* 色見本を小さく */
+        height: 20px;
+        margin-right: 5px;
+    }
+
+    .fc {
+        font-size: 0.8em; /* カレンダー全体のフォントサイズを小さく */
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 1.3em; /* カレンダータイトルを小さく */
+    }
+
+    .fc .fc-button {
+        padding: 5px 10px; /* カレンダーボタンを小さく */
+        font-size: 0.9em;
+    }
+
+    #alwaysOpenRecruitmentList {
+        flex-direction: column; /* 常時公募枠のアイテムを縦に並べる */
+        align-items: center; /* 中央揃え */
+    }
+
+    .always-open-item {
+        width: 90%; /* アイテムの幅を画面に合わせる */
+        margin-bottom: 15px;
+    }
+
+    .modal-content {
+        width: 95%; /* モーダルの幅を画面に合わせる */
+        margin: 5vh auto; /* 上下のマージンを少し小さく */
+        padding: 20px; /* パディングを小さく */
+    }
+
+    .modal-content h2 {
+        font-size: 1.3em; /* モーダル内のタイトルを小さく */
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+    }
+
+    .modal-content p {
+        font-size: 0.95em; /* モーダル内のテキストを小さく */
+        margin-bottom: 8px;
+    }
+
+    .close-button {
+        font-size: 24px; /* 閉じるボタンを少し小さく */
+        top: 10px;
+        right: 10px;
+    }
+
+    footer {
+        padding: 15px; /* フッターのパディングを小さく */
+        font-size: 0.8em; /* フッターのフォントサイズを小さく */
+    }
+}
