@@ -20,10 +20,10 @@ exports.handler = async function(event, context) {
           id
           club {
             clubName
+            category
           }
           startDateTime
           endDateTime
-          category
           tweetUrl
           relatedInfo
           recruitmentType
