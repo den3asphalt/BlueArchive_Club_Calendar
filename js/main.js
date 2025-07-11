@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const modal = document.getElementById('eventModal');
         const modalTitle = document.getElementById('modalTitle');
         const modalCircleName = document.getElementById('modalCircleName');
-        const modalCategory = document.getElementById('modalCategory');
         const modalDuration = document.getElementById('modalDuration');
         const modalRelatedInfo = document.getElementById('modalRelatedInfo');
         const modalTweetEmbed = document.getElementById('modalTweetEmbed');
@@ -17,7 +16,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         modalTitle.textContent = eventData.title;
         modalCircleName.textContent = props.circleName || '不明';
-        modalCategory.textContent = props.category || '不明';
         modalRelatedInfo.innerHTML = props.relatedInfo ? marked.parse(props.relatedInfo) : 'なし';
         
         let durationText = '';
@@ -145,14 +143,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return { domNodes: [div] };
         },
 
-        eventClassNames: function(arg) {
-            const category = arg.event.extendedProps.category;
-            // ★★★ ここを修正！日本語文字を許可する正規表現に変更 ★★★
-            // \p{L} はあらゆる言語の文字、\p{N} はあらゆる数字にマッチします。uフラグが必須です。
-            const safeCategory = category ? category.replace(/[^\p{L}\p{N}_-]/gu, '-') : ''; 
-            return safeCategory ? ['category-' + safeCategory] : [];
-        },
-
         eventClick: function(info) {
             info.jsEvent.preventDefault();
             displayEventModal(info.event);
@@ -180,14 +170,6 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log("DEBUG: Rendering always open item:", item.title);
             const itemDiv = document.createElement('div');
             itemDiv.classList.add('always-open-item'); 
-
-            // カテゴリのクラスをカード全体に付与 (日本語対応)
-            const safeCategory = item.extendedProps.category ? item.extendedProps.category.replace(/[^\p{L}\p{N}_-]/gu, '-') : ''; 
-            if (safeCategory) {
-                itemDiv.classList.add('category-' + safeCategory); 
-            } else {
-                itemDiv.classList.add('category-不明'); // カテゴリがない場合のデフォルトクラス
-            }
             
             const circleNameText = item.title || item.extendedProps.circleName || '不明なサークル';
 
