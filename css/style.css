@@ -277,13 +277,6 @@ footer {
     box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
 }
 
-/* 凡例の色分けクラス（カレンダーイベント、常時公募枠と同じ定義を再利用） */
-.legend-color.category-交流 { background-color: #28a745; }
-.legend-color.category-チナトロ目標-維持 { background-color: #fd7e14; }
-.legend-color.category-上位狙い { background-color: #dc3545; }
-.legend-color.category-特殊 { background-color: #e0f2f7; }
-
-
 /* 常時公募枠セクションのスタイル */
 #alwaysOpenRecruitmentSection {
     margin-top: 40px; /* カレンダーとの間隔 */
@@ -341,24 +334,6 @@ footer {
     margin-top: 0;
     margin-bottom: 0;
     font-weight: 700;
-}
-
-/* 常時公募枠の各項目（カード全体）の色分け */
-.always-open-item.category-交流 {
-    background-color: #e6ffe6; 
-    border-color: #a3e9a4;
-}
-.always-open-item.category-チナトロ目標-維持 { 
-    background-color: #fffbe6; 
-    border-color: #ffd88a;
-}
-.always-open-item.category-上位狙い {
-    background-color: #ffe6e6; 
-    border-color: #ffb3b3;
-}
-.always-open-item.category-特殊 {
-    background-color: #e0f2f7; 
-    border-color: #81d4fa;
 }
 
 /* 常時公募枠がない場合のメッセージ */
