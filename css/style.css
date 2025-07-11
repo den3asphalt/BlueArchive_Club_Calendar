@@ -110,13 +110,6 @@ main {
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* カレンダーイベントのカテゴリ色 */
-.fc-event.category-交流 { background-color: #28a745; }
-.fc-event.category-チナトロ目標-維持 { background-color: #fd7e14; }
-.fc-event.category-上位狙い { background-color: #dc3545; }
-.fc-event.category-特殊 { background-color: #e0f2f7; }
-
-
 /* カレンダーグリッドの日付ヘッダー */
 .fc .fc-col-header-cell-cushion {
     padding: 8px;
