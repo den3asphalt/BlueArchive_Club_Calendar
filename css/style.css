@@ -69,7 +69,6 @@ h1 {
     background-color: rgba(0, 0, 0, 0.2);
 }
 
-/* 修正点2: ボタンの文字色が見えるようにセレクタの具体性を高める */
 a.report-link {
     background-color: #ffffff;
     color: #007bff;
@@ -203,8 +202,8 @@ main {
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
-    width: calc(33.333% - 20px); /* 修正点3: 幅の計算を調整 */
-    box-sizing: border-box; /* 修正点3: レイアウト崩れを防ぐ */
+    width: calc(33.333% - 20px);
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -335,44 +334,49 @@ footer {
     background-color: #343a40;
 }
 
-/* スマートフォン向けのスタイル */
+/* ================================================= */
+/* スマートフォン向けのスタイル (全面的に見直し)         */
+/* ================================================= */
 @media (max-width: 768px) {
     body {
         font-size: 15px;
     }
     header {
         padding: 10px 15px;
-        flex-wrap: nowrap; /* ヘッダー自体は折り返さない */
+        flex-wrap: nowrap;
     }
 
     /* ハンバーガーメニューの実装 */
     .hamburger-btn {
-        display: block;
+        display: block; /* スマホではボタンを表示 */
     }
     .header-nav {
-        /* 修正点1: display:noneを削除し、transformで制御 */
+        display: none; /* スマホでは通常時非表示 */
+    }
+    
+    /* JavaScriptで .nav-open クラスが付与された時のスタイル */
+    header.nav-open .header-nav {
+        display: flex;
         position: fixed;
         top: 0;
         right: 0;
         width: 70%;
         height: 100vh;
         background-color: #0056b3;
-        display: flex;
         flex-direction: column;
         align-items: flex-start;
         padding: 80px 30px 30px;
         gap: 25px;
-        transform: translateX(100%);
+        transform: translateX(0);
         transition: transform 0.3s ease-in-out;
         z-index: 1000;
-    }
-    header.nav-open .header-nav {
-        transform: translateX(0);
         box-shadow: -5px 0 15px rgba(0,0,0,0.2);
     }
+    
     .header-nav a {
         font-size: 1.2em;
     }
+    
     .report-link {
         width: 100%;
         text-align: center;
@@ -402,13 +406,14 @@ footer {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 15px;
+        gap: 10px; /* 各要素間のスペースを調整 */
     }
     .fc .fc-toolbar-chunk {
         display: flex;
         align-items: center;
         justify-content: center;
         width: 100%;
+        gap: 5px; /* ボタン間のスペースを調整 */
     }
 
     .fc .fc-toolbar-title {
@@ -418,13 +423,17 @@ footer {
     }
 
     .fc .fc-button {
-        padding: 5px 10px;
+        padding: 8px 12px; /* ボタンのサイズを調整 */
         font-size: 0.9em;
     }
+    
+    /* 常時公募枠 */
     .always-open-item {
         width: 100%;
         box-sizing: border-box;
     }
+    
+    /* モーダル */
     .modal-content {
         width: 95%;
         margin: 5vh auto;

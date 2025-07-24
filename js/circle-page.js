@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="memo-section">
                     <h2>メモ</h2>
                     <div class="memo-content">
-                        ${circle.memo ? marked.parse(circle.memo) : '<p>メモはありません。</p>'}
+                        ${circle.description ? marked.parse(circle.description) : '<p>メモはありません。</p>'}
                     </div>
                 </div>
             </div>
