@@ -60,7 +60,7 @@ exports.handler = async function(event, context) {
                 start: item.startDateTime, 
                 end: item.endDateTime,
                 extendedProps: { 
-                    clubId: item.club.clubId,
+                    clubId: item.club.id,
                     circleName: item.club.clubName,
                     tweetUrl: item.tweetUrl,
                     relatedInfo: item.relatedInfo,
