@@ -18,14 +18,13 @@ exports.handler = async function(event, context) {
         const DATOCMS_API_TOKEN = process.env.DATOCMS_READONLY_API_TOKEN;
         const DATOCMS_API_URL = 'https://graphql.datocms.com/';
 
-        // 特定のIDを持つclubの情報を取得するクエリ
+        // 特定のIDを持つclubの情報を取得するクエリから category を削除
         // 【要確認】DatoCMSのclubモデルに leaderTwitter と memo フィールドが必要です
         const query = `
           query GetClubDetail($id: ItemId!) {
             club(filter: {id: {eq: $id}}) {
               id
               clubName
-              category
               leaderTwitter
               memo
             }
