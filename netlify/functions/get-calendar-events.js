@@ -10,7 +10,7 @@ exports.handler = async function(event, context) {
         const DATOCMS_API_TOKEN = process.env.DATOCMS_READONLY_API_TOKEN;
         const DATOCMS_API_URL = 'https://graphql.datocms.com/';
 
-        // clubのIDも取得するようにクエリを修正
+        // GraphQLクエリからcategoryを削除
         const query = `
           query AllRecruitmentInfos {
             allRecruitmentInfos(orderBy: startDateTime_ASC) {
@@ -18,7 +18,6 @@ exports.handler = async function(event, context) {
               club {
                 id
                 clubName
-                category
               }
               startDateTime
               endDateTime
@@ -52,18 +51,17 @@ exports.handler = async function(event, context) {
         const alwaysOpenRecruitment = [];
 
         datoEvents.forEach(item => {
-            // clubが存在しないデータはスキップ
             if (!item.club) return;
 
+            // formattedItemからcategoryを削除
             const formattedItem = {
                 id: item.id,
                 title: item.club.clubName,
                 start: item.startDateTime, 
                 end: item.endDateTime,
                 extendedProps: { 
-                    clubId: item.club.id, // ★サークル詳細ページ用にIDを追加
+                    clubId: item.club.id,
                     circleName: item.club.clubName,
-                    category: item.club.category,
                     tweetUrl: item.tweetUrl,
                     relatedInfo: item.relatedInfo,
                     recruitmentType: item.recruitmentType,
