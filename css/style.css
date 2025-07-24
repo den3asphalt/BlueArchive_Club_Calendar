@@ -170,7 +170,7 @@ main {
     display: flex;
     flex-wrap: wrap;
     gap: 20px; 
-    justify-content: flex-start; /* 左寄せに変更 */
+    justify-content: flex-start;
 }
 
 /* 常時公募枠の各項目（カード） */
@@ -182,9 +182,10 @@ main {
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
-    width: calc(33.333% - 27px); /* 3列表示 (gapを考慮) */
+    width: calc(33.333% - 27px);
     display: flex;
     flex-direction: column;
+    justify-content: center; /* 垂直方向中央揃え */
     gap: 10px;
 }
 
@@ -198,15 +199,6 @@ main {
     color: #343a40; 
     margin: 0;
     font-weight: 700;
-}
-
-.always-open-item .category-tag {
-    font-size: 0.8em;
-    padding: 4px 8px;
-    border-radius: 20px;
-    background-color: #e9ecef;
-    color: #495057;
-    align-self: flex-start; /* タグを左上に配置 */
 }
 
 /* モーダル */
@@ -291,15 +283,6 @@ main {
     padding-bottom: 15px;
     margin-bottom: 20px;
 }
-.circle-info .category-tag {
-     font-size: 1em;
-    padding: 5px 12px;
-    border-radius: 20px;
-    background-color: #e9ecef;
-    color: #495057;
-    display: inline-block;
-    margin-bottom: 20px;
-}
 .memo-section h2 {
     border-left: 4px solid #007bff;
     padding-left: 10px;
@@ -327,7 +310,7 @@ footer {
     color: white; 
     font-size: 0.9em;
     margin-top: 50px; 
-    background-color: #343a40; /* フッターの色を変更 */
+    background-color: #343a40;
 }
 
 /* スマートフォン向けのスタイル */
@@ -353,7 +336,7 @@ footer {
     .report-link {
         width: 100%;
         text-align: center;
-        box-sizing: border-box; /* paddingを含めて幅100%にする */
+        box-sizing: border-box;
     }
     main {
         margin: 20px auto;
@@ -367,7 +350,7 @@ footer {
         font-size: 0.9em;
     }
     .always-open-item {
-        width: 100%; /* 1列表示 */
+        width: 100%;
         box-sizing: border-box;
     }
     .modal-content {
