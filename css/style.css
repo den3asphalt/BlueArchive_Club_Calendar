@@ -3,69 +3,122 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Inter', 'Noto Sans JP', sans-serif;
-    background-color: #f8f9fa; /* 非常に明るいグレー */
-    color: #212529; /* 暗めのテキスト色 */
+    background-color: #f8f9fa;
+    color: #212529;
     line-height: 1.6;
     font-size: 16px;
 }
 
+/* ヘッダー */
 header {
-    background-color: #007bff; /* メインカラーを鮮やかな青に */
+    background-color: #007bff;
     color: white;
-    padding: 20px 40px; /* ヘッダー全体の上下左右のパディング */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* より明確な影 */
-    display: flex; /* flexboxを使って子要素を制御 */
-    align-items: center; /* 垂直方向の中央揃え */
-    justify-content: space-between; /* アイコンとh1は左、リンクは右に寄せる */
-}
-
-.header-left-content { /* アイコンとh1をまとめるためのクラス */
+    padding: 15px 30px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     display: flex;
     align-items: center;
-    gap: 25px; /* アイコンとh1の間のスペース */
-    /* margin-left: 20px; はheaderのpaddingで代替 */
+    justify-content: space-between;
+    flex-wrap: wrap; /* スマホ表示で折り返すように */
 }
 
-.header-icon { /* アイコンのスタイル (imgタグにも適用) */
-    width: 36px; /* アイコンのサイズ */
+.header-left-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-icon {
+    width: 36px;
     height: 36px;
-    flex-shrink: 0; /* アイコンが縮まないように */
-    object-fit: contain; /* 画像が歪まないように */
+    flex-shrink: 0;
+    object-fit: contain;
 }
 
 h1 {
     margin: 0;
-    font-size: 2.5em; 
-    font-weight: 600; 
-    letter-spacing: 0.05em; 
-    color: white; /* ヘッダーのh1は白のまま */
+    font-size: 1.8em; 
+    font-weight: 600;
 }
 
-.report-link { /* 「報告はこちら」リンクのスタイル */
-    background-color: rgba(255, 255, 255, 0.2); /* 半透明の白背景 */
+.header-title-link {
     color: white;
-    padding: 10px 20px;
-    border-radius: 25px; /* 角丸を強くしてボタンのように */
-    text-decoration: none; /* 下線なし */
-    font-size: 1em;
+    text-decoration: none;
+}
+
+/* ヘッダーナビゲーション */
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+}
+
+.header-nav a:not(.report-link):hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.header-nav a.current-page {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.report-link {
+    background-color: #ffffff;
+    color: #007bff;
+    padding: 8px 18px;
+    border-radius: 25px;
     font-weight: 600;
     transition: background-color 0.3s ease, transform 0.2s ease;
-    flex-shrink: 0; /* 縮まないように */
-    /* margin-right: 20px; はheaderのpaddingで代替 */
 }
 
 .report-link:hover {
-    background-color: rgba(255, 255, 255, 0.3); 
+    background-color: #e9ecef; 
     transform: translateY(-2px); 
 }
 
+/* メインコンテンツ */
 main {
-    max-width: 960px; 
+    max-width: 1100px; 
     margin: 40px auto; 
     padding: 30px; 
     background-color: #ffffff;
     border-radius: 12px; 
     box-shadow: 0 8px 20px rgba(0,0,0,0.1); 
+}
+
+/* 静的ページ用のスタイル */
+.static-page {
+    padding: 20px;
+}
+.static-page h2 {
+    color: #007bff;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+.static-page h3 {
+    color: #343a40;
+    border-left: 4px solid #007bff;
+    padding-left: 10px;
+    margin-top: 30px;
+}
+.static-page ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+.static-page li {
+    background-color: #f8f9fa;
+    border-left: 3px solid #ced4da;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
 }
 
 /* FullCalendarのカスタムスタイル */
@@ -90,42 +143,73 @@ main {
     border-color: #0056b3;
 }
 
-/* イベントの基本スタイル */
 .fc-event {
     border-radius: 4px; 
     font-size: 0.9em;
     padding: 3px 5px; 
-    color: white; 
     border: none; 
-    font-weight: 500;
-    margin-bottom: 2px; 
-    overflow: hidden; 
-    text-overflow: ellipsis; 
-    white-space: nowrap; 
-    transition: transform 0.1s ease-in-out; 
+    cursor: pointer;
 }
 
-.fc-event:hover {
-    transform: translateY(-2px); 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+/* 常時公募枠セクション */
+#alwaysOpenRecruitmentSection {
+    margin-top: 40px;
+    padding-top: 40px;
+    border-top: 1px solid #e9ecef;
 }
 
-/* カレンダーグリッドの日付ヘッダー */
-.fc .fc-col-header-cell-cushion {
-    padding: 8px;
+#alwaysOpenRecruitmentSection h2 {
+    font-size: 2em; 
+    color: #007bff;
+    margin-bottom: 30px; 
+    text-align: center;
     font-weight: 600;
-    color: #495057;
 }
 
-/* カレンダーのセル内の日付 */
-.fc-daygrid-day-number {
-    padding: 5px;
-    font-size: 1.1em;
-    font-weight: 600;
-    color: #495057;
+#alwaysOpenRecruitmentList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; 
+    justify-content: flex-start; /* 左寄せに変更 */
 }
 
-/* モーダルウィンドウのスタイル */
+/* 常時公募枠の各項目（カード） */
+.always-open-item {
+    background-color: #ffffff; 
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 20px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    width: calc(33.333% - 27px); /* 3列表示 (gapを考慮) */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.always-open-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+.always-open-item h3 {
+    font-size: 1.2em; 
+    color: #343a40; 
+    margin: 0;
+    font-weight: 700;
+}
+
+.always-open-item .category-tag {
+    font-size: 0.8em;
+    padding: 4px 8px;
+    border-radius: 20px;
+    background-color: #e9ecef;
+    color: #495057;
+    align-self: flex-start; /* タグを左上に配置 */
+}
+
+/* モーダル */
 .modal {
     display: none; 
     position: fixed; 
@@ -161,9 +245,9 @@ main {
     color: #888;
     position: absolute; 
     top: 15px;
-    right: 15px;
+    right: 20px;
     font-size: 32px; 
-    font-weight: normal; 
+    font-weight: bold; 
     cursor: pointer;
     transition: color 0.2s ease;
 }
@@ -180,7 +264,6 @@ main {
     padding-bottom: 15px;
     margin-bottom: 20px;
     font-size: 1.8em;
-    font-weight: 600;
 }
 
 .modal-content p {
@@ -201,282 +284,98 @@ main {
     text-align: center;
 }
 
-.twitter-tweet {
-    margin-left: auto !important;
-    margin-right: auto !important;
-    max-width: 100% !important; 
-    height: auto !important;
+/* サークル詳細ページ */
+#circle-detail-container h1 {
+    color: #007bff;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+.circle-info .category-tag {
+     font-size: 1em;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background-color: #e9ecef;
+    color: #495057;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+.memo-section h2 {
+    border-left: 4px solid #007bff;
+    padding-left: 10px;
+    font-size: 1.5em;
+    margin-top: 30px;
+}
+.memo-content {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+.loading-indicator {
+    text-align: center;
+    padding: 50px;
+    font-size: 1.2em;
+    color: #6c757d;
 }
 
-.tweet-embed-container p {
-    font-size: 0.9em;
-    color: #888;
-    margin-bottom: 10px;
-}
 
-.tweet-embed-container p[style*="color:red"] {
-    font-weight: 600;
-}
-
+/* フッター */
 footer {
     text-align: center;
     padding: 25px; 
     color: white; 
     font-size: 0.9em;
     margin-top: 50px; 
-    background-color: #007bff; 
+    background-color: #343a40; /* フッターの色を変更 */
 }
-
-
-/* カテゴリ色分け凡例のスタイル */
-#categoryLegendSection {
-    margin-top: 40px; 
-    padding: 25px;
-    background-color: #e0f8ff; 
-    border-radius: 12px; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
-    text-align: center;
-    margin-bottom: 40px; /* カレンダーとの間隔 */
-}
-
-#categoryLegendSection h2 {
-    font-size: 1.6em;
-    color: #007bff;
-    margin-bottom: 20px;
-    font-weight: 600;
-}
-
-.legend-items {
-    display: flex;
-    flex-wrap: wrap; 
-    justify-content: center; 
-    gap: 25px; 
-}
-
-.legend-item {
-    display: flex;
-    align-items: center; 
-    font-size: 1em;
-    color: #343a40;
-    font-weight: 500;
-}
-
-.legend-color {
-    width: 24px; 
-    height: 24px;
-    border-radius: 50%; 
-    margin-right: 10px; 
-    border: 1px solid rgba(0,0,0,0.15); 
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
-}
-
-/* 常時公募枠セクションのスタイル */
-#alwaysOpenRecruitmentSection {
-    margin-top: 40px; /* カレンダーとの間隔 */
-    padding-top: 40px; /* 上部パディングで区切り線からの間隔 */
-    border-top: 1px solid #e9ecef; /* ここが常時公募枠の上部の区切り線 */
-}
-
-#alwaysOpenRecruitmentSection h2 {
-    font-size: 2em; 
-    color: #007bff;
-    margin-bottom: 30px; 
-    text-align: center;
-    font-weight: 600;
-}
-
-/* 常時公募枠のリストコンテナ */
-#alwaysOpenRecruitmentList {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px; 
-    justify-content: center;
-    margin-top: 20px;
-}
-
-/* 常時公募枠の各項目（カード） */
-.always-open-item {
-    background-color: #ffffff; 
-    border: 1px solid #e9ecef;
-    border-radius: 10px;
-    padding: 15px 20px; 
-    margin-bottom: 0;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column; 
-    gap: 5px; 
-    align-items: center; 
-    justify-content: center; 
-    width: calc(33.33% - 15px); 
-    min-width: 150px;
-    max-width: 200px;
-    text-align: center; 
-    color: #343a40; 
-}
-
-.always-open-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-}
-
-.always-open-item h3 {
-    font-size: 1.2em; 
-    color: inherit; 
-    margin-top: 0;
-    margin-bottom: 0;
-    font-weight: 700;
-}
-
-/* 常時公募枠がない場合のメッセージ */
-#alwaysOpenRecruitmentList p:last-child[style*="text-align: center"] {
-    margin-top: 20px;
-    padding: 20px;
-    border: 1px dashed #e0e0e0;
-    border-radius: 8px;
-    background-color: #f0f0f0;
-    color: #6c757d;
-    width: 100%;
-}
-
 
 /* スマートフォン向けのスタイル */
 @media (max-width: 768px) {
+    body {
+        font-size: 15px;
+    }
     header {
-        flex-direction: column; /* ヘッダーの要素を縦に並べる */
-        align-items: center; /* 中央揃え */
-        padding: 15px; /* パディングを小さく */
-        text-align: center; /* テキストを中央揃え */
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 15px;
     }
-
-    .header-left-content {
-        flex-direction: row; /* アイコンとタイトルは横並びに戻す */
-        justify-content: center; /* 中央揃え */
-        margin-left: 0; /* 左マージンを削除 */
-        gap: 10px; /* アイコンとタイトルの間隔を調整 */
-        margin-bottom: 10px; /* 下マージンを追加して「報告はこちら」との間隔を作る */
-    }
-
-    .header-icon {
-        width: 24px; /* アイコンを小さく */
-        height: 24px;
-    }
-
     h1 {
-        font-size: 1.5em; /* タイトルを小さく */
+        font-size: 1.5em;
     }
-
+    .header-nav {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        gap: 5px;
+    }
     .report-link {
-        width: 80%; /* ボタンの幅を画面に合わせて調整 */
-        padding: 8px 15px; /* パディングを小さく */
-        font-size: 0.9em; /* フォントサイズを小さく */
-        margin-right: 0; /* 右マージンを削除 */
+        width: 100%;
+        text-align: center;
+        box-sizing: border-box; /* paddingを含めて幅100%にする */
     }
-
-    #categoryLegendSection .legend-items {
-        flex-direction: column; /* 凡例のアイテムを縦に並べる */
-        align-items: flex-start; /* 左寄せ */
+    main {
+        margin: 20px auto;
+        padding: 15px;
     }
-
-    .legend-item {
-        margin-bottom: 10px; /* アイテム間のスペース */
-    }
-
-    .legend-color {
-        width: 20px; /* 色見本を小さく */
-        height: 20px;
-        margin-right: 5px;
-    }
-
-    .fc {
-        font-size: 0.8em; /* カレンダー全体のフォントサイズを小さく */
-    }
-
     .fc .fc-toolbar-title {
-        font-size: 1.3em; /* カレンダータイトルを小さく */
+        font-size: 1.3em;
     }
-
     .fc .fc-button {
-        padding: 5px 10px; /* カレンダーボタンを小さく */
+        padding: 5px 10px;
         font-size: 0.9em;
     }
-
-    #alwaysOpenRecruitmentList {
-        flex-direction: column; /* 常時公募枠のアイテムを縦に並べる */
-        align-items: center; /* 中央揃え */
-    }
-
     .always-open-item {
-        width: 90%; /* アイテムの幅を画面に合わせる */
-        margin-bottom: 15px;
+        width: 100%; /* 1列表示 */
+        box-sizing: border-box;
     }
-
     .modal-content {
-        width: 95%; /* モーダルの幅を画面に合わせる */
-        margin: 5vh auto; /* 上下のマージンを少し小さく */
-        padding: 20px; /* パディングを小さく */
+        width: 95%;
+        margin: 5vh auto;
+        padding: 20px;
     }
-
     .modal-content h2 {
-        font-size: 1.3em; /* モーダル内のタイトルを小さく */
-        margin-bottom: 10px;
-        padding-bottom: 10px;
+        font-size: 1.4em;
     }
-
-    .modal-content p {
-        font-size: 0.95em; /* モーダル内のテキストを小さく */
-        margin-bottom: 8px;
-    }
-
-    .close-button {
-        font-size: 24px; /* 閉じるボタンを少し小さく */
-        top: 10px;
-        right: 10px;
-    }
-
-    footer {
-        padding: 15px; /* フッターのパディングを小さく */
-        font-size: 0.8em; /* フッターのフォントサイズを小さく */
-    }
-}
-/* style.css の末尾などに追記 */
-
-.accordion-trigger {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    padding: 10px 0;
-    border-bottom: 1px solid #e9ecef;
-}
-
-.accordion-trigger h2 {
-    margin: 0;
-}
-
-.accordion-icon {
-    font-size: 2em;
-    font-weight: bold;
-    color: #007bff;
-    transition: transform 0.3s ease;
-}
-
-.accordion-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.4s ease-out;
-    background-color: #f8f9fa;
-    padding: 0 15px;
-    border-radius: 0 0 8px 8px;
-}
-
-/* 開いたときのスタイル */
-#alwaysOpenRecruitmentSection.active .accordion-content {
-    /* JavaScriptで高さを設定 */
-    padding: 20px 15px;
-}
-
-#alwaysOpenRecruitmentSection.active .accordion-icon {
-    transform: rotate(45deg);
 }
