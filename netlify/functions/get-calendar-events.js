@@ -1,120 +1,178 @@
-// netlify/functions/get-calendar-events.js
-
+// =======================================================================
+// netlify/functions/get-calendar-events.js (既存Functionの修正版)
+// =======================================================================
 exports.handler = async function(event, context) {
-  if (event.httpMethod !== 'GET') {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ message: 'Method Not Allowed' }),
-      headers: { 'Allow': 'GET' }
-    };
-  }
-
-  try {
-    const DATOCMS_API_TOKEN = process.env.DATOCMS_READONLY_API_TOKEN;
-    const DATOCMS_API_URL = 'https://graphql.datocms.com/';
-
-    // ★★★ ここが最終修正点！YOUR_LINK_FIELD_API_ID を「club」に置き換えました ★★★
-    const query = `
-      query AllRecruitmentInfos {
-        allRecruitmentInfos {
-          id
-          club {
-            clubName
-            category
-          }
-          startDateTime
-          endDateTime
-          tweetUrl
-          relatedInfo
-          recruitmentType
-        }
-      }
-    `;
-
-    const response = await fetch(DATOCMS_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${DATOCMS_API_TOKEN}`,
-      },
-      body: JSON.stringify({ query }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`DatoCMS API error: ${response.status} ${response.statusText}`);
+    if (event.httpMethod !== 'GET') {
+        return { statusCode: 405, body: 'Method Not Allowed' };
     }
 
-    const jsonResponse = await response.json();
-    if (jsonResponse.errors) {
-      throw new Error(`GraphQL error: ${JSON.stringify(jsonResponse.errors)}`);
-    }
+    try {
+        const DATOCMS_API_TOKEN = process.env.DATOCMS_READONLY_API_TOKEN;
+        const DATOCMS_API_URL = 'https://graphql.datocms.com/';
 
-    const datoEvents = jsonResponse.data.allRecruitmentInfos;
-
-    const calendarEvents = [];
-    const alwaysOpenRecruitment = [];
-
-    datoEvents.forEach(item => {
-
-        const formattedItem = {
-            id: item.id,
-            title: item.club.clubName,
-            start: item.startDateTime, 
-            end: item.endDateTime,
-            extendedProps: { 
-                circleName: item.club.clubName,
-                category: item.club.category,
-                tweetUrl: item.tweetUrl,
-                relatedInfo: item.relatedInfo,
-                recruitmentType: item.recruitmentType,
+        // clubのIDも取得するようにクエリを修正
+        const query = `
+          query AllRecruitmentInfos {
+            allRecruitmentInfos(orderBy: startDateTime_ASC) {
+              id
+              club {
+                id
+                clubName
+                category
+              }
+              startDateTime
+              endDateTime
+              tweetUrl
+              relatedInfo
+              recruitmentType
             }
+          }
+        `;
+
+        const response = await fetch(DATOCMS_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${DATOCMS_API_TOKEN}`,
+            },
+            body: JSON.stringify({ query }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`DatoCMS API error: ${response.status}`);
+        }
+
+        const jsonResponse = await response.json();
+        if (jsonResponse.errors) {
+            throw new Error(`GraphQL error: ${JSON.stringify(jsonResponse.errors)}`);
+        }
+
+        const datoEvents = jsonResponse.data.allRecruitmentInfos;
+        const calendarEvents = [];
+        const alwaysOpenRecruitment = [];
+
+        datoEvents.forEach(item => {
+            // clubが存在しないデータはスキップ
+            if (!item.club) return;
+
+            const formattedItem = {
+                id: item.id,
+                title: item.club.clubName,
+                start: item.startDateTime, 
+                end: item.endDateTime,
+                extendedProps: { 
+                    clubId: item.club.id, // ★サークル詳細ページ用にIDを追加
+                    circleName: item.club.clubName,
+                    category: item.club.category,
+                    tweetUrl: item.tweetUrl,
+                    relatedInfo: item.relatedInfo,
+                    recruitmentType: item.recruitmentType,
+                }
+            };
+
+            if (item.recruitmentType === '常時公募') {
+                alwaysOpenRecruitment.push(formattedItem);
+            } else {
+                if (item.startDateTime) { 
+                    calendarEvents.push(formattedItem);
+                }
+            }
+        });
+
+        return {
+            statusCode: 200,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                calendarEvents,
+                alwaysOpenRecruitment
+            }),
         };
 
-        if (item.recruitmentType === '常時公募') {
-            alwaysOpenRecruitment.push(formattedItem);
-        } else {
-            if (item.startDateTime) { 
-                calendarEvents.push(formattedItem);
-            } else {
-                console.warn(`Event ${item.id || item.clubName} has '期間公募' type but no startDateTime. It will not be shown on calendar.`);
-            }
-        }
-    });
-
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'https://bluearchive-club-calendar.netlify.app',
-      },
-      body: JSON.stringify({
-          calendarEvents: calendarEvents,
-          alwaysOpenRecruitment: alwaysOpenRecruitment
-      }),
-    };
-
-  } catch (error) {
-    console.error("Error fetching data from DatoCMS or processing:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error.message || "Failed to load recruitment info." }),
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'https://bluearchive-club-calendar.netlify.app',
-      }
-    };
-  }
+    } catch (error) {
+        console.error("Error in get-calendar-events:", error);
+        return {
+            statusCode: 500,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: error.message }),
+        };
+    }
 };
 
-function parseDescription(description) {
-    try {
-        const jsonPartMatch = description.match(/\{[\s\S]*\}/s); 
-        if (jsonPartMatch) {
-            return JSON.parse(jsonPartMatch[0]);
-        }
-    } catch (e) {
-        console.warn("Failed to parse description as JSON:", e);
+
+// =======================================================================
+// netlify/functions/get-circle-detail.js (新規作成)
+// =======================================================================
+exports.handler = async function(event, context) {
+    if (event.httpMethod !== 'GET') {
+        return { statusCode: 405, body: 'Method Not Allowed' };
     }
-    return {}; 
-}
+
+    const circleId = event.queryStringParameters.id;
+    if (!circleId) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ error: 'Circle ID is required' })
+        };
+    }
+
+    try {
+        const DATOCMS_API_TOKEN = process.env.DATOCMS_READONLY_API_TOKEN;
+        const DATOCMS_API_URL = 'https://graphql.datocms.com/';
+
+        // 特定のIDを持つclubの情報を取得するクエリ
+        // 【要確認】DatoCMSのclubモデルに leaderTwitter と memo フィールドが必要です
+        const query = `
+          query GetClubDetail($id: ItemId!) {
+            club(filter: {id: {eq: $id}}) {
+              id
+              clubName
+              category
+              leaderTwitter
+              memo
+            }
+          }
+        `;
+
+        const variables = { id: circleId };
+
+        const response = await fetch(DATOCMS_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${DATOCMS_API_TOKEN}`,
+            },
+            body: JSON.stringify({ query, variables }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`DatoCMS API error: ${response.status}`);
+        }
+
+        const jsonResponse = await response.json();
+        if (jsonResponse.errors) {
+            throw new Error(`GraphQL error: ${JSON.stringify(jsonResponse.errors)}`);
+        }
+        
+        if (!jsonResponse.data.club) {
+             return {
+                statusCode: 404,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ error: 'Club not found' }),
+            };
+        }
+
+        return {
+            statusCode: 200,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ club: jsonResponse.data.club }),
+        };
+
+    } catch (error) {
+        console.error("Error in get-circle-detail:", error);
+        return {
+            statusCode: 500,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: error.message }),
+        };
+    }
+};
