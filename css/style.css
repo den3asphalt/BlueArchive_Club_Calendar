@@ -440,3 +440,43 @@ footer {
         font-size: 0.8em; /* フッターのフォントサイズを小さく */
     }
 }
+/* style.css の末尾などに追記 */
+
+.accordion-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.accordion-trigger h2 {
+    margin: 0;
+}
+
+.accordion-icon {
+    font-size: 2em;
+    font-weight: bold;
+    color: #007bff;
+    transition: transform 0.3s ease;
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out;
+    background-color: #f8f9fa;
+    padding: 0 15px;
+    border-radius: 0 0 8px 8px;
+}
+
+/* 開いたときのスタイル */
+#alwaysOpenRecruitmentSection.active .accordion-content {
+    /* JavaScriptで高さを設定 */
+    padding: 20px 15px;
+}
+
+#alwaysOpenRecruitmentSection.active .accordion-icon {
+    transform: rotate(45deg);
+}
