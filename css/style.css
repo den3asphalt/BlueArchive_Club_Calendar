@@ -342,6 +342,15 @@ footer {
         margin: 20px auto;
         padding: 15px;
     }
+    
+    /* === 修正箇所 === */
+    .fc .fc-header-toolbar {
+        display: flex;
+        flex-direction: column; /* ツールバーの要素を縦に並べる */
+        align-items: center;   /* 中央揃えにする */
+        gap: 10px;             /* 各要素間のスペースを確保 */
+    }
+
     .fc .fc-toolbar-title {
         font-size: 1.3em;
     }
