@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
-        // 新しいNetlify Functionを呼び出す
         const response = await fetch(`/.netlify/functions/get-circle-detail?id=${circleId}`);
         if (!response.ok) {
             throw new Error(`サーバーエラー: ${response.status}`);
@@ -25,14 +24,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         const circle = data.club;
 
-        // ページタイトルをサークル名に設定
         document.title = `${circle.clubName} - サークル詳細`;
 
-        // HTMLを生成して表示
+        // カテゴリ表示のコードを削除
         container.innerHTML = `
             <h1>${circle.clubName}</h1>
             <div class="circle-info">
-                ${circle.category ? `<span class="category-tag">${circle.category}</span>` : ''}
                 <p><strong>リーダーTwitter:</strong> 
                     ${circle.leaderTwitter ? `<a href="${circle.leaderTwitter}" target="_blank" rel="noopener noreferrer">${circle.leaderTwitter}</a>` : '未設定'}
                 </p>
