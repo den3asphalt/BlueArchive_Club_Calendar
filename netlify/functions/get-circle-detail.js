@@ -25,7 +25,7 @@ exports.handler = async function(event, context) {
               id
               clubName
               leaderTwitter
-              memo
+              description
             }
           }
         `;
