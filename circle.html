@@ -1,72 +1,52 @@
 <!-- ======================================================================= -->
-<!-- index.html (トップページ)                                               -->
+<!-- circle.html (サークル詳細ページテンプレート) ★追加★                         -->
 <!-- ======================================================================= -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>公募カレンダー</title>
-    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>サークル詳細</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Noto+Sans+JP:wght@300;400;600&display=swap" rel="stylesheet">
-
     <link rel="icon" type="image/png" href="img/icon.png">
-    <link rel="apple-touch-icon" href="img/icon.png"> 
-    
-    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' rel='stylesheet' />
-    
-    <link href='./css/style.css' rel='stylesheet' />
+    <link rel="apple-touch-icon" href="img/icon.png">
+    <link href="/css/style.css" rel="stylesheet">
 </head>
 <body>
-<header>
-    <div class="header-left-content">
-        <img src="img/icon.png" alt="公募カレンダーアイコン" class="header-icon"> 
-        <h1><a href="/" class="header-title-link">公募カレンダー</a></h1>
-    </div>
-    <button class="hamburger-btn" id="hamburger-btn" aria-label="メニューを開く" aria-controls="header-nav" aria-expanded="false">
-        <span class="hamburger-bar"></span>
-        <span class="hamburger-bar"></span>
-        <span class="hamburger-bar"></span>
-    </button>
-    <nav class="header-nav" id="header-nav">
-        <a href="/guidelines.html">サイトについて</a>
-        <a href="/contact.html">連絡先</a>
-        <a href="https://forms.gle/t3hTkcfvwofD7GM98" target="_blank" class="report-link">報告はこちら</a> 
-    </nav>
-</header>
+    <header>
+        <div class="header-left-content">
+            <img src="img/icon.png" alt="公募カレンダーアイコン" class="header-icon"> 
+            <h1><a href="/" class="header-title-link">公募カレンダー</a></h1>
+        </div>
+        <button class="hamburger-btn" id="hamburger-btn" aria-label="メニューを開く" aria-controls="header-nav" aria-expanded="false">
+            <span class="hamburger-bar"></span>
+            <span class="hamburger-bar"></span>
+            <span class="hamburger-bar"></span>
+        </button>
+        <nav class="header-nav" id="header-nav">
+            <a href="/guidelines.html">サイトについて</a>
+            <a href="/contact.html">連絡先</a>
+            <a href="https://forms.gle/t3hTkcfvwofD7GM98" target="_blank" class="report-link">報告はこちら</a> 
+        </nav>
+    </header>
 
     <main>
-        <div id='calendar'></div>
-        <section id="alwaysOpenRecruitmentSection" style="display: none;">
-            <h2>常時公募枠</h2>
-            <div id="alwaysOpenRecruitmentList">
-                <p style="text-align: center; color: #6c757d;">現在、常時公募枠はありません。</p>
+        <div id="circle-detail-container">
+            <!-- JavaScriptによって内容が挿入されます -->
+            <div class="loading-indicator">
+                <p>読み込み中...</p>
             </div>
-        </section>
+        </div>
     </main>
 
     <footer>
         <p>&copy; 2025 ブルーアーカイブ サークル公募カレンダー</p>
     </footer>
 
-    <div id="eventModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2 id="modalTitle"></h2>
-            <p><strong>サークル名:</strong> <span id="modalCircleName"></span></p>
-            <p><strong>期間:</strong> <span id="modalDuration"></span></p>
-            <p><strong>関連情報:</strong> <span id="modalRelatedInfo"></span></p>
-            <div id="modalTweetEmbed" class="tweet-embed-container"></div>
-            <p id="modalTweetLink"></p>
-        </div>
-    </div>
-
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
-    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src='./js/main.js'></script>
+    <script src="/js/circle-page.js"></script>
     <script>
         // Hamburger Menu Toggle
         document.addEventListener('DOMContentLoaded', () => {
