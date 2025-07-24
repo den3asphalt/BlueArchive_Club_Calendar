@@ -170,7 +170,7 @@ main {
     display: flex;
     flex-wrap: wrap;
     gap: 20px; 
-    justify-content: flex-start;
+    justify-content: center; /* 左寄せから中央揃えに変更してバランスを調整 */
 }
 
 /* 常時公募枠の各項目（カード） */
