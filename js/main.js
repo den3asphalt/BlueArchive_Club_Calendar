@@ -89,13 +89,12 @@ document.addEventListener('DOMContentLoaded', function() {
             center: 'title',
             right: isMobile ? 'listWeek,dayGridMonth' : 'dayGridMonth,timeGridWeek'
         },
-        // === 修正箇所 ===
         buttonText: {
             today: '今日',
             month: '月',
-            week: '週', // "list" を "week" に修正
+            week: '週',
             day: '日',
-            list: 'リスト' // listWeekビュー用のテキストはそのまま
+            list: '週' // 「リスト」から「週」に修正
         },
         eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
         allDayText: '終日',
