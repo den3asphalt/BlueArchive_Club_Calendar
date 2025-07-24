@@ -205,3 +205,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 });
+// main.js の末尾（DOMContentLoadedの中）に追加
+
+const accordionTrigger = document.querySelector('.accordion-trigger');
+const accordionContent = document.querySelector('.accordion-content');
+const alwaysOpenSection = document.getElementById('alwaysOpenRecruitmentSection');
+
+if (accordionTrigger) {
+    accordionTrigger.addEventListener('click', () => {
+        alwaysOpenSection.classList.toggle('active');
+        if (alwaysOpenSection.classList.contains('active')) {
+            // コンテンツの実際の高さにmax-heightを設定してアニメーション
+            accordionContent.style.maxHeight = accordionContent.scrollHeight + "px";
+        } else {
+            accordionContent.style.maxHeight = '0';
+        }
+    });
+}
