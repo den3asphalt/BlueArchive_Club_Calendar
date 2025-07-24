@@ -148,15 +148,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const itemDiv = document.createElement('div');
             itemDiv.classList.add('always-open-item'); 
             
-            const category = item.extendedProps.category || 'カテゴリなし';
-            
+            // カテゴリ表示のコードを削除
             itemDiv.innerHTML = `
-                <span class="category-tag">${category}</span>
                 <h3>${item.title}</h3>
             `; 
 
             itemDiv.addEventListener('click', () => {
-                // 常時公募アイテムには開始/終了時刻がないため、ダミーのDateオブジェクトを渡す
                 const eventData = { ...item, start: new Date(), end: null };
                 displayEventModal(eventData); 
             });
