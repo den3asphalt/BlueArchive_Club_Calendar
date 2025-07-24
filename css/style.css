@@ -18,7 +18,7 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap; /* スマホ表示で折り返すように */
+    position: relative; /* For mobile nav positioning */
 }
 
 .header-left-content {
@@ -45,7 +45,7 @@ h1 {
     text-decoration: none;
 }
 
-/* ヘッダーナビゲーション */
+/* ヘッダーナビゲーション (PC) */
 .header-nav {
     display: flex;
     align-items: center;
@@ -76,11 +76,31 @@ h1 {
     border-radius: 25px;
     font-weight: 600;
     transition: background-color 0.3s ease, transform 0.2s ease;
+    white-space: nowrap;
 }
 
 .report-link:hover {
     background-color: #e9ecef; 
     transform: translateY(-2px); 
+}
+
+/* ハンバーガーメニューボタン (スマホ用) */
+.hamburger-btn {
+    display: none; /* PCでは非表示 */
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    z-index: 1100; /* ナビゲーションより手前に */
+}
+
+.hamburger-bar {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: white;
+    margin: 5px 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 /* メインコンテンツ */
@@ -170,7 +190,7 @@ main {
     display: flex;
     flex-wrap: wrap;
     gap: 20px; 
-    justify-content: center; /* 左寄せから中央揃えに変更してバランスを調整 */
+    justify-content: center;
 }
 
 /* 常時公募枠の各項目（カード） */
@@ -185,7 +205,7 @@ main {
     width: calc(33.333% - 27px);
     display: flex;
     flex-direction: column;
-    justify-content: center; /* 垂直方向中央揃え */
+    justify-content: center;
     gap: 10px;
 }
 
@@ -319,41 +339,82 @@ footer {
         font-size: 15px;
     }
     header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-        padding: 15px;
+        padding: 10px 15px;
+        flex-wrap: nowrap; /* ヘッダー自体は折り返さない */
     }
-    h1 {
-        font-size: 1.5em;
+
+    /* ハンバーガーメニューの実装 */
+    .hamburger-btn {
+        display: block;
     }
     .header-nav {
+        display: none; /* 初期状態では非表示 */
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 70%;
+        height: 100vh;
+        background-color: #0056b3;
         flex-direction: column;
         align-items: flex-start;
-        width: 100%;
-        gap: 5px;
+        padding: 80px 30px 30px;
+        gap: 25px;
+        transform: translateX(100%);
+        transition: transform 0.3s ease-in-out;
+        z-index: 1000;
+    }
+    header.nav-open .header-nav {
+        display: flex; /* 開いた時に表示 */
+        transform: translateX(0);
+        box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+    }
+    .header-nav a {
+        font-size: 1.2em;
     }
     .report-link {
         width: 100%;
         text-align: center;
         box-sizing: border-box;
+        padding: 12px 15px;
     }
+
+    /* ハンバーガーボタンが開いた時のスタイル (X印) */
+    header.nav-open .hamburger-bar:nth-of-type(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+    header.nav-open .hamburger-bar:nth-of-type(2) {
+        opacity: 0;
+    }
+    header.nav-open .hamburger-bar:nth-of-type(3) {
+        transform: translateY(-8px) rotate(-45deg);
+    }
+
+    /* メインコンテンツ */
     main {
         margin: 20px auto;
         padding: 15px;
     }
     
-    /* === 修正箇所 === */
+    /* カレンダーツールバーの改善 */
     .fc .fc-header-toolbar {
         display: flex;
-        flex-direction: column; /* ツールバーの要素を縦に並べる */
-        align-items: center;   /* 中央揃えにする */
-        gap: 10px;             /* 各要素間のスペースを確保 */
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    .fc .fc-toolbar-chunk {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
     }
 
     .fc .fc-toolbar-title {
-        font-size: 1.3em;
+        font-size: 1.5em;
+        order: -1; /* タイトルを一番上に */
+        margin-bottom: 5px;
     }
+
     .fc .fc-button {
         padding: 5px 10px;
         font-size: 0.9em;
