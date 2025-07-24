@@ -1,0 +1,46 @@
+<!-- ======================================================================= -->
+<!-- circle.html (サークル詳細ページテンプレート)                                -->
+<!-- ======================================================================= -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>サークル詳細</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Noto+Sans+JP:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="img/icon.png">
+    <link rel="apple-touch-icon" href="img/icon.png">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="header-left-content">
+            <img src="img/icon.png" alt="公募カレンダーアイコン" class="header-icon"> 
+            <h1><a href="/" class="header-title-link">公募カレンダー</a></h1>
+        </div>
+        <nav class="header-nav">
+            <a href="/guidelines.html">掲載基準</a>
+            <a href="/contact.html">連絡先</a>
+            <a href="https://forms.gle/t3hTkcfvwofD7GM98" target="_blank" class="report-link">報告はこちら</a> 
+        </nav>
+    </header>
+
+    <main>
+        <div id="circle-detail-container">
+            <!-- JavaScriptによって内容が挿入されます -->
+            <div class="loading-indicator">
+                <p>読み込み中...</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 BlueArchive Club 公募カレンダー</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="/js/circle-page.js"></script>
+</body>
+</html>
