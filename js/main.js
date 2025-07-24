@@ -1,8 +1,12 @@
+// =======================================================================
+// js/main.js (トップページ用)
+// =======================================================================
 document.addEventListener('DOMContentLoaded', function() {
     const calendarEl = document.getElementById('calendar');
     const alwaysOpenSection = document.getElementById('alwaysOpenRecruitmentSection');
     const alwaysOpenList = document.getElementById('alwaysOpenRecruitmentList');
 
+    // モーダル表示関数
     function displayEventModal(eventData) {
         const modal = document.getElementById('eventModal');
         const modalTitle = document.getElementById('modalTitle');
@@ -13,75 +17,55 @@ document.addEventListener('DOMContentLoaded', function() {
         const modalTweetLink = document.getElementById('modalTweetLink');
         
         const props = eventData.extendedProps;
+        const circleNameText = props.circleName || '不明';
 
         modalTitle.textContent = eventData.title;
-        modalCircleName.textContent = props.circleName || '不明';
+        
+        // サークルIDがあれば詳細ページへのリンクを生成
+        if (props.clubId) {
+            modalCircleName.innerHTML = `<a href="/circle.html?id=${props.clubId}" target="_blank">${circleNameText}</a>`;
+        } else {
+            modalCircleName.textContent = circleNameText;
+        }
+        
         modalRelatedInfo.innerHTML = props.relatedInfo ? marked.parse(props.relatedInfo) : 'なし';
         
+        // 期間のフォーマット
         let durationText = '';
-        if (eventData.start && eventData.end) {
-            if (eventData.start.toDateString() !== eventData.end.toDateString()) {
-                durationText = `${eventData.start.toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })} - ${eventData.end.toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
-            } else { 
-                durationText = `${eventData.start.toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })} ${eventData.start.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
-                if (eventData.end && eventData.start.getTime() !== eventData.end.getTime()) {
-                    durationText += ` - ${eventData.end.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
-                }
-            }
-        } else if (eventData.start) {
-            durationText = eventData.start.toLocaleString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
-            if (eventData.allDay) {
-                 durationText += ' (終日)';
-            }
-        }
-        
-        const durationParagraph = modalDuration.closest('p');
-        if (durationText && durationText !== '未設定') {
-            modalDuration.textContent = durationText;
-            durationParagraph.style.display = 'block';
-        } else {
-            durationParagraph.style.display = 'none';
-        }
-
-        const modalLocationElement = document.getElementById('modalLocation'); 
-        if (modalLocationElement) {
-            const locationParagraph = modalLocationElement.closest('p'); 
-            if (props.location) { 
-                modalLocationElement.textContent = props.location;
-                locationParagraph.style.display = 'block';
+        if (eventData.start) {
+            const start = new Date(eventData.start);
+            const end = eventData.end ? new Date(eventData.end) : null;
+            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
+            
+            if (end && start.toDateString() !== end.toDateString()) {
+                durationText = `${start.toLocaleString('ja-JP', options)} - ${end.toLocaleString('ja-JP', options)}`;
+            } else if (end) {
+                 durationText = `${start.toLocaleDateString('ja-JP')} ${start.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}`;
             } else {
-                locationParagraph.style.display = 'none';
+                durationText = start.toLocaleString('ja-JP', options);
             }
         }
-        
-        modalTweetEmbed.innerHTML = ''; 
-        modalTweetLink.innerHTML = '';  
+        modalDuration.textContent = durationText || '未設定';
 
+        // Twitter埋め込み
+        modalTweetEmbed.innerHTML = ''; 
+        modalTweetLink.innerHTML = ''; 
         if (props.tweetUrl) {
             const tweetIdMatch = props.tweetUrl.match(/\/status\/(\d+)/);
             if (tweetIdMatch && window.twttr && window.twttr.widgets) {
-                const loadingMessageElement = document.createElement('p');
-                loadingMessageElement.style.textAlign = 'center';
-                loadingMessageElement.textContent = 'Twitterコンテンツを読み込み中...';
-                modalTweetEmbed.appendChild(loadingMessageElement); 
-
+                modalTweetEmbed.innerHTML = '<p>Twitterコンテンツを読み込み中...</p>';
                 window.twttr.widgets.createTweet(
                     tweetIdMatch[1], 
                     modalTweetEmbed, 
-                    { theme: 'light', conversation: 'none', cards: 'hidden', width: '450' }
-                ).then(function (el) {
-                    if (loadingMessageElement && loadingMessageElement.parentNode) {
-                        loadingMessageElement.remove(); 
+                    { theme: 'light', conversation: 'none', dnt: true }
+                ).then(el => {
+                    if (!el) {
+                        modalTweetEmbed.innerHTML = '<p style="color:red; text-align: center;">ツイートの読み込みに失敗しました。削除されたか、非公開の可能性があります。</p>';
+                    } else {
+                        // 成功したらローディングメッセージを消す
+                        const loadingMsg = modalTweetEmbed.querySelector('p');
+                        if(loadingMsg) loadingMsg.remove();
                     }
-                    if (!el) { 
-                        modalTweetEmbed.innerHTML = '<p style="color:red; text-align: center;">指定されたツイートは存在しないか、非公開です。<br>または、ブラウザの拡張機能（広告ブロッカー等）によってコンテンツがブロックされている可能性があります。</p>';
-                    }
-                }).catch(function (error) {
-                    if (loadingMessageElement && loadingMessageElement.parentNode) {
-                        loadingMessageElement.remove();
-                    }
-                    console.error('Twitterコンテンツ埋め込みエラー:', error);
-                    modalTweetEmbed.innerHTML = '<p style="color:red; text-align: center;">Twitterコンテンツの読み込み中にエラーが発生しました。<br>ネットワーク接続やブラウザの拡張機能をご確認ください。</p>';
                 });
             } else {
                 modalTweetLink.innerHTML = `<p>ツイートURL: <a href="${props.tweetUrl}" target="_blank">${props.tweetUrl}</a></p>`;
@@ -93,39 +77,33 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.style.display = 'block';
     }
 
+    // 画面幅に応じてカレンダーの初期ビューを決定
+    const isMobile = window.innerWidth <= 768;
+    const initialView = isMobile ? 'listWeek' : 'dayGridMonth';
 
     const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
+        initialView: initialView,
         locale: 'ja',
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            right: isMobile ? 'listWeek,dayGridMonth' : 'dayGridMonth,timeGridWeek'
         },
         buttonText: {
             today: '今日',
             month: '月',
             week: '週',
-            day: '日'
+            day: '日',
+            list: 'リスト'
         },
-        eventTimeFormat: {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-        },
-        slotLabelFormat: {
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: false
-        },
+        eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
         allDayText: '終日',
 
+        // Netlify Functionからイベントを取得
         events: async function(fetchInfo, successCallback, failureCallback) {
             try {
                 const response = await fetch('/.netlify/functions/get-calendar-events');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
                 
                 successCallback(data.calendarEvents); 
@@ -138,9 +116,12 @@ document.addEventListener('DOMContentLoaded', function() {
         },
 
         eventContent: function(arg) {
-            const div = document.createElement('div');
-            div.innerHTML = `<strong>${arg.event.title}</strong>`;
-            return { domNodes: [div] };
+            // listWeekビューの表示をカスタマイズ
+            if (arg.view.type === 'listWeek') {
+                return { html: `<b>${arg.timeText}</b> - ${arg.event.title}` };
+            }
+            // 月表示ではタイトルのみ
+            return { html: `<div>${arg.event.title}</div>` };
         },
 
         eventClick: function(info) {
@@ -151,53 +132,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
     calendar.render();
 
-    // 常時公募枠を表示する関数
-    function renderAlwaysOpenRecruitment(recruitmentItems) {
-        if (!alwaysOpenSection || !alwaysOpenList) {
-            console.error("DEBUG: Always open section or list elements not found!");
-            return; 
-        }
+    // 常時公募枠をカード形式で表示する関数
+    function renderAlwaysOpenRecruitment(items) {
+        if (!alwaysOpenSection || !alwaysOpenList) return;
 
         alwaysOpenList.innerHTML = ''; 
 
-        if (recruitmentItems.length === 0) {
-            alwaysOpenList.innerHTML = '<p style="text-align: center; color: #6c757d;">現在、常時公募枠はありません。</p>';
+        if (items.length === 0) {
+            alwaysOpenList.innerHTML = '<p style="text-align: center; color: #6c757d; width: 100%;">現在、常時公募枠はありません。</p>';
             alwaysOpenSection.style.display = 'block'; 
             return;
         }
 
-        recruitmentItems.forEach(item => {
-            console.log("DEBUG: Rendering always open item:", item.title);
+        items.forEach(item => {
             const itemDiv = document.createElement('div');
             itemDiv.classList.add('always-open-item'); 
             
-            const circleNameText = item.title || item.extendedProps.circleName || '不明なサークル';
-
+            const category = item.extendedProps.category || 'カテゴリなし';
+            
             itemDiv.innerHTML = `
-                <h3 class="always-open-title">${circleNameText}</h3>
+                <span class="category-tag">${category}</span>
+                <h3>${item.title}</h3>
             `; 
 
-            alwaysOpenList.appendChild(itemDiv);
-            console.log("DEBUG: Appended itemDiv for:", circleNameText, " with class:", itemDiv.className);
-
-
             itemDiv.addEventListener('click', () => {
-                displayEventModal(item); 
+                // 常時公募アイテムには開始/終了時刻がないため、ダミーのDateオブジェクトを渡す
+                const eventData = { ...item, start: new Date(), end: null };
+                displayEventModal(eventData); 
             });
+            alwaysOpenList.appendChild(itemDiv);
         });
         alwaysOpenSection.style.display = 'block'; 
-        console.log("DEBUG: Always open section set to display: block.");
     }
 
     // モーダルを閉じるロジック
     const modal = document.getElementById('eventModal');
     const closeButton = document.querySelector('.close-button');
-
     closeButton.onclick = function() {
         modal.style.display = 'none';
         document.getElementById('modalTweetEmbed').innerHTML = ''; 
     };
-
     window.onclick = function(event) {
         if (event.target === modal) { 
             modal.style.display = 'none';
@@ -205,20 +179,56 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 });
-// main.js の末尾（DOMContentLoadedの中）に追加
 
-const accordionTrigger = document.querySelector('.accordion-trigger');
-const accordionContent = document.querySelector('.accordion-content');
-const alwaysOpenSection = document.getElementById('alwaysOpenRecruitmentSection');
+// =======================================================================
+// js/circle-page.js (サークル詳細ページ用)
+// =======================================================================
+document.addEventListener('DOMContentLoaded', async () => {
+    const container = document.getElementById('circle-detail-container');
+    const params = new URLSearchParams(window.location.search);
+    const circleId = params.get('id');
 
-if (accordionTrigger) {
-    accordionTrigger.addEventListener('click', () => {
-        alwaysOpenSection.classList.toggle('active');
-        if (alwaysOpenSection.classList.contains('active')) {
-            // コンテンツの実際の高さにmax-heightを設定してアニメーション
-            accordionContent.style.maxHeight = accordionContent.scrollHeight + "px";
-        } else {
-            accordionContent.style.maxHeight = '0';
+    if (!circleId) {
+        container.innerHTML = '<h1>エラー</h1><p>サークルIDが指定されていません。</p>';
+        return;
+    }
+
+    try {
+        // 新しいNetlify Functionを呼び出す
+        const response = await fetch(`/.netlify/functions/get-circle-detail?id=${circleId}`);
+        if (!response.ok) {
+            throw new Error(`サーバーエラー: ${response.status}`);
         }
-    });
-}
+        const data = await response.json();
+
+        if (data.error || !data.club) {
+            throw new Error(data.error || '指定されたサークルは見つかりませんでした。');
+        }
+        
+        const circle = data.club;
+
+        // ページタイトルをサークル名に設定
+        document.title = `${circle.clubName} - サークル詳細`;
+
+        // HTMLを生成して表示
+        container.innerHTML = `
+            <h1>${circle.clubName}</h1>
+            <div class="circle-info">
+                ${circle.category ? `<span class="category-tag">${circle.category}</span>` : ''}
+                <p><strong>リーダーTwitter:</strong> 
+                    ${circle.leaderTwitter ? `<a href="${circle.leaderTwitter}" target="_blank" rel="noopener noreferrer">${circle.leaderTwitter}</a>` : '未設定'}
+                </p>
+                <div class="memo-section">
+                    <h2>メモ</h2>
+                    <div class="memo-content">
+                        ${circle.memo ? marked.parse(circle.memo) : '<p>メモはありません。</p>'}
+                    </div>
+                </div>
+            </div>
+        `;
+
+    } catch (error) {
+        console.error('Failed to load circle details:', error);
+        container.innerHTML = `<h1>エラー</h1><p>情報の読み込みに失敗しました。<br>${error.message}</p>`;
+    }
+});
