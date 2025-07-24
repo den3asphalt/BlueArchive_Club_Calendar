@@ -25,7 +25,12 @@
         <img src="img/icon.png" alt="公募カレンダーアイコン" class="header-icon"> 
         <h1><a href="/" class="header-title-link">公募カレンダー</a></h1>
     </div>
-    <nav class="header-nav">
+    <button class="hamburger-btn" id="hamburger-btn" aria-label="メニューを開く" aria-controls="header-nav" aria-expanded="false">
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+    </button>
+    <nav class="header-nav" id="header-nav">
         <a href="/guidelines.html">サイトについて</a>
         <a href="/contact.html">連絡先</a>
         <a href="https://forms.gle/t3hTkcfvwofD7GM98" target="_blank" class="report-link">報告はこちら</a> 
@@ -62,5 +67,17 @@
     <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src='./js/main.js'></script>
+    <script>
+        // Hamburger Menu Toggle
+        document.addEventListener('DOMContentLoaded', () => {
+            const hamburgerBtn = document.getElementById('hamburger-btn');
+            const header = document.querySelector('header');
+            hamburgerBtn.addEventListener('click', () => {
+                header.classList.toggle('nav-open');
+                const isExpanded = hamburgerBtn.getAttribute('aria-expanded') === 'true';
+                hamburgerBtn.setAttribute('aria-expanded', !isExpanded);
+            });
+        });
+    </script>
 </body>
 </html>
