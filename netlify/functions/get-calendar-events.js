@@ -13,8 +13,8 @@ exports.handler = async function(event, context) {
         // GraphQLクエリからcategoryを削除
         // 500を越える場合は別途色々する必要あり
         const query = `
-          query AllRecruitmentInfos(first: 500) {
-            allRecruitmentInfos(orderBy: startDateTime_ASC) {
+          query AllRecruitmentInfos() {
+            allRecruitmentInfos(orderBy: startDateTime_ASC, first: 500) {
               id
               club {
                 id
