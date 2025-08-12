@@ -11,8 +11,9 @@ exports.handler = async function(event, context) {
         const DATOCMS_API_URL = 'https://graphql.datocms.com/';
 
         // GraphQLクエリからcategoryを削除
+        // 500を越える場合は別途色々する必要あり
         const query = `
-          query AllRecruitmentInfos {
+          query AllRecruitmentInfos(first: 500) {
             allRecruitmentInfos(orderBy: startDateTime_ASC) {
               id
               club {
