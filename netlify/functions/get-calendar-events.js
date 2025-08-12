@@ -50,6 +50,9 @@ exports.handler = async function(event, context) {
         const calendarEvents = [];
         const alwaysOpenRecruitment = [];
 
+        // データ数表示
+        console.log(`Data length: ${datoEvents.length}`);
+
         datoEvents.forEach(item => {
             if (!item.club) return;
 
@@ -73,6 +76,9 @@ exports.handler = async function(event, context) {
             } else {
                 if (item.startDateTime) { 
                     calendarEvents.push(formattedItem);
+                }
+                else {
+                    console.warn(`Skipping event with missing startDateTime: ${item.title}`);
                 }
             }
         });
