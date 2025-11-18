@@ -1,5 +1,5 @@
 /* =======================================================================
-   style.css - Revised for Better UI/UX
+   style.css - Month View Only
    ======================================================================= */
 
 /* 基本的なスタイルリセット */
@@ -11,7 +11,7 @@ body {
     color: #212529;
     line-height: 1.6;
     font-size: 16px;
-    -webkit-text-size-adjust: 100%; /* スマホでの文字サイズ自動調整を防ぐ */
+    -webkit-text-size-adjust: 100%;
 }
 
 /* ヘッダー */
@@ -24,7 +24,7 @@ header {
     align-items: center;
     justify-content: space-between;
     position: relative;
-    z-index: 1001; /* 常に最前面に */
+    z-index: 1001;
 }
 
 .header-left-content {
@@ -86,9 +86,9 @@ a.report-link:hover {
     transform: translateY(-2px); 
 }
 
-/* ハンバーガーメニューボタン (スマホ用) */
+/* ハンバーガーメニュー (スマホ用) */
 .hamburger-btn {
-    display: none; /* PCでは非表示 */
+    display: none;
     background: none;
     border: none;
     cursor: pointer;
@@ -115,7 +115,7 @@ main {
     box-shadow: 0 8px 20px rgba(0,0,0,0.1); 
 }
 
-/* FullCalendar カスタムスタイル (共通) */
+/* FullCalendar カスタムスタイル */
 .fc .fc-toolbar-title {
     font-size: 1.8em; 
     font-weight: 600;
@@ -136,36 +136,35 @@ main {
     border-color: #0056b3;
 }
 
+/* イベントの見た目（月表示用） */
 .fc-event {
-    border-radius: 4px; 
-    font-size: 0.9em;
-    cursor: pointer;
     border: none;
+    border-radius: 3px;
+    font-size: 0.85em; /* 少し小さめに */
+    cursor: pointer;
+    background-color: #3788d8; /* デフォルト色 */
+    color: #fff;
+    overflow: hidden; /* はみ出し防止 */
 }
 
-/* ★改善: リストビュー（スマホ用）のデザイン強化 */
-.fc-list-event:hover td {
-    background-color: #f1f8ff; /* ホバー時の色 */
-}
-
-.fc-theme-standard .fc-list {
-    border: 1px solid #e9ecef; /* 外枠を少し薄く */
-    border-radius: 8px;
+.fc-event-content-custom {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
     overflow: hidden;
+    padding: 1px 2px;
 }
 
-.fc-list-day-cushion {
-    background-color: #f8f9fa !important; /* 日付ヘッダーの背景 */
-}
-
-.fc-list-event-title {
-    font-weight: 600;
-    color: #333;
-}
-
-.fc-list-event-time {
-    color: #666;
+.fc-event-time-custom {
     font-size: 0.9em;
+    opacity: 0.9;
+}
+
+.fc-event-title-custom {
+    font-weight: 600;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 /* 常時公募枠セクション */
@@ -190,18 +189,17 @@ main {
     justify-content: center;
 }
 
-/* ★改善: 常時公募枠の各項目（カードデザイン） */
+/* 常時公募枠のカードデザイン */
 .always-open-item {
     background-color: #ffffff; 
     border: 1px solid #e9ecef;
     border-radius: 10px;
-    padding: 0; /* paddingは内部のcontentに任せる */
+    padding: 0;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
     width: calc(33.333% - 20px);
     box-sizing: border-box;
-    overflow: hidden; /* 角丸のため */
 }
 
 .always-open-item:hover {
@@ -212,10 +210,8 @@ main {
 
 .always-open-item:active {
     background-color: #f1f8ff;
-    transform: translateY(0);
 }
 
-/* カード内部のレイアウト（Flexbox） */
 .always-open-content {
     display: flex;
     justify-content: space-between;
@@ -230,7 +226,7 @@ main {
     color: #343a40; 
     margin: 0;
     font-weight: 700;
-    flex: 1; /* テキスト部分を伸ばす */
+    flex: 1;
     padding-right: 10px;
 }
 
@@ -245,7 +241,7 @@ main {
 .modal {
     display: none; 
     position: fixed; 
-    z-index: 2000; /* ヘッダーより上 */
+    z-index: 2000; 
     left: 0;
     top: 0;
     width: 100%;
@@ -257,7 +253,7 @@ main {
 
 .modal-content {
     background-color: #fefefe;
-    margin: 5vh auto; /* 上下のマージン調整 */
+    margin: 5vh auto;
     padding: 30px; 
     border: none; 
     width: 90%; 
@@ -282,7 +278,7 @@ main {
     font-weight: bold; 
     cursor: pointer;
     transition: color 0.2s ease;
-    padding: 5px; /* タップ領域確保 */
+    padding: 5px;
 }
 
 .close-button:hover { color: #333; }
@@ -295,7 +291,7 @@ main {
     margin-bottom: 20px;
     font-size: 1.6em;
     line-height: 1.3;
-    padding-right: 30px; /* 閉じるボタンと被らないように */
+    padding-right: 30px;
 }
 
 .modal-content p {
@@ -320,12 +316,11 @@ main {
     border-bottom-style: solid;
 }
 
-/* Twitter埋め込みエリア */
 .tweet-embed-container {
     margin-top: 25px;
     border-top: 1px solid #e9ecef; 
     padding-top: 25px;
-    min-height: 150px; /* 読み込み中のガタつき防止 */
+    min-height: 150px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -363,7 +358,6 @@ footer {
     background-color: #343a40;
 }
 
-
 /* ================================================= */
 /* スマートフォン向けのスタイル (最適化版)               */
 /* ================================================= */
@@ -373,7 +367,6 @@ footer {
     }
     header {
         padding: 10px 15px;
-        /* wrapは許可しない（ハンバーガーとロゴを横並び維持） */
         flex-wrap: nowrap;
     }
 
@@ -384,13 +377,13 @@ footer {
         display: none; 
     }
     
-    /* 開閉式メニュー */
+    /* メニュー開閉 */
     header.nav-open .header-nav {
         display: flex;
         position: fixed;
         top: 0;
         right: 0;
-        width: 75%; /* 少し広げる */
+        width: 75%;
         height: 100vh;
         background-color: #0056b3;
         flex-direction: column;
@@ -398,46 +391,53 @@ footer {
         padding: 80px 30px;
         gap: 25px;
         box-shadow: -5px 0 15px rgba(0,0,0,0.2);
-        overflow-y: auto; /* 縦が短いスマホ対応 */
+        overflow-y: auto;
     }
     
     .header-nav a {
         font-size: 1.1em;
-        width: 100%; /* クリック範囲を横一杯に */
+        width: 100%;
     }
 
-    /* メインコンテンツの余白調整 */
     main {
         margin: 20px 15px;
-        padding: 20px 15px;
+        padding: 20px 10px; /* スマホではパディングを少し減らしてカレンダーを広く見せる */
     }
     
-    /* FullCalendar スマホ表示の最適化 */
+    /* カレンダーヘッダーの調整 (スマホ) */
     .fc .fc-toolbar {
-        flex-wrap: wrap;
+        flex-direction: column;
         gap: 10px;
-        margin-bottom: 1.5em !important;
+        margin-bottom: 1em !important;
     }
     
     .fc .fc-toolbar-title {
-        font-size: 1.4em;
-        width: 100%;
-        text-align: center;
-        margin-bottom: 5px;
-    }
-
-    /* ボタンサイズの調整 */
-    .fc .fc-button {
-        padding: 6px 12px; 
-        font-size: 0.85em;
+        font-size: 1.3em; /* タイトルサイズを調整 */
+        margin: 0;
     }
     
-    /* 常時公募枠（1カラム表示） */
+    .fc-toolbar-chunk {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+    
+    /* FullCalendarのボタン配置調整: タイトルを真ん中に、左右にボタン */
+    .fc .fc-toolbar-chunk:first-child {
+        justify-content: center; /* prev, next, today を中央寄せ */
+        width: 100%;
+    }
+    
+    /* 月表示（スマホ）のイベント文字サイズ調整 */
+    .fc-event {
+        font-size: 0.75em; /* スマホでは小さくして入りきるように */
+        padding: 1px;
+    }
+    
     .always-open-item {
         width: 100%;
     }
     
-    /* モーダル */
     .modal-content {
         width: 85%;
         margin: 10vh auto;
