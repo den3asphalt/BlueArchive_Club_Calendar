@@ -52,10 +52,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 const startMinutes = start.getHours() * 60 + start.getMinutes();
                 const endMinutes = end.getHours() * 60 + end.getMinutes();
                 
-                // 1440分(24時間)に対する割合
-                leftPercent = (startMinutes / 1440) * 100;
+                // 1. 【計算の分母】: 1日の総時間 (1440分) を100%とする
+                const TOTAL_DAILY_MINUTES = 1440;
+
+                // 2. 【計算: margin-left】: 1日の総時間に対する開始位置の割合
+                //     (例: 04:00開始なら 240 / 1440 ≈ 16.6%)
+                leftPercent = (startMinutes / TOTAL_DAILY_MINUTES) * 100;
+                
+                // 3. 【計算: width】: 1日の総時間に対する期間の割合
                 let durationMinutes = endMinutes - startMinutes;
-                widthPercent = (durationMinutes / 1440) * 100;
+                widthPercent = (durationMinutes / TOTAL_DAILY_MINUTES) * 100;
 
                 // ガード処理
                 if (leftPercent > 85) leftPercent = 85; 
@@ -64,8 +70,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 style = `margin-left: ${leftPercent}%; width: ${widthPercent}%;`;
             } else {
-                // 日またぎイベント、または終日イベントの場合はフル幅表示
-                // これにより「3日分の枠に対して80%ズレる」バグを防ぐ
+                // 日またぎイベント、または終日イベントの場合はフル幅表示 (100%)
+                // (お客様の計算を適用すると描画要素の幅がズレてしまうため、FullCalendarのデフォルト幅を使用)
                 style = 'width: 100%;';
             }
 
