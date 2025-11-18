@@ -1,5 +1,5 @@
 // =======================================================================
-// js/main.js (期間表示対応版)
+// js/main.js (複数日バグ修正版)
 // =======================================================================
 document.addEventListener('DOMContentLoaded', function() {
     const calendarEl = document.getElementById('calendar');
@@ -24,37 +24,62 @@ document.addEventListener('DOMContentLoaded', function() {
         eventContent: function(arg) {
             let timeText = '';
             
-            // --- 位置と幅の計算ロジック (前回と同じ) ---
+            // 現在描画しているセグメントが、イベント全体の「最初」か「最後」か
+            const isStartDay = arg.isStart;
+            const isEndDay = arg.isEnd;
+
+            // --- 1. 位置と幅の計算ロジック (修正版) ---
             let leftPercent = 0;
             let widthPercent = 100;
 
-            if (!arg.event.allDay && arg.event.start) {
-                const start = arg.event.start;
-                // 終了未設定時は仮に2時間とする
-                const end = arg.event.end || new Date(start.getTime() + (2 * 60 * 60 * 1000)); 
+            // 終日イベントでない場合のみ計算
+            if (!arg.event.allDay) {
+                // デフォルトは「その日の0:00開始、24:00終了」とする
+                let segmentStartMinutes = 0;
+                let segmentEndMinutes = 1440; // 24 * 60
 
-                const startMinutes = start.getHours() * 60 + start.getMinutes();
-                let endMinutes = end.getHours() * 60 + end.getMinutes();
-                if (end.getDate() !== start.getDate()) {
-                    endMinutes = 1440; 
-                }
-                if (endMinutes === 0 && end.getDate() !== start.getDate()) {
-                    endMinutes = 1440;
+                // ■開始日の場合: 開始時間を適用
+                if (isStartDay && arg.event.start) {
+                    const start = arg.event.start;
+                    segmentStartMinutes = start.getHours() * 60 + start.getMinutes();
                 }
 
-                leftPercent = (startMinutes / 1440) * 100;
-                let durationMinutes = endMinutes - startMinutes;
-                if (durationMinutes < 0) durationMinutes = 1440 - startMinutes;
+                // ■終了日の場合: 終了時間を適用
+                if (isEndDay && arg.event.end) {
+                    const end = arg.event.end;
+                    let endMin = end.getHours() * 60 + end.getMinutes();
+                    // 0:00終了ジャストの場合は24:00扱いにする（ただし日付またぎの考慮はFullCalendarが本来行うが、念のため）
+                    if (endMin === 0) endMin = 1440;
+                    segmentEndMinutes = endMin;
+                }
+                
+                // もし単発イベントで終了時刻未設定の場合は、仮に2時間幅にする等の処理
+                if (isStartDay && isEndDay && !arg.event.end && arg.event.start) {
+                     // start + 2時間
+                     segmentEndMinutes = segmentStartMinutes + 120; 
+                }
 
+                // パーセント計算
+                leftPercent = (segmentStartMinutes / 1440) * 100;
+                let durationMinutes = segmentEndMinutes - segmentStartMinutes;
                 widthPercent = (durationMinutes / 1440) * 100;
 
-                if (leftPercent > 85) leftPercent = 85; 
+                // --- ガード処理（視認性確保） ---
+                // 「終了日」あるいは「単発」のとき、右端の文字が見えなくなるのを防ぐ
+                if ((isStartDay || isEndDay) && leftPercent > 85) leftPercent = 85; 
+                
+                // 極端に細くなるのを防ぐ
                 if (widthPercent < 15) widthPercent = 15; 
+                
+                // はみ出し防止
                 if (leftPercent + widthPercent > 100) {
                     widthPercent = 100 - leftPercent;
                 }
+            }
 
-                // --- 【修正】時間テキスト生成 (XX/XX XX:XX ~ XX/XX XX:XX) ---
+            // --- 2. 時間テキスト生成 (変更なし: 全体の開始終了を表示) ---
+            // ※ここは「セグメントの時間」ではなく「イベント本来の時間」を表示し続けるのが正解
+            if (!arg.event.allDay && arg.event.start) {
                 const formatDateTime = (d) => {
                     const m = (d.getMonth() + 1).toString().padStart(2, '0');
                     const day = d.getDate().toString().padStart(2, '0');
@@ -63,16 +88,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     return `${m}/${day} ${h}:${min}`;
                 };
 
-                const startStr = formatDateTime(start);
-                // 実際のイベントデータにendが無い場合は空文字扱いでstartのみ表示等の処理
-                // ※計算用のendではなく arg.event.end を使う
+                const startStr = formatDateTime(arg.event.start);
                 const originalEnd = arg.event.end;
                 
                 if (originalEnd) {
                     const endStr = formatDateTime(originalEnd);
                     timeText = `${startStr} ~ ${endStr}`;
                 } else {
-                    timeText = startStr; // 終了未定の場合
+                    timeText = startStr;
                 }
             }
 
@@ -81,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 ? '' 
                 : `margin-left: ${leftPercent}%; width: ${widthPercent}%;`;
 
-            // ホバー時に全文を表示するための title 属性を追加
+            // ツールチップ用
             const tooltipText = timeText ? `${timeText}\n${arg.event.title}` : arg.event.title;
 
             return { 
