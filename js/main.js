@@ -1,95 +1,87 @@
 // =======================================================================
-// js/main.js (総期間計算適用版)
+// js/main.js (枠またぎ対応・最終版)
 // =======================================================================
 document.addEventListener('DOMContentLoaded', function() {
-    const calendarEl = document.getElementById('calendar');
-    const alwaysOpenSection = document.getElementById('alwaysOpenRecruitmentSection');
-    const alwaysOpenList = document.getElementById('alwaysOpenRecruitmentList');
-
+    // ... (前略：カレンダー初期化設定まで) ...
+    
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'ja',
         
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: '' 
-        },
-        buttonText: { today: '今日', month: '月' },
-        
-        dayMaxEvents: true, 
-        contentHeight: 'auto',
+        // ... (中略：headerToolbar, buttonText, dayMaxEventsは変更なし) ...
 
         // イベント表示内容のカスタマイズ
         eventContent: function(arg) {
             let timeText = '';
             
-            // --- 1. 位置と幅の計算ロジック (総期間基準) ---
+            // 現在描画しているセグメントの情報
+            const isStartDay = arg.isStart;
+            const isEndDay = arg.isEnd;
+
+            // --- 1. 位置と幅の計算ロジック (セグメント基準) ---
             let leftPercent = 0;
             let widthPercent = 100;
             let style = '';
 
-        // js/main.js (最終修正版 - 排他的終了時間対応)
-        if (!arg.event.allDay && arg.event.start) {
-            const start = arg.event.start;
-            const end = arg.event.end || start;
+            // 終日イベントでない場合のみ計算
+            if (!arg.event.allDay && arg.event.start) {
+                const start = arg.event.start;
+                const end = arg.event.end || new Date(start.getTime() + (2 * 60 * 60 * 1000)); // 終了未設定時は仮に2時間
 
-            // ----------------------------------------------------
-            // 【総期間 (T) の計算】: イベントの描画要素の全幅（分）
-            // ----------------------------------------------------
-            const startOfSpan = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-            
-            // 排他的終了日の計算準備
-            let exclusiveEndDate = end; 
-
-            // ★修正ロジック: 終了時間が 00:00 ちょうどの場合、分母の基準日を1日前にする
-            if (end.getHours() === 0 && end.getMinutes() === 0 && start.getDate() !== end.getDate()) {
-                exclusiveEndDate = new Date(end.getTime() - (24 * 60 * 60 * 1000)); // 1日分戻す
-            }
-
-            // 描画終了日の翌日 0:00 を排他的終了点とする
-            const endOfSpan = new Date(exclusiveEndDate.getFullYear(), exclusiveEndDate.getMonth(), exclusiveEndDate.getDate() + 1); 
-            
-            const totalSpanMinutes = (endOfSpan.getTime() - startOfSpan.getTime()) / 60000;
-        // ... (後略) ...
+                // 1日の総分数 (1440分) を基準 (100%) とする
+                const TOTAL_DAILY_MINUTES = 1440;
                 
-                // ----------------------------------------------------
-                // 【開始位置 (S) の計算】: 描画要素の左端 (0:00) からイベント開始時刻までのずれ
-                // ----------------------------------------------------
-                const startOffsetMinutes = (start.getTime() - startOfSpan.getTime()) / 60000; 
+                let segmentStartMinutes = 0;
+                let segmentEndMinutes = TOTAL_DAILY_MINUTES;
 
                 // ----------------------------------------------------
-                // 【期間 (D) の計算】: イベントの実際の長さ (分)
+                // ★修正ロジック: isStart/isEnd フラグを使って、このセグメントの開始・終了時刻を決定
                 // ----------------------------------------------------
-                const durationMinutes = (end.getTime() - start.getTime()) / 60000;
-                
-                // ----------------------------------------------------
-                // 【パーセンテージ適用】
-                // ----------------------------------------------------
-                if (totalSpanMinutes > 0) {
-                    leftPercent = (startOffsetMinutes / totalSpanMinutes) * 100;
-                    widthPercent = (durationMinutes / totalSpanMinutes) * 100;
+
+                // [1] 開始位置 (margin-left) の決定
+                if (isStartDay) {
+                    // イベントの開始時刻をセグメントの開始点とする
+                    segmentStartMinutes = start.getHours() * 60 + start.getMinutes();
+                } else {
+                    // 中間日または最終日は 0:00 (0分) スタート
+                    segmentStartMinutes = 0;
                 }
-                
-                // ガード処理（幅が極端に狭い場合）
-                if (widthPercent > 0 && widthPercent < 5) widthPercent = 5; // 最小幅5%確保
 
-                // はみ出し防止（計算上は不要だが念のため）
-                if (leftPercent + widthPercent > 100) widthPercent = 100 - leftPercent;
-
-                // 00:00開始のイベントは左端に寄せ、位置調整を無効化（見栄え重視）
-                if (startOffsetMinutes === 0) {
-                    leftPercent = 0;
+                // [2] 終了位置 (width) の決定
+                if (isEndDay) {
+                    // イベントの終了時刻をセグメントの終了点とする
+                    segmentEndMinutes = end.getHours() * 60 + end.getMinutes();
+                    // 終了が0:00の場合は24:00 (1440分) 終了とみなす
+                    if (segmentEndMinutes === 0) segmentEndMinutes = TOTAL_DAILY_MINUTES; 
+                } else {
+                    // 開始日または中間日は 24:00 (1440分) エンド
+                    segmentEndMinutes = TOTAL_DAILY_MINUTES;
                 }
+
+                // [3] パーセンテージ計算
+                leftPercent = (segmentStartMinutes / TOTAL_DAILY_MINUTES) * 100;
+                let durationMinutes = segmentEndMinutes - segmentStartMinutes;
+                
+                // 期間の分数がマイナスになった場合 (ロジック上発生しにくいが安全策) は残りの幅を使用
+                if (durationMinutes < 0) durationMinutes = TOTAL_DAILY_MINUTES - segmentStartMinutes; 
+
+                widthPercent = (durationMinutes / TOTAL_DAILY_MINUTES) * 100;
+                
+                // --- ガード処理 --- (単日イベントの体裁維持用)
+                if (isStartDay && leftPercent > 85) leftPercent = 85; 
+                if (isEndDay && widthPercent < 15) widthPercent = 15; 
+                
+                // 期間がマイナスになる特殊なケースで0%以下になるのを防ぐ
+                if (widthPercent < 0) widthPercent = 100;
 
                 style = `margin-left: ${leftPercent}%; width: ${widthPercent}%;`;
 
             } else {
-                // 終日イベントの場合はフル幅
+                // 終日イベントはフル幅
                 style = 'width: 100%;';
             }
 
-            // --- 2. 時間テキスト生成 ---
+            // --- 2. 時間テキスト生成 (変更なし) ---
             if (!arg.event.allDay && arg.event.start) {
                 const formatDateTime = (d) => {
                     const m = (d.getMonth() + 1).toString().padStart(2, '0');
@@ -122,23 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
             };
         },
 
-        events: async function(fetchInfo, successCallback, failureCallback) {
-            try {
-                const response = await fetch('/.netlify/functions/get-calendar-events');
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const data = await response.json();
-                successCallback(data.calendarEvents); 
-                renderAlwaysOpenRecruitment(data.alwaysOpenRecruitment);
-            } catch (error) {
-                console.error("Error fetching events:", error);
-                failureCallback(error);
-            }
-        },
-
-        eventClick: function(info) {
-            info.jsEvent.preventDefault();
-            displayEventModal(info.event);
-        }
+        // ... (後略：events, eventClick, 共通関数は変更なし) ...
     });
 
     calendar.render();
