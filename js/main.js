@@ -1,5 +1,5 @@
 // =======================================================================
-// js/main.js (タイムライン可視化版)
+// js/main.js (期間表示対応版)
 // =======================================================================
 document.addEventListener('DOMContentLoaded', function() {
     const calendarEl = document.getElementById('calendar');
@@ -24,71 +24,75 @@ document.addEventListener('DOMContentLoaded', function() {
         eventContent: function(arg) {
             let timeText = '';
             
-            // --- 位置と幅の計算ロジック ---
-            let leftPercent = 0;  // 左端からの距離 (%)
-            let widthPercent = 100; // バーの長さ (%)
+            // --- 位置と幅の計算ロジック (前回と同じ) ---
+            let leftPercent = 0;
+            let widthPercent = 100;
 
             if (!arg.event.allDay && arg.event.start) {
                 const start = arg.event.start;
-                const end = arg.event.end || new Date(start.getTime() + (2 * 60 * 60 * 1000)); // 終了がない場合は仮に2時間後とする
+                // 終了未設定時は仮に2時間とする
+                const end = arg.event.end || new Date(start.getTime() + (2 * 60 * 60 * 1000)); 
 
-                // 1日を1440分として計算
                 const startMinutes = start.getHours() * 60 + start.getMinutes();
-                
-                // 終了時間が翌日にまたぐ場合の考慮（簡易的に24:00=1440とする）
                 let endMinutes = end.getHours() * 60 + end.getMinutes();
                 if (end.getDate() !== start.getDate()) {
-                    endMinutes = 1440; // 日を跨ぐ場合はその日の終わりまでバーを伸ばす
+                    endMinutes = 1440; 
                 }
-                
-                // 終了時間が0:00(24:00)の場合の補正
                 if (endMinutes === 0 && end.getDate() !== start.getDate()) {
                     endMinutes = 1440;
                 }
 
-                // パーセント計算 (1440分 = 100%)
                 leftPercent = (startMinutes / 1440) * 100;
-                
-                // 幅の計算
                 let durationMinutes = endMinutes - startMinutes;
-                if (durationMinutes < 0) durationMinutes = 1440 - startMinutes; // 念のため
+                if (durationMinutes < 0) durationMinutes = 1440 - startMinutes;
 
                 widthPercent = (durationMinutes / 1440) * 100;
 
-                // 【視認性調整】
-                // あまりに右に寄りすぎると文字が読めないので、最大85%くらいで止める
-                // また、幅が狭すぎるとクリックできないので、最低幅を確保する
                 if (leftPercent > 85) leftPercent = 85; 
                 if (widthPercent < 15) widthPercent = 15; 
-                
-                // 左位置 + 幅 が 100% を超えないように調整
                 if (leftPercent + widthPercent > 100) {
                     widthPercent = 100 - leftPercent;
                 }
 
-                // 時間テキスト生成
-                const formatTime = (d) => d.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
-                timeText = formatTime(start);
+                // --- 【修正】時間テキスト生成 (XX/XX XX:XX ~ XX/XX XX:XX) ---
+                const formatDateTime = (d) => {
+                    const m = (d.getMonth() + 1).toString().padStart(2, '0');
+                    const day = d.getDate().toString().padStart(2, '0');
+                    const h = d.getHours().toString().padStart(2, '0');
+                    const min = d.getMinutes().toString().padStart(2, '0');
+                    return `${m}/${day} ${h}:${min}`;
+                };
+
+                const startStr = formatDateTime(start);
+                // 実際のイベントデータにendが無い場合は空文字扱いでstartのみ表示等の処理
+                // ※計算用のendではなく arg.event.end を使う
+                const originalEnd = arg.event.end;
+                
+                if (originalEnd) {
+                    const endStr = formatDateTime(originalEnd);
+                    timeText = `${startStr} ~ ${endStr}`;
+                } else {
+                    timeText = startStr; // 終了未定の場合
+                }
             }
 
-            // スタイル文字列の生成
-            // 終日イベント(allDay)の場合は左端0、幅100%
+            // スタイル生成
             const style = arg.event.allDay 
                 ? '' 
                 : `margin-left: ${leftPercent}%; width: ${widthPercent}%;`;
 
-            // HTMLの組み立て
+            // ホバー時に全文を表示するための title 属性を追加
+            const tooltipText = timeText ? `${timeText}\n${arg.event.title}` : arg.event.title;
+
             return { 
                 html: `
-                    <div class="fc-event-inner" style="${style}">
+                    <div class="fc-event-inner" style="${style}" title="${tooltipText}">
                         <div class="fc-event-time-row">${timeText}</div>
                         <div class="fc-event-title-row">${arg.event.title}</div>
                     </div>
                 ` 
             };
         },
-
-        // イベントクラスの動的付与ロジックは不要になったので削除（styleで制御するため）
 
         events: async function(fetchInfo, successCallback, failureCallback) {
             try {
