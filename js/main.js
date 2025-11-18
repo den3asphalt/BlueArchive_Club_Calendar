@@ -1,5 +1,5 @@
 // =======================================================================
-// js/main.js (時間表示デザイン強化版)
+// js/main.js (タイムライン可視化版)
 // =======================================================================
 document.addEventListener('DOMContentLoaded', function() {
     const calendarEl = document.getElementById('calendar');
@@ -15,93 +15,88 @@ document.addEventListener('DOMContentLoaded', function() {
             center: 'title',
             right: '' 
         },
+        buttonText: { today: '今日', month: '月' },
         
-        buttonText: {
-            today: '今日',
-            month: '月',
-        },
-        
-        // イベントの重なり許容数（スマホで見やすいように調整）
         dayMaxEvents: true, 
         contentHeight: 'auto',
 
-        // ■ 1. クラス名の動的付与
-        // これにより、CSSで「左端を空ける」「右端を空ける」を制御します
-        eventClassNames: function(arg) {
-            const classes = [];
-            const start = arg.event.start;
-            const end = arg.event.end;
-
-            // 開始が00:00でない場合 -> 左に隙間を作るクラス
-            if (start && (start.getHours() !== 0 || start.getMinutes() !== 0)) {
-                classes.push('is-delayed-start');
-            }
-
-            // 終了が存在し、かつ23:59(または翌00:00)でない場合 -> 右に隙間を作るクラス
-            // ※FullCalendarのendは排他的（翌00:00）の場合があるので判定に注意
-            if (end) {
-                const isMidnight = end.getHours() === 0 && end.getMinutes() === 0;
-                if (!isMidnight) {
-                    classes.push('is-early-end');
-                }
-            }
-            
-            return classes;
-        },
-
-        // ■ 2. イベント表示内容のカスタマイズ
-        // 時間とタイトルを綺麗に配置します
+        // イベント表示内容のカスタマイズ
         eventContent: function(arg) {
             let timeText = '';
             
-            // 時間テキストの生成 (例: 19:00 - 21:00)
+            // --- 位置と幅の計算ロジック ---
+            let leftPercent = 0;  // 左端からの距離 (%)
+            let widthPercent = 100; // バーの長さ (%)
+
             if (!arg.event.allDay && arg.event.start) {
                 const start = arg.event.start;
-                const end = arg.event.end;
-                
-                const formatTime = (date) => {
-                    return date.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
-                };
+                const end = arg.event.end || new Date(start.getTime() + (2 * 60 * 60 * 1000)); // 終了がない場合は仮に2時間後とする
 
-                timeText = formatTime(start);
-                if (end && start.getDate() === end.getDate()) {
-                    // 同日の場合のみ終了時刻を表示（すっきりさせるため）
-                    timeText += ` - ${formatTime(end)}`;
+                // 1日を1440分として計算
+                const startMinutes = start.getHours() * 60 + start.getMinutes();
+                
+                // 終了時間が翌日にまたぐ場合の考慮（簡易的に24:00=1440とする）
+                let endMinutes = end.getHours() * 60 + end.getMinutes();
+                if (end.getDate() !== start.getDate()) {
+                    endMinutes = 1440; // 日を跨ぐ場合はその日の終わりまでバーを伸ばす
                 }
+                
+                // 終了時間が0:00(24:00)の場合の補正
+                if (endMinutes === 0 && end.getDate() !== start.getDate()) {
+                    endMinutes = 1440;
+                }
+
+                // パーセント計算 (1440分 = 100%)
+                leftPercent = (startMinutes / 1440) * 100;
+                
+                // 幅の計算
+                let durationMinutes = endMinutes - startMinutes;
+                if (durationMinutes < 0) durationMinutes = 1440 - startMinutes; // 念のため
+
+                widthPercent = (durationMinutes / 1440) * 100;
+
+                // 【視認性調整】
+                // あまりに右に寄りすぎると文字が読めないので、最大85%くらいで止める
+                // また、幅が狭すぎるとクリックできないので、最低幅を確保する
+                if (leftPercent > 85) leftPercent = 85; 
+                if (widthPercent < 15) widthPercent = 15; 
+                
+                // 左位置 + 幅 が 100% を超えないように調整
+                if (leftPercent + widthPercent > 100) {
+                    widthPercent = 100 - leftPercent;
+                }
+
+                // 時間テキスト生成
+                const formatTime = (d) => d.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+                timeText = formatTime(start);
             }
 
+            // スタイル文字列の生成
+            // 終日イベント(allDay)の場合は左端0、幅100%
+            const style = arg.event.allDay 
+                ? '' 
+                : `margin-left: ${leftPercent}%; width: ${widthPercent}%;`;
+
             // HTMLの組み立て
-            // 時間がある場合: 上段に時間、下段にタイトル
-            // 終日の場合: タイトルのみ
-            let htmlContent;
-            if (timeText) {
-                htmlContent = `
-                    <div class="fc-event-inner">
+            return { 
+                html: `
+                    <div class="fc-event-inner" style="${style}">
                         <div class="fc-event-time-row">${timeText}</div>
                         <div class="fc-event-title-row">${arg.event.title}</div>
                     </div>
-                `;
-            } else {
-                htmlContent = `
-                    <div class="fc-event-inner fc-event-allday">
-                        <div class="fc-event-title-row">${arg.event.title}</div>
-                    </div>
-                `;
-            }
-
-            return { html: htmlContent };
+                ` 
+            };
         },
 
-        // イベント取得 (変更なし)
+        // イベントクラスの動的付与ロジックは不要になったので削除（styleで制御するため）
+
         events: async function(fetchInfo, successCallback, failureCallback) {
             try {
                 const response = await fetch('/.netlify/functions/get-calendar-events');
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
-                
                 successCallback(data.calendarEvents); 
                 renderAlwaysOpenRecruitment(data.alwaysOpenRecruitment);
-
             } catch (error) {
                 console.error("Error fetching events:", error);
                 failureCallback(error);
@@ -116,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     calendar.render();
 
-    // --- 以下、モーダル等の共通処理 (変更なし) ---
+    // --- 以下、モーダル・常時公募関数（変更なし） ---
     function displayEventModal(eventData) {
         const modal = document.getElementById('eventModal');
         const modalTitle = document.getElementById('modalTitle');

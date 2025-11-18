@@ -1,8 +1,8 @@
 /* =======================================================================
-   style.css - Revised for "Timeline-feel" in Month View
+   style.css - Timeline Style Updates
    ======================================================================= */
 
-/* 基本的なスタイルリセット */
+/* 基本リセット等は変更なし */
 body {
     margin: 0;
     padding: 0;
@@ -136,86 +136,61 @@ main {
     border-color: #0056b3;
 }
 
-/* =========================================================
-   ★イベントデザインの刷新 (時間差の視覚化)
-   ========================================================= */
+/* イベント要素のリセット */
 .fc-event {
     border: none !important;
-    background: transparent !important; /* 背景はinnerで制御するため透明に */
+    background: transparent !important;
     margin-bottom: 2px;
     cursor: pointer;
+    /* デフォルトのwidth制御を無効化して、内部のinnerで制御する */
+    width: 100%; 
 }
 
-/* イベントの内部コンテナ */
+/* =========================================================
+   ★イベント内部コンテナ (タイムラインバー)
+   ========================================================= */
 .fc-event-inner {
-    background-color: #3788d8; /* デフォルト色 */
+    background-color: #3788d8;
     color: #fff;
     border-radius: 4px;
     padding: 2px 5px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
-    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    overflow: hidden; /* 文字がはみ出したら隠す */
+    white-space: nowrap;
     transition: background-color 0.2s, transform 0.1s;
     
-    /* Flexboxで縦並び */
     display: flex;
     flex-direction: column;
     justify-content: center;
+    
+    /* 幅とマージンはJSのインラインスタイルで制御される */
+    min-width: 20px; /* 最小幅の安全策 */
 }
 
 .fc-event-inner:hover {
     background-color: #2c6cb0;
     transform: translateY(-1px);
+    z-index: 5; /* ホバー時は少し手前に */
 }
 
-/* 時間行のデザイン */
+/* 時間行 */
 .fc-event-time-row {
-    font-size: 0.75em; /* かなり小さく */
+    font-size: 0.7em; /* 小さく */
     opacity: 0.9;
-    line-height: 1.1;
-    font-variant-numeric: tabular-nums; /* 数字の幅を揃える */
-    white-space: nowrap;
+    line-height: 1;
     margin-bottom: 1px;
-}
-
-/* タイトル行のデザイン */
-.fc-event-title-row {
-    font-size: 0.85em;
-    font-weight: 600;
-    line-height: 1.2;
-    white-space: nowrap;
+    /* 文字幅が狭い場合への対応 */
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* 終日イベントの場合の調整 */
-.fc-event-allday {
-    padding: 4px 6px; /* 少し高さを出す */
-}
-.fc-event-allday .fc-event-title-row {
-    font-size: 0.9em;
-}
-
-/* ★時間差の表現 (main.jsで付与したクラスを利用) */
-/* 0:00開始でない場合: 左にマージンを開ける */
-.is-delayed-start .fc-event-inner {
-    margin-left: 10%; /* 枠の10%分右にずらす */
-    border-top-left-radius: 8px; /* 角を少し丸くして「途中から」感を出す */
-    border-bottom-left-radius: 8px;
-    background: linear-gradient(90deg, #4a9dec 0%, #3788d8 15%); /* 左端を少し明るく */
-}
-
-/* 24:00終了でない場合: 右にマージンを開ける */
-.is-early-end .fc-event-inner {
-    margin-right: 10%; /* 枠の10%分左で止める */
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
-}
-
-/* 両方（途中から始まり途中で終わる）の場合の見た目調整 */
-.is-delayed-start.is-early-end .fc-event-inner {
-    margin-left: 8%; 
-    margin-right: 8%;
-    text-align: center; /* 真ん中に寄せる */
+/* タイトル行 */
+.fc-event-title-row {
+    font-size: 0.8em;
+    font-weight: 600;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* 常時公募枠セクション */
@@ -240,7 +215,7 @@ main {
     justify-content: center;
 }
 
-/* 常時公募枠のカードデザイン */
+/* 常時公募枠カード */
 .always-open-item {
     background-color: #ffffff; 
     border: 1px solid #e9ecef;
@@ -371,4 +346,70 @@ main {
     margin-top: 25px;
     border-top: 1px solid #e9ecef; 
     padding-top: 25px;
-    min-
+    min-height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.loader {
+    font-size: 0.9em;
+    color: #6c757d;
+    margin: 20px 0;
+}
+
+.twitter-link-btn {
+    display: inline-block;
+    margin-top: 10px;
+    color: #1d9bf0;
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    border: 1px solid #e9ecef;
+    border-radius: 20px;
+    transition: background 0.2s;
+}
+.twitter-link-btn:hover {
+    background-color: #f8f9fa;
+}
+
+/* フッター */
+footer {
+    text-align: center;
+    padding: 30px 20px; 
+    color: rgba(255,255,255,0.8); 
+    font-size: 0.9em;
+    margin-top: 50px; 
+    background-color: #343a40;
+}
+
+/* スマホ向け */
+@media (max-width: 768px) {
+    body { font-size: 15px; }
+    header { padding: 10px 15px; flex-wrap: nowrap; }
+    .hamburger-btn { display: block; }
+    .header-nav { display: none; }
+    
+    header.nav-open .header-nav {
+        display: flex; position: fixed; top: 0; right: 0; width: 75%; height: 100vh;
+        background-color: #0056b3; flex-direction: column; align-items: flex-start;
+        padding: 80px 30px; gap: 25px; box-shadow: -5px 0 15px rgba(0,0,0,0.2); overflow-y: auto;
+    }
+    .header-nav a { font-size: 1.1em; width: 100%; }
+    main { margin: 20px 15px; padding: 20px 10px; }
+    
+    .fc .fc-toolbar { flex-direction: column; gap: 10px; margin-bottom: 1em !important; }
+    .fc .fc-toolbar-title { font-size: 1.3em; margin: 0; }
+    .fc-toolbar-chunk { display: flex; justify-content: space-between; width: 100%; }
+    .fc .fc-toolbar-chunk:first-child { justify-content: center; width: 100%; }
+    
+    /* スマホではさらに小さく */
+    .fc-event-inner { padding: 1px 3px; }
+    .fc-event-time-row { font-size: 0.6em; }
+    .fc-event-title-row { font-size: 0.7em; }
+    
+    .always-open-item { width: 100%; }
+    .modal-content { width: 85%; margin: 10vh auto; padding: 25px 20px; }
+    .modal-content h2 { font-size: 1.3em; }
+}
