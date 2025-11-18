@@ -1,5 +1,5 @@
 // =======================================================================
-// js/main.js (複数日バグ修正版)
+// js/main.js (複数日ズレ修正・完全版)
 // =======================================================================
 document.addEventListener('DOMContentLoaded', function() {
     const calendarEl = document.getElementById('calendar');
@@ -38,25 +38,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 let segmentStartMinutes = 0;
                 let segmentEndMinutes = 1440; // 24 * 60
 
-                // ■開始日の場合: 開始時間を適用
+                // ■開始日の場合のみ、開始時間を適用 (それ以外は0:00スタート)
                 if (isStartDay && arg.event.start) {
                     const start = arg.event.start;
                     segmentStartMinutes = start.getHours() * 60 + start.getMinutes();
                 }
 
-                // ■終了日の場合: 終了時間を適用
+                // ■終了日の場合のみ、終了時間を適用 (それ以外は24:00エンド)
                 if (isEndDay && arg.event.end) {
                     const end = arg.event.end;
                     let endMin = end.getHours() * 60 + end.getMinutes();
-                    // 0:00終了ジャストの場合は24:00扱いにする（ただし日付またぎの考慮はFullCalendarが本来行うが、念のため）
+                    // 0:00終了ジャストの場合は24:00扱いにする
                     if (endMin === 0) endMin = 1440;
                     segmentEndMinutes = endMin;
                 }
                 
-                // もし単発イベントで終了時刻未設定の場合は、仮に2時間幅にする等の処理
+                // 単発イベントで終了時刻未設定の場合のフォールバック
                 if (isStartDay && isEndDay && !arg.event.end && arg.event.start) {
-                     // start + 2時間
-                     segmentEndMinutes = segmentStartMinutes + 120; 
+                     segmentEndMinutes = segmentStartMinutes + 120; // 2時間
                 }
 
                 // パーセント計算
@@ -65,20 +64,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 widthPercent = (durationMinutes / 1440) * 100;
 
                 // --- ガード処理（視認性確保） ---
-                // 「終了日」あるいは「単発」のとき、右端の文字が見えなくなるのを防ぐ
-                if ((isStartDay || isEndDay) && leftPercent > 85) leftPercent = 85; 
                 
-                // 極端に細くなるのを防ぐ
+                // 「開始日」において、あまりに右に寄りすぎると見えないので制限
+                if (isStartDay && leftPercent > 85) leftPercent = 85;
+                
+                // 幅が極端に細くなるのを防ぐ
                 if (widthPercent < 15) widthPercent = 15; 
                 
-                // はみ出し防止
+                // はみ出し防止 (左位置 + 幅 が 100% を超えないように)
                 if (leftPercent + widthPercent > 100) {
                     widthPercent = 100 - leftPercent;
                 }
             }
 
-            // --- 2. 時間テキスト生成 (変更なし: 全体の開始終了を表示) ---
-            // ※ここは「セグメントの時間」ではなく「イベント本来の時間」を表示し続けるのが正解
+            // --- 2. 時間テキスト生成 (ここは変更なし: 全体の期間を表示) ---
             if (!arg.event.allDay && arg.event.start) {
                 const formatDateTime = (d) => {
                     const m = (d.getMonth() + 1).toString().padStart(2, '0');
@@ -104,7 +103,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 ? '' 
                 : `margin-left: ${leftPercent}%; width: ${widthPercent}%;`;
 
-            // ツールチップ用
             const tooltipText = timeText ? `${timeText}\n${arg.event.title}` : arg.event.title;
 
             return { 
