@@ -29,24 +29,29 @@ document.addEventListener('DOMContentLoaded', function() {
             let widthPercent = 100;
             let style = '';
 
-            // 終日イベントでない場合のみ計算
-            if (!arg.event.allDay && arg.event.start) {
-                const start = arg.event.start;
-                // FullCalendarのイベント終了は排他的なので、終了が未定義の場合は開始日と同じとする
-                const end = arg.event.end || start;
+        // js/main.js (最終修正版 - 排他的終了時間対応)
+        if (!arg.event.allDay && arg.event.start) {
+            const start = arg.event.start;
+            const end = arg.event.end || start;
 
-                // ----------------------------------------------------
-                // 【総期間 (T) の計算】: イベントの描画要素の全幅（分）
-                // 描画開始日 0:00 から 描画終了日の翌日 0:00 まで
-                // ※ ここではイベントの start/end date をベースに計算します
-                // ----------------------------------------------------
-                const startOfSpan = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-                
-                // 終了日の翌日 0:00 を排他的終了点とする
-                const endOfSpan = new Date(end.getFullYear(), end.getMonth(), end.getDate() + 1); 
-                
-                // 総期間（分母）を計算
-                const totalSpanMinutes = (endOfSpan.getTime() - startOfSpan.getTime()) / 60000;
+            // ----------------------------------------------------
+            // 【総期間 (T) の計算】: イベントの描画要素の全幅（分）
+            // ----------------------------------------------------
+            const startOfSpan = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+            
+            // 排他的終了日の計算準備
+            let exclusiveEndDate = end; 
+
+            // ★修正ロジック: 終了時間が 00:00 ちょうどの場合、分母の基準日を1日前にする
+            if (end.getHours() === 0 && end.getMinutes() === 0 && start.getDate() !== end.getDate()) {
+                exclusiveEndDate = new Date(end.getTime() - (24 * 60 * 60 * 1000)); // 1日分戻す
+            }
+
+            // 描画終了日の翌日 0:00 を排他的終了点とする
+            const endOfSpan = new Date(exclusiveEndDate.getFullYear(), exclusiveEndDate.getMonth(), exclusiveEndDate.getDate() + 1); 
+            
+            const totalSpanMinutes = (endOfSpan.getTime() - startOfSpan.getTime()) / 60000;
+        // ... (後略) ...
                 
                 // ----------------------------------------------------
                 // 【開始位置 (S) の計算】: 描画要素の左端 (0:00) からイベント開始時刻までのずれ
