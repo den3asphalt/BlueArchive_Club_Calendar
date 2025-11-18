@@ -1,5 +1,5 @@
 // =======================================================================
-// js/main.js (月カレンダー固定版)
+// js/main.js (時間表示デザイン強化版)
 // =======================================================================
 document.addEventListener('DOMContentLoaded', function() {
     const calendarEl = document.getElementById('calendar');
@@ -7,33 +7,92 @@ document.addEventListener('DOMContentLoaded', function() {
     const alwaysOpenList = document.getElementById('alwaysOpenRecruitmentList');
 
     const calendar = new FullCalendar.Calendar(calendarEl, {
-        // 【変更】デバイス問わず「月カレンダー」に固定
         initialView: 'dayGridMonth',
         locale: 'ja',
         
-        // 【変更】ツールバーから表示切り替えボタンを排除
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: '' // 右側の切り替えボタンなし
+            right: '' 
         },
         
         buttonText: {
             today: '今日',
             month: '月',
-            // list, week, day は使用しないため削除
         },
         
-        // 時間の表示フォーマット (例: 21:00)
-        eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
-        
-        // 月表示でイベントが多くなった時に「+他n件」と表示する設定
+        // イベントの重なり許容数（スマホで見やすいように調整）
         dayMaxEvents: true, 
-        
-        // 高さの自動調整
         contentHeight: 'auto',
 
-        // イベント取得ロジック
+        // ■ 1. クラス名の動的付与
+        // これにより、CSSで「左端を空ける」「右端を空ける」を制御します
+        eventClassNames: function(arg) {
+            const classes = [];
+            const start = arg.event.start;
+            const end = arg.event.end;
+
+            // 開始が00:00でない場合 -> 左に隙間を作るクラス
+            if (start && (start.getHours() !== 0 || start.getMinutes() !== 0)) {
+                classes.push('is-delayed-start');
+            }
+
+            // 終了が存在し、かつ23:59(または翌00:00)でない場合 -> 右に隙間を作るクラス
+            // ※FullCalendarのendは排他的（翌00:00）の場合があるので判定に注意
+            if (end) {
+                const isMidnight = end.getHours() === 0 && end.getMinutes() === 0;
+                if (!isMidnight) {
+                    classes.push('is-early-end');
+                }
+            }
+            
+            return classes;
+        },
+
+        // ■ 2. イベント表示内容のカスタマイズ
+        // 時間とタイトルを綺麗に配置します
+        eventContent: function(arg) {
+            let timeText = '';
+            
+            // 時間テキストの生成 (例: 19:00 - 21:00)
+            if (!arg.event.allDay && arg.event.start) {
+                const start = arg.event.start;
+                const end = arg.event.end;
+                
+                const formatTime = (date) => {
+                    return date.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+                };
+
+                timeText = formatTime(start);
+                if (end && start.getDate() === end.getDate()) {
+                    // 同日の場合のみ終了時刻を表示（すっきりさせるため）
+                    timeText += ` - ${formatTime(end)}`;
+                }
+            }
+
+            // HTMLの組み立て
+            // 時間がある場合: 上段に時間、下段にタイトル
+            // 終日の場合: タイトルのみ
+            let htmlContent;
+            if (timeText) {
+                htmlContent = `
+                    <div class="fc-event-inner">
+                        <div class="fc-event-time-row">${timeText}</div>
+                        <div class="fc-event-title-row">${arg.event.title}</div>
+                    </div>
+                `;
+            } else {
+                htmlContent = `
+                    <div class="fc-event-inner fc-event-allday">
+                        <div class="fc-event-title-row">${arg.event.title}</div>
+                    </div>
+                `;
+            }
+
+            return { html: htmlContent };
+        },
+
+        // イベント取得 (変更なし)
         events: async function(fetchInfo, successCallback, failureCallback) {
             try {
                 const response = await fetch('/.netlify/functions/get-calendar-events');
@@ -49,17 +108,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         },
 
-        // イベント表示のカスタマイズ
-        eventContent: function(arg) {
-            // シンプルにタイトルを表示
-            return { 
-                html: `<div class="fc-event-content-custom">
-                        <span class="fc-event-time-custom">${arg.timeText}</span>
-                        <span class="fc-event-title-custom">${arg.event.title}</span>
-                       </div>` 
-            };
-        },
-
         eventClick: function(info) {
             info.jsEvent.preventDefault();
             displayEventModal(info.event);
@@ -68,8 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     calendar.render();
 
-    // --- 以下、モーダルと常時公募のロジック（前回と同じ） ---
-
+    // --- 以下、モーダル等の共通処理 (変更なし) ---
     function displayEventModal(eventData) {
         const modal = document.getElementById('eventModal');
         const modalTitle = document.getElementById('modalTitle');
