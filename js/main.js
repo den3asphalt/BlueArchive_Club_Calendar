@@ -1,53 +1,39 @@
 // =======================================================================
-// js/main.js (改善版)
+// js/main.js (月カレンダー固定版)
 // =======================================================================
 document.addEventListener('DOMContentLoaded', function() {
     const calendarEl = document.getElementById('calendar');
     const alwaysOpenSection = document.getElementById('alwaysOpenRecruitmentSection');
     const alwaysOpenList = document.getElementById('alwaysOpenRecruitmentList');
 
-    // 画面幅判定
-    const isMobile = window.innerWidth <= 768;
-
-    // 【改善1】スマホの初期ビューを 'listMonth' に変更
-    // これにより、タップなしでその月の予定を縦スクロールで一気に確認できます。
-    // ※ FullCalendarのStandard Bundleにはlist viewが含まれています
-    const initialView = isMobile ? 'listMonth' : 'dayGridMonth';
-
-    // 【改善2】ヘッダーツールバーの最適化
-    // スマホではタイトルを中央、切り替えを右に配置し、ボタンを厳選
-    const headerToolbar = isMobile ? {
-        left: 'prev,next',
-        center: 'title',
-        right: 'listMonth,dayGridMonth' // 週表示(listWeek)は情報量が中途半端なので削除、カレンダーかリストかの二択にする
-    } : {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,timeGridWeek,listMonth'
-    };
-
     const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: initialView,
+        // 【変更】デバイス問わず「月カレンダー」に固定
+        initialView: 'dayGridMonth',
         locale: 'ja',
-        headerToolbar: headerToolbar,
+        
+        // 【変更】ツールバーから表示切り替えボタンを排除
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: '' // 右側の切り替えボタンなし
+        },
+        
         buttonText: {
             today: '今日',
             month: '月',
-            week: '週',
-            day: '日',
-            list: 'リスト' // 「週」から汎用的な「リスト」に変更
+            // list, week, day は使用しないため削除
         },
-        // スマホのリスト表示で日付が目立つようにカスタマイズ
-        listDayFormat: { month: 'long', day: 'numeric', weekday: 'short' },
-        listDaySideFormat: false, // 左側の日付表示を消してスッキリさせる（好みによる）
         
+        // 時間の表示フォーマット (例: 21:00)
         eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
-        allDayText: '終日',
         
-        // 高さの自動調整（スマホで縦に伸びすぎるのを防ぐ場合は固定値を検討、今回は自動）
+        // 月表示でイベントが多くなった時に「+他n件」と表示する設定
+        dayMaxEvents: true, 
+        
+        // 高さの自動調整
         contentHeight: 'auto',
-        
-        // イベント取得ロジック（変更なし）
+
+        // イベント取得ロジック
         events: async function(fetchInfo, successCallback, failureCallback) {
             try {
                 const response = await fetch('/.netlify/functions/get-calendar-events');
@@ -65,13 +51,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // イベント表示のカスタマイズ
         eventContent: function(arg) {
-            // listビュー（スマホメイン）での表示情報量を増やす
-            if (arg.view.type.startsWith('list')) {
-                // サークル名があれば表示したいが、event.titleに既に含まれている想定
-                // 色分けなどが設定されていればここでクラス付与可能
-                return { html: `<div class="fc-list-event-content-custom">${arg.event.title}</div>` };
-            }
-            return { html: `<div>${arg.event.title}</div>` };
+            // シンプルにタイトルを表示
+            return { 
+                html: `<div class="fc-event-content-custom">
+                        <span class="fc-event-time-custom">${arg.timeText}</span>
+                        <span class="fc-event-title-custom">${arg.event.title}</span>
+                       </div>` 
+            };
         },
 
         eventClick: function(info) {
@@ -82,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     calendar.render();
 
-    // --- 以下、モーダルと常時公募のロジック（変更なし、または微調整） ---
+    // --- 以下、モーダルと常時公募のロジック（前回と同じ） ---
 
     function displayEventModal(eventData) {
         const modal = document.getElementById('eventModal');
@@ -99,7 +85,6 @@ document.addEventListener('DOMContentLoaded', function() {
         modalTitle.textContent = eventData.title;
         
         if (props.clubId) {
-            // 【改善3】リンクのタップ領域を明確にするためのクラス付与（CSSで装飾推奨）
             modalCircleName.innerHTML = `<a href="/circle.html?id=${props.clubId}" class="modal-circle-link" target="_blank">${circleNameText} <span style="font-size:0.8em">🔗</span></a>`;
         } else {
             modalCircleName.textContent = circleNameText;
@@ -107,7 +92,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         modalRelatedInfo.innerHTML = props.relatedInfo ? marked.parse(props.relatedInfo) : 'なし';
         
-        // 日付フォーマット処理（変更なし）
         let durationText = '';
         if (eventData.start) {
             const start = new Date(eventData.start);
@@ -124,14 +108,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         modalDuration.textContent = durationText || '未設定';
 
-        // Twitter埋め込み
         modalTweetEmbed.innerHTML = ''; 
         modalTweetLink.innerHTML = ''; 
         
         if (props.tweetUrl) {
-            // 常にテキストリンクは表示しておく（埋め込み失敗時の保険 兼 UX向上）
             modalTweetLink.innerHTML = `<p><a href="${props.tweetUrl}" target="_blank" class="twitter-link-btn">Twitterで元のツイートを見る</a></p>`;
-
             const tweetIdMatch = props.tweetUrl.match(/\/status\/(\d+)/);
             if (tweetIdMatch && window.twttr && window.twttr.widgets) {
                 modalTweetEmbed.innerHTML = '<div class="loader">Twitter読み込み中...</div>';
@@ -142,10 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 ).then(el => {
                     const loader = modalTweetEmbed.querySelector('.loader');
                     if(loader) loader.remove();
-                    
-                    if (!el) {
-                        modalTweetEmbed.innerHTML = '<p class="error-msg">埋め込み表示できませんでした。</p>';
-                    }
+                    if (!el) modalTweetEmbed.innerHTML = '<p class="error-msg">埋め込み表示できませんでした。</p>';
                 });
             }
         } else {
@@ -155,7 +133,6 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.style.display = 'block';
     }
 
-    // 常時公募枠（変更なし、ただしCSSでクリック可能感を出すこと推奨）
     function renderAlwaysOpenRecruitment(items) {
         if (!alwaysOpenSection || !alwaysOpenList) return;
         alwaysOpenList.innerHTML = ''; 
@@ -169,7 +146,6 @@ document.addEventListener('DOMContentLoaded', function() {
         items.forEach(item => {
             const itemDiv = document.createElement('div');
             itemDiv.classList.add('always-open-item'); 
-            // タップ誘導のためのアイコン追加
             itemDiv.innerHTML = `
                 <div class="always-open-content">
                     <h3>${item.title}</h3>
@@ -185,11 +161,8 @@ document.addEventListener('DOMContentLoaded', function() {
         alwaysOpenSection.style.display = 'block'; 
     }
 
-    // モーダル閉じる処理（変更なし）
     const modal = document.getElementById('eventModal');
     const closeButton = document.querySelector('.close-button');
-    
-    // 閉じるボタンのタップ判定を広げるためのラッパー関数推奨だが今回はそのまま
     closeButton.onclick = function() {
         modal.style.display = 'none';
         document.getElementById('modalTweetEmbed').innerHTML = ''; 
