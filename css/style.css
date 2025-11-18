@@ -1,3 +1,7 @@
+/* =======================================================================
+   style.css - Revised for Better UI/UX
+   ======================================================================= */
+
 /* 基本的なスタイルリセット */
 body {
     margin: 0;
@@ -7,6 +11,7 @@ body {
     color: #212529;
     line-height: 1.6;
     font-size: 16px;
+    -webkit-text-size-adjust: 100%; /* スマホでの文字サイズ自動調整を防ぐ */
 }
 
 /* ヘッダー */
@@ -18,7 +23,8 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: relative; /* For mobile nav positioning */
+    position: relative;
+    z-index: 1001; /* 常に最前面に */
 }
 
 .header-left-content {
@@ -65,10 +71,6 @@ h1 {
     background-color: rgba(255, 255, 255, 0.15);
 }
 
-.header-nav a.current-page {
-    background-color: rgba(0, 0, 0, 0.2);
-}
-
 a.report-link {
     background-color: #ffffff;
     color: #007bff;
@@ -91,7 +93,7 @@ a.report-link:hover {
     border: none;
     cursor: pointer;
     padding: 10px;
-    z-index: 1100; /* ナビゲーションより手前に */
+    z-index: 1100;
 }
 
 .hamburger-bar {
@@ -113,37 +115,9 @@ main {
     box-shadow: 0 8px 20px rgba(0,0,0,0.1); 
 }
 
-/* 静的ページ用のスタイル */
-.static-page {
-    padding: 20px;
-}
-.static-page h2 {
-    color: #007bff;
-    border-bottom: 2px solid #e9ecef;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
-.static-page h3 {
-    color: #343a40;
-    border-left: 4px solid #007bff;
-    padding-left: 10px;
-    margin-top: 30px;
-}
-.static-page ul {
-    list-style-type: none;
-    padding-left: 0;
-}
-.static-page li {
-    background-color: #f8f9fa;
-    border-left: 3px solid #ced4da;
-    padding: 10px 15px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-}
-
-/* FullCalendarのカスタムスタイル */
+/* FullCalendar カスタムスタイル (共通) */
 .fc .fc-toolbar-title {
-    font-size: 2em; 
+    font-size: 1.8em; 
     font-weight: 600;
     color: #007bff; 
 }
@@ -152,10 +126,9 @@ main {
     background-color: #007bff; 
     border-color: #007bff;
     color: white;
-    padding: 8px 15px; 
-    border-radius: 6px; 
     font-weight: 400;
     transition: background-color 0.2s ease; 
+    padding: 8px 16px;
 }
 
 .fc .fc-button-primary:hover {
@@ -166,9 +139,33 @@ main {
 .fc-event {
     border-radius: 4px; 
     font-size: 0.9em;
-    padding: 3px 5px; 
-    border: none; 
     cursor: pointer;
+    border: none;
+}
+
+/* ★改善: リストビュー（スマホ用）のデザイン強化 */
+.fc-list-event:hover td {
+    background-color: #f1f8ff; /* ホバー時の色 */
+}
+
+.fc-theme-standard .fc-list {
+    border: 1px solid #e9ecef; /* 外枠を少し薄く */
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.fc-list-day-cushion {
+    background-color: #f8f9fa !important; /* 日付ヘッダーの背景 */
+}
+
+.fc-list-event-title {
+    font-weight: 600;
+    color: #333;
+}
+
+.fc-list-event-time {
+    color: #666;
+    font-size: 0.9em;
 }
 
 /* 常時公募枠セクション */
@@ -179,7 +176,7 @@ main {
 }
 
 #alwaysOpenRecruitmentSection h2 {
-    font-size: 2em; 
+    font-size: 1.8em; 
     color: #007bff;
     margin-bottom: 30px; 
     text-align: center;
@@ -193,52 +190,74 @@ main {
     justify-content: center;
 }
 
-/* 常時公募枠の各項目（カード） */
+/* ★改善: 常時公募枠の各項目（カードデザイン） */
 .always-open-item {
     background-color: #ffffff; 
     border: 1px solid #e9ecef;
     border-radius: 10px;
-    padding: 20px; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    padding: 0; /* paddingは内部のcontentに任せる */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
     width: calc(33.333% - 20px);
     box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 10px;
+    overflow: hidden; /* 角丸のため */
 }
 
 .always-open-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    border-color: #007bff;
+}
+
+.always-open-item:active {
+    background-color: #f1f8ff;
+    transform: translateY(0);
+}
+
+/* カード内部のレイアウト（Flexbox） */
+.always-open-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .always-open-item h3 {
-    font-size: 1.2em; 
+    font-size: 1.1em; 
     color: #343a40; 
     margin: 0;
     font-weight: 700;
+    flex: 1; /* テキスト部分を伸ばす */
+    padding-right: 10px;
+}
+
+.arrow-icon {
+    font-size: 1.5rem;
+    color: #adb5bd;
+    font-weight: bold;
+    line-height: 1;
 }
 
 /* モーダル */
 .modal {
     display: none; 
     position: fixed; 
-    z-index: 1000; 
+    z-index: 2000; /* ヘッダーより上 */
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     overflow: auto; 
     background-color: rgba(0,0,0,0.6); 
-    backdrop-filter: blur(5px); 
+    backdrop-filter: blur(3px); 
 }
 
 .modal-content {
     background-color: #fefefe;
-    margin: 8vh auto; 
+    margin: 5vh auto; /* 上下のマージン調整 */
     padding: 30px; 
     border: none; 
     width: 90%; 
@@ -255,20 +274,18 @@ main {
 }
 
 .close-button {
-    color: #888;
+    color: #adb5bd;
     position: absolute; 
     top: 15px;
     right: 20px;
-    font-size: 32px; 
+    font-size: 28px;
     font-weight: bold; 
     cursor: pointer;
     transition: color 0.2s ease;
+    padding: 5px; /* タップ領域確保 */
 }
 
-.close-button:hover,
-.close-button:focus {
-    color: #333;
-}
+.close-button:hover { color: #333; }
 
 .modal-content h2 {
     margin-top: 0;
@@ -276,66 +293,79 @@ main {
     border-bottom: 2px solid #e9ecef; 
     padding-bottom: 15px;
     margin-bottom: 20px;
-    font-size: 1.8em;
+    font-size: 1.6em;
+    line-height: 1.3;
+    padding-right: 30px; /* 閉じるボタンと被らないように */
 }
 
 .modal-content p {
     margin-bottom: 12px; 
-    font-size: 1.05em;
+    font-size: 1em;
+    color: #555;
 }
 
 .modal-content strong {
-    color: #495057;
-    display: inline-block; 
-    min-width: 80px; 
+    color: #212529;
+    font-weight: 600;
+    margin-right: 5px;
 }
 
+.modal-circle-link {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px dashed #007bff;
+}
+.modal-circle-link:hover {
+    border-bottom-style: solid;
+}
+
+/* Twitter埋め込みエリア */
 .tweet-embed-container {
     margin-top: 25px;
     border-top: 1px solid #e9ecef; 
     padding-top: 25px;
-    text-align: center;
+    min-height: 150px; /* 読み込み中のガタつき防止 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
 
-/* サークル詳細ページ */
-#circle-detail-container h1 {
-    color: #007bff;
-    border-bottom: 2px solid #e9ecef;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
-}
-.memo-section h2 {
-    border-left: 4px solid #007bff;
-    padding-left: 10px;
-    font-size: 1.5em;
-    margin-top: 30px;
-}
-.memo-content {
-    background-color: #f8f9fa;
-    padding: 20px;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-}
-.loading-indicator {
-    text-align: center;
-    padding: 50px;
-    font-size: 1.2em;
+.loader {
+    font-size: 0.9em;
     color: #6c757d;
+    margin: 20px 0;
 }
 
+.twitter-link-btn {
+    display: inline-block;
+    margin-top: 10px;
+    color: #1d9bf0;
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    border: 1px solid #e9ecef;
+    border-radius: 20px;
+    transition: background 0.2s;
+}
+.twitter-link-btn:hover {
+    background-color: #f8f9fa;
+}
 
 /* フッター */
 footer {
     text-align: center;
-    padding: 25px; 
-    color: white; 
+    padding: 30px 20px; 
+    color: rgba(255,255,255,0.8); 
     font-size: 0.9em;
     margin-top: 50px; 
     background-color: #343a40;
 }
 
+
 /* ================================================= */
-/* スマートフォン向けのスタイル (全面的に見直し)         */
+/* スマートフォン向けのスタイル (最適化版)               */
 /* ================================================= */
 @media (max-width: 768px) {
     body {
@@ -343,103 +373,77 @@ footer {
     }
     header {
         padding: 10px 15px;
+        /* wrapは許可しない（ハンバーガーとロゴを横並び維持） */
         flex-wrap: nowrap;
     }
 
-    /* ハンバーガーメニューの実装 */
     .hamburger-btn {
-        display: block; /* スマホではボタンを表示 */
+        display: block; 
     }
     .header-nav {
-        display: none; /* スマホでは通常時非表示 */
+        display: none; 
     }
     
-    /* JavaScriptで .nav-open クラスが付与された時のスタイル */
+    /* 開閉式メニュー */
     header.nav-open .header-nav {
         display: flex;
         position: fixed;
         top: 0;
         right: 0;
-        width: 70%;
+        width: 75%; /* 少し広げる */
         height: 100vh;
         background-color: #0056b3;
         flex-direction: column;
         align-items: flex-start;
-        padding: 80px 30px 30px;
+        padding: 80px 30px;
         gap: 25px;
-        transform: translateX(0);
-        transition: transform 0.3s ease-in-out;
-        z-index: 1000;
         box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+        overflow-y: auto; /* 縦が短いスマホ対応 */
     }
     
     .header-nav a {
-        font-size: 1.2em;
+        font-size: 1.1em;
+        width: 100%; /* クリック範囲を横一杯に */
+    }
+
+    /* メインコンテンツの余白調整 */
+    main {
+        margin: 20px 15px;
+        padding: 20px 15px;
     }
     
-    .report-link {
+    /* FullCalendar スマホ表示の最適化 */
+    .fc .fc-toolbar {
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 1.5em !important;
+    }
+    
+    .fc .fc-toolbar-title {
+        font-size: 1.4em;
         width: 100%;
         text-align: center;
-        box-sizing: border-box;
-        padding: 12px 15px;
-    }
-
-    /* ハンバーガーボタンが開いた時のスタイル (X印) */
-    header.nav-open .hamburger-bar:nth-of-type(1) {
-        transform: translateY(8px) rotate(45deg);
-    }
-    header.nav-open .hamburger-bar:nth-of-type(2) {
-        opacity: 0;
-    }
-    header.nav-open .hamburger-bar:nth-of-type(3) {
-        transform: translateY(-8px) rotate(-45deg);
-    }
-
-    /* メインコンテンツ */
-    main {
-        margin: 20px auto;
-        padding: 15px;
-    }
-    
-    /* カレンダーツールバーの改善 */
-    .fc .fc-header-toolbar {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px; /* 各要素間のスペースを調整 */
-    }
-    .fc .fc-toolbar-chunk {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        gap: 5px; /* ボタン間のスペースを調整 */
-    }
-
-    .fc .fc-toolbar-title {
-        font-size: 1.5em;
-        order: -1; /* タイトルを一番上に */
         margin-bottom: 5px;
     }
 
+    /* ボタンサイズの調整 */
     .fc .fc-button {
-        padding: 8px 12px; /* ボタンのサイズを調整 */
-        font-size: 0.9em;
+        padding: 6px 12px; 
+        font-size: 0.85em;
     }
     
-    /* 常時公募枠 */
+    /* 常時公募枠（1カラム表示） */
     .always-open-item {
         width: 100%;
-        box-sizing: border-box;
     }
     
     /* モーダル */
     .modal-content {
-        width: 95%;
-        margin: 5vh auto;
-        padding: 20px;
+        width: 85%;
+        margin: 10vh auto;
+        padding: 25px 20px;
     }
     .modal-content h2 {
-        font-size: 1.4em;
+        font-size: 1.3em;
     }
 }
