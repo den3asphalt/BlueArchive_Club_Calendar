@@ -1,5 +1,5 @@
 // =======================================================================
-// js/main.js (FullCalendar安定版: セグメント計算)
+// js/main.js (修正版: eventDisplay追加)
 // =======================================================================
 document.addEventListener('DOMContentLoaded', function() {
     const calendarEl = document.getElementById('calendar');
@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'ja',
+        
+        // ★重要: これがないと時間付きイベントが「ドット」扱いになり、幅指定が効かず消えてしまいます
+        eventDisplay: 'block', 
         
         headerToolbar: {
             left: 'prev,next today',
@@ -36,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 終日イベントでない場合のみ計算
             if (!arg.event.allDay && arg.event.start) {
                 const start = arg.event.start;
-                const end = arg.event.end; // 終了時刻がnullでもarg.isEnd判定に影響なし
+                const end = arg.event.end; 
 
                 const TOTAL_DAILY_MINUTES = 1440;
                 
@@ -45,39 +48,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // [1] 開始位置 (margin-left) の決定
                 if (isStartDay) {
-                    // イベントの開始時刻をセグメントの開始点とする
                     segmentStartMinutes = start.getHours() * 60 + start.getMinutes();
                 }
-                // (isStartDayでない場合、中間日または最終日なので 0:00 スタート)
 
                 // [2] 終了位置 (width) の決定
                 if (isEndDay && end) {
-                    // イベントの終了時刻をセグメントの終了点とする
                     segmentEndMinutes = end.getHours() * 60 + end.getMinutes();
-                    // 終了が0:00の場合 (例: 11/7 00:00) は、そのセグメントの終了点（24:00）として計算する
                     if (segmentEndMinutes === 0) segmentEndMinutes = TOTAL_DAILY_MINUTES; 
                 }
-                // (isEndDayでない場合、開始日または中間日なので 24:00 エンド)
 
                 // [3] パーセンテージ計算
                 leftPercent = (segmentStartMinutes / TOTAL_DAILY_MINUTES) * 100;
                 let durationMinutes = segmentEndMinutes - segmentStartMinutes;
                 
-                // 期間の計算 (幅)
                 widthPercent = (durationMinutes / TOTAL_DAILY_MINUTES) * 100;
 
-                // --- ガード処理（最小幅/最大マージン） ---
+                // --- ガード処理 ---
                 if (widthPercent < 15) widthPercent = 15; 
                 if (leftPercent + widthPercent > 100) widthPercent = 100 - leftPercent; 
 
                 style = `margin-left: ${leftPercent}%; width: ${widthPercent}%;`;
 
             } else {
-                // 終日イベントの場合はフル幅
                 style = 'width: 100%;';
             }
 
-            // --- 2. 時間テキスト生成 (XX/XX XX:XX ~ XX/XX XX:XX) ---
+            // --- 2. 時間テキスト生成 ---
             if (!arg.event.allDay && arg.event.start) {
                 const formatDateTime = (d) => {
                     const m = (d.getMonth() + 1).toString().padStart(2, '0');
@@ -113,12 +109,30 @@ document.addEventListener('DOMContentLoaded', function() {
         eventClick: function(info) {
             info.jsEvent.preventDefault();
             displayEventModal(info.event);
+        },
+
+        // イベントデータ取得
+        events: async function(fetchInfo, successCallback, failureCallback) {
+            try {
+                const response = await fetch('/.netlify/functions/get-calendar-events');
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                
+                // ログでデータ数を確認（ブラウザのコンソールで確認できます）
+                console.log('Fetched events:', data.calendarEvents.length);
+                
+                successCallback(data.calendarEvents); 
+                renderAlwaysOpenRecruitment(data.alwaysOpenRecruitment);
+            } catch (error) {
+                console.error("Error fetching events:", error);
+                failureCallback(error);
+            }
         }
     });
 
     calendar.render();
 
-    // --- 以下、共通関数（変更なし） ---
+    // --- 共通関数（変更なし） ---
     function displayEventModal(eventData) {
         const modal = document.getElementById('eventModal');
         const modalTitle = document.getElementById('modalTitle');
