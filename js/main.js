@@ -1,10 +1,10 @@
 // =======================================================================
-// js/main.js (UI/UX改善: シンプル表示・バグ修正完了版)
+// js/main.js (常時公募の期間非表示対応版)
 // =======================================================================
 document.addEventListener('DOMContentLoaded', function() {
     const calendarEl = document.getElementById('calendar');
-    const alwaysOpenSection = document.getElementById('alwaysOpenRecruitmentSection'); // 追加
-    const alwaysOpenList = document.getElementById('alwaysOpenRecruitmentList');       // 追加
+    const alwaysOpenSection = document.getElementById('alwaysOpenRecruitmentSection');
+    const alwaysOpenList = document.getElementById('alwaysOpenRecruitmentList');
 
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
@@ -26,96 +26,102 @@ document.addEventListener('DOMContentLoaded', function() {
             const isStart = arg.isStart;
             const isEnd = arg.isEnd;
             
-            let innerContent = `<span class="fc-event-title-label">${event.title}</span>`;
-            let style = 'width: 100%;'; // デフォルトは全幅
+            let widthStyle = 'width: 100%;'; 
 
-            // 時間指定があるイベントのみ計算する
+            // --- 1. バーの長さ（幅・位置）の計算 ---
             if (!event.allDay && event.start) {
                 const MINUTES_IN_DAY = 1440;
                 const startDate = event.start;
-                const endDate = event.end || event.start; 
+                let rawEndDate = event.end || event.start;
+                
+                let calcEndDate = new Date(rawEndDate);
+                let calcEndMinutes = calcEndDate.getHours() * 60 + calcEndDate.getMinutes();
 
-                // --- A. 開始セグメント (左側にマージンが必要) ---
+                if (calcEndMinutes === 0 && calcEndDate > startDate) {
+                    calcEndDate.setDate(calcEndDate.getDate() - 1);
+                    calcEndMinutes = 1440; 
+                }
+
                 if (isStart) {
-                    // 1. 分母(segmentDays)の計算
                     let segmentDays = 1;
-                    let segmentStart = new Date(startDate);
-                    
                     if (isEnd) {
-                        // 単一行完結: (終了 - 開始) の日数
-                        const diffTime = Math.abs(endDate - startDate); // ここは実時間で計算
-                        segmentDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                        if (segmentDays < 1) segmentDays = 1;
-                        
-                        // ただし、日を跨がない(同日)場合は1日
-                         if (startDate.getDate() === endDate.getDate() && startDate.getMonth() === endDate.getMonth()) {
-                            segmentDays = 1;
-                        }
+                        // 単一行完結
+                        const sDate = new Date(startDate);
+                        const eDate = new Date(calcEndDate);
+                        sDate.setHours(0,0,0,0);
+                        eDate.setHours(0,0,0,0);
+                        const diffDays = Math.round((eDate - sDate) / (1000 * 60 * 60 * 24));
+                        segmentDays = diffDays + 1;
                     } else {
-                        // 週またぎの開始行: 土曜日までの日数
-                        const startDay = segmentStart.getDay(); 
+                        // 週またぎ開始行
+                        const startDay = startDate.getDay(); 
                         const daysUntilSat = 6 - startDay;
                         segmentDays = daysUntilSat + 1;
                     }
 
-                    // 2. スタイルの計算
                     const startMinutes = startDate.getHours() * 60 + startDate.getMinutes();
                     const leftPercent = (startMinutes / (MINUTES_IN_DAY * segmentDays)) * 100;
                     
                     let widthPercent;
                     if (isEnd) {
-                        // 単一行完結の場合
-                        let endMinutes = endDate.getHours() * 60 + endDate.getMinutes();
-                        // 00:00終了かつ日付が違う場合は24:00扱い
-                        if (endMinutes === 0 && endDate > startDate) endMinutes = MINUTES_IN_DAY;
-                        
-                        const durationMinutes = (endDate.getTime() - startDate.getTime()) / (1000 * 60);
+                        const durationMinutes = (calcEndDate.getTime() - startDate.getTime()) / (1000 * 60);
                         widthPercent = (durationMinutes / (MINUTES_IN_DAY * segmentDays)) * 100;
                     } else {
-                        // 翌週へ続く場合
                         widthPercent = 100 - leftPercent;
                     }
-
-                    style = `margin-left: ${leftPercent}%; width: ${widthPercent}%;`;
-                    
-                    const timeStr = startDate.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
-                    innerContent = `<span class="fc-event-time-label">${timeStr} -></span> ` + innerContent;
+                    widthStyle = `margin-left: ${leftPercent}%; width: ${widthPercent}%;`;
                 } 
-                // --- B. 終了セグメント (右側で切れる・00:00またぎ対策あり) ---
                 else if (isEnd) {
-                    // 1. 00:00終了またぎ対策 (前日の24:00として計算)
-                    let calcEndDate = new Date(endDate);
-                    let calcEndMinutes = calcEndDate.getHours() * 60 + calcEndDate.getMinutes();
-
-                    if (calcEndMinutes === 0) {
-                        calcEndDate.setDate(calcEndDate.getDate() - 1);
-                        calcEndMinutes = 1440; // 24:00
-                    }
-
-                    // 2. 分母と分子の計算
-                    const endDayIndex = calcEndDate.getDay(); // 0(Sun) - 6(Sat)
-                    const segmentDays = endDayIndex + 1;      // 日曜開始からの日数
-                    
+                    const endDayIndex = calcEndDate.getDay(); 
+                    const segmentDays = endDayIndex + 1;      
                     const totalMinutes = (endDayIndex * MINUTES_IN_DAY) + calcEndMinutes;
                     const totalCapacity = segmentDays * MINUTES_IN_DAY;
                     
                     let widthPercent = (totalMinutes / totalCapacity) * 100;
                     if (widthPercent > 100) widthPercent = 100;
                     
-                    style = `width: ${widthPercent}%;`;
-                    
-                    const timeStr = endDate.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
-                    innerContent = innerContent + ` <span class="fc-event-time-label">-> ${timeStr}</span>`;
-                }
-                // --- C. 中間の週 (isStartでもisEndでもない) ---
-                else {
-                    // デフォルトの style='width: 100%;' が適用されるので何もしない
+                    widthStyle = `width: ${widthPercent}%;`;
                 }
             }
 
+            // --- 2. テキスト表示の生成 ---
+            const formatDate = (d) => {
+                const month = d.getMonth() + 1;
+                const date = d.getDate();
+                const hours = String(d.getHours()).padStart(2, '0');
+                const minutes = String(d.getMinutes()).padStart(2, '0');
+                return `${month}/${date} ${hours}:${minutes}`;
+            };
+
+            let timeText = '';
+            if (event.start) {
+                const startStr = formatDate(event.start);
+                const endStr = event.end ? formatDate(event.end) : startStr;
+                timeText = `${startStr} -> ${endStr}`;
+            }
+
+            // 縦並び・改行用のスタイル
+            const containerStyle = `
+                ${widthStyle} 
+                display: flex; 
+                flex-direction: column; 
+                align-items: flex-start; 
+                justify-content: center; 
+                height: auto; 
+                min-height: 34px; 
+                padding: 2px 4px;
+                line-height: 1.2;
+                white-space: normal;
+            `;
+
+            const innerContent = `
+                <div class="fc-event-time-label" style="font-size: 0.75em; margin-bottom: 2px;">${timeText}</div>
+                <div class="fc-event-title-label" style="font-size: 0.85em; font-weight: bold;">${event.title}</div>
+            `;
+
             return { 
                 html: `
-                    <div class="fc-event-inner-custom" style="${style}" title="${event.title}">
+                    <div class="fc-event-inner-custom" style="${containerStyle}" title="${event.title}">
                         ${innerContent}
                     </div>
                 ` 
@@ -152,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const modalTweetEmbed = document.getElementById('modalTweetEmbed');
         const modalTweetLink = document.getElementById('modalTweetLink');
         
-        const props = eventData.extendedProps;
+        const props = eventData.extendedProps || {};
         const circleNameText = props.circleName || '不明';
 
         modalTitle.textContent = eventData.title;
@@ -165,21 +171,31 @@ document.addEventListener('DOMContentLoaded', function() {
         
         modalRelatedInfo.innerHTML = props.relatedInfo ? marked.parse(props.relatedInfo) : 'なし';
         
-        let durationText = '';
-        if (eventData.start) {
-            const start = new Date(eventData.start);
-            const end = eventData.end ? new Date(eventData.end) : null;
-            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
+        // === 【修正】常時公募の場合は期間を非表示にする ===
+        const durationContainer = modalDuration.closest('p') || modalDuration.parentElement;
+        
+        if (props.recruitmentType === '常時公募') {
+            durationContainer.style.display = 'none';
+        } else {
+            durationContainer.style.display = 'block';
             
-            if (end && start.toDateString() !== end.toDateString()) {
-                durationText = `${start.toLocaleString('ja-JP', options)} - ${end.toLocaleString('ja-JP', options)}`;
-            } else if (end) {
-                 durationText = `${start.toLocaleDateString('ja-JP')} ${start.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}`;
-            } else {
-                durationText = start.toLocaleString('ja-JP', options);
+            let durationText = '';
+            if (eventData.start) {
+                const start = new Date(eventData.start);
+                const end = eventData.end ? new Date(eventData.end) : null;
+                const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
+                
+                if (end && start.toDateString() !== end.toDateString()) {
+                    durationText = `${start.toLocaleString('ja-JP', options)} - ${end.toLocaleString('ja-JP', options)}`;
+                } else if (end) {
+                     durationText = `${start.toLocaleDateString('ja-JP')} ${start.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}`;
+                } else {
+                    durationText = start.toLocaleString('ja-JP', options);
+                }
             }
+            modalDuration.textContent = durationText || '未設定';
         }
-        modalDuration.textContent = durationText || '未設定';
+        // ===================================================
 
         modalTweetEmbed.innerHTML = ''; 
         modalTweetLink.innerHTML = ''; 
@@ -207,7 +223,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderAlwaysOpenRecruitment(items) {
-        // 上部で定義した alwaysOpenSection / List を使用
         if (!alwaysOpenSection || !alwaysOpenList) return;
         alwaysOpenList.innerHTML = ''; 
 
@@ -227,6 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             `; 
             itemDiv.addEventListener('click', () => {
+                // extendedPropsが含まれているitemをそのまま渡す
                 const eventData = { ...item, start: new Date(), end: null };
                 displayEventModal(eventData); 
             });
