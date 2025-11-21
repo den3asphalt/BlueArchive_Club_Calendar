@@ -26,9 +26,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const isStart = arg.isStart;
             const isEnd = arg.isEnd;
             
+            // デフォルトの幅
             let widthStyle = 'width: 100%;'; 
 
             // --- 1. バーの長さ（幅・位置）の計算 ---
+            // ※計算ロジックは前回の修正（正しく動くもの）を維持しています
             if (!event.allDay && event.start) {
                 const MINUTES_IN_DAY = 1440;
                 const startDate = event.start;
@@ -84,45 +86,49 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
 
-            // --- 2. テキスト表示の生成 ---
-            const formatDate = (d) => {
-                const month = d.getMonth() + 1;
-                const date = d.getDate();
-                const hours = String(d.getHours()).padStart(2, '0');
-                const minutes = String(d.getMinutes()).padStart(2, '0');
-                return `${month}/${date} ${hours}:${minutes}`;
+            // --- 2. テキスト表示の生成 (1行・時刻のみ) ---
+            const formatTime = (d) => {
+                return d.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
             };
 
-            let timeText = '';
-            if (event.start) {
-                const startStr = formatDate(event.start);
-                const endStr = event.end ? formatDate(event.end) : startStr;
-                timeText = `${startStr} -> ${endStr}`;
+            let displayText = '';
+
+            if (!event.allDay && event.start) {
+                // 開始時間 (セグメントの始まりのみ表示)
+                if (isStart) {
+                    displayText += `${formatTime(event.start)} -> `;
+                }
+
+                // サークル名
+                displayText += event.title;
+
+                // 終了時間 (セグメントの終わり＝イベント全体の終わりのみ表示)
+                if (isEnd) {
+                    const endDate = event.end || event.start;
+                    displayText += ` -> ${formatTime(endDate)}`;
+                }
+            } else {
+                // 時間がない場合など
+                displayText = event.title;
             }
 
-            // 縦並び・改行用のスタイル
+            // 1行表示用のスタイル (flex-direction: column を削除し、nowrapに)
             const containerStyle = `
                 ${widthStyle} 
                 display: flex; 
-                flex-direction: column; 
-                align-items: flex-start; 
-                justify-content: center; 
-                height: auto; 
-                min-height: 34px; 
-                padding: 2px 4px;
-                line-height: 1.2;
-                white-space: normal;
-            `;
-
-            const innerContent = `
-                <div class="fc-event-time-label" style="font-size: 0.75em; margin-bottom: 2px;">${timeText}</div>
-                <div class="fc-event-title-label" style="font-size: 0.85em; font-weight: bold;">${event.title}</div>
+                align-items: center;
+                white-space: nowrap; 
+                overflow: hidden; 
+                text-overflow: ellipsis;
+                padding: 1px 4px;
+                font-size: 0.85em;
+                height: 20px; /* 高さ固定で揃える */
             `;
 
             return { 
                 html: `
                     <div class="fc-event-inner-custom" style="${containerStyle}" title="${event.title}">
-                        ${innerContent}
+                        <span class="fc-event-title-label">${displayText}</span>
                     </div>
                 ` 
             };
