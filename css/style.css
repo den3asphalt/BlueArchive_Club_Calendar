@@ -463,3 +463,107 @@ footer {
     /* 既にJSでマージンが計算されている場合、上記 transform による追加のずれを回避 */
     transform: none;
 }
+
+/* =========================================================
+   ★スマホ・リスト表示 & アコーディオン追加スタイル
+   ========================================================= */
+
+/* アコーディオンボタンのデザイン */
+.accordion-toggle {
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px 20px;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #007bff;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s;
+    outline: none;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.accordion-toggle:hover {
+    background-color: #f8f9fa;
+}
+
+.toggle-icon {
+    transition: transform 0.3s ease;
+    font-size: 0.8em;
+}
+
+/* 常時公募リストが開いた時のスタイル調整 */
+#alwaysOpenRecruitmentList {
+    /* flex設定はJSで制御されますが、アニメーション用に定義 */
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+
+/* スマホのリストビュー調整 */
+@media (max-width: 768px) {
+    /* リスト表示のイベント行 */
+    .fc-list-event-time {
+        display: none; /* 時間はタイトル横に出る場合が多いので、リストの左列は隠してスッキリさせる */
+    }
+    .fc-list-event-title {
+        font-size: 0.95em;
+        padding: 12px 15px !important;
+    }
+    .fc-list-day-cushion {
+        background-color: #f1f8ff !important; /* 日付ヘッダーの色を薄い青に */
+    }
+    
+    /* 常時公募はスマホでは1列にする */
+    .always-open-item {
+        width: 100%;
+    }
+}
+
+/* アコーディオンボタン */
+.accordion-toggle {
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px 20px;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #007bff;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.toggle-icon {
+    transition: transform 0.3s ease;
+}
+
+/* 常時公募リスト（開いたとき） */
+#alwaysOpenRecruitmentList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    width: 100%;
+}
+
+/* スマホリスト表示の日付ヘッダー強調 */
+@media (max-width: 768px) {
+    .fc-list-day-cushion {
+        background-color: #e3f2fd !important; /* ブルアカっぽい薄い青 */
+        border-left: 4px solid #007bff; /* 左にアクセントライン */
+    }
+    .fc-list-day-text, .fc-list-day-side-text {
+        font-weight: bold;
+        color: #0056b3;
+    }
+}
