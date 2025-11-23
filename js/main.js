@@ -1,27 +1,5 @@
 // =======================================================================
-// Google Analytics (GA4) の動的読み込み
-// =======================================================================
-(function() {
-    // ★ここに取得した測定IDを入れてください
-    const GA_ID = 'G-HN3YK955QX'; 
-
-    // 1. 外部スクリプト (gtag.js) を生成してheadに追加
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
-    document.head.appendChild(script);
-
-    // 2. dataLayerの初期化と設定
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    
-    // JSで読み込むため、少しタイミングを考慮して即時実行
-    gtag('js', new Date());
-    gtag('config', GA_ID);
-})();
-
-// =======================================================================
-// js/main.js (今日を画面上部に表示・日本時間完全対応版)
+// js/main.js (直近・カレンダーボタン統一 & UI改善版)
 // =======================================================================
 document.addEventListener('DOMContentLoaded', function() {
     const calendarEl = document.getElementById('calendar');
@@ -35,64 +13,67 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 画面幅判定
     const isMobile = window.innerWidth < 768;
+    
+    // ★初期ビュー: スマホは「直近」、PCは「カレンダー」
     const initialViewType = isMobile ? 'listUpcoming' : 'dayGridMonth';
 
     const calendar = new FullCalendar.Calendar(calendarEl, {
-        // ★重要: 日本時間を基準にする
         timeZone: 'Asia/Tokyo', 
 
         initialView: initialViewType,
         locale: 'ja',
         eventDisplay: 'auto', 
         
-        // スマホ用「直近2週間」ビュー
+        // ★ビュー定義
         views: {
+            // 直近ビュー (今後2週間のリスト)
             listUpcoming: {
                 type: 'list',
                 duration: { days: 14 }, 
-                buttonText: '直近',
+                buttonText: '直近', // ボタン名
                 listDayFormat: { month: 'numeric', day: 'numeric', weekday: 'short' },
                 listDaySideFormat: false
             },
-            listMonth: {
-                buttonText: '月ごと'
+            // カレンダービュー (月グリッド)
+            dayGridMonth: {
+                buttonText: 'カレンダー' // ボタン名
             }
         },
 
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: isMobile ? 'listUpcoming,listMonth' : 'dayGridMonth,listMonth' 
+            // ★ここを統一: 「直近」と「カレンダー」の2つだけにする
+            right: 'listUpcoming,dayGridMonth' 
         },
         buttonText: { 
-            today: '今日', 
-            month: 'カレンダー', 
+            today: '今日',
         },
         
         dayMaxEvents: true, 
         contentHeight: 'auto',
         
+        // リサイズ時の自動切り替え
         windowResize: function(view) {
             const currentIsMobile = window.innerWidth < 768;
             if (currentIsMobile) {
+                // PC -> スマホ: 直近リストへ
                 if (view.type === 'dayGridMonth') {
                     calendar.changeView('listUpcoming');
                 }
             } else {
-                if (view.type.includes('list')) {
+                // スマホ -> PC: カレンダーへ
+                if (view.type === 'listUpcoming') {
                     calendar.changeView('dayGridMonth');
                 }
             }
         },
 
-        // ★【修正】スクロール処理 (画面上部に合わせる)
+        // スクロール処理 (直近リスト用)
         datesSet: function(info) {
-            if (info.view.type.includes('list')) {
+            if (info.view.type === 'listUpcoming') {
                 setTimeout(() => {
-                    // 1. FullCalendarが判定した「今日」を探す
                     let targetEl = document.querySelector('.fc-list-day-now');
-                    
-                    // 2. なければ、日本時間の今日以降の最初のイベントを探す
                     if (!targetEl) {
                         const todayJST = new Date().toLocaleDateString('en-CA', {
                             timeZone: 'Asia/Tokyo',
@@ -100,32 +81,28 @@ document.addEventListener('DOMContentLoaded', function() {
                             month: '2-digit',
                             day: '2-digit'
                         });
-                        
                         const allDays = document.querySelectorAll('.fc-list-day');
                         for (let day of allDays) {
-                            const dateAttr = day.getAttribute('data-date');
-                            if (dateAttr >= todayJST) {
+                            if (day.getAttribute('data-date') >= todayJST) {
                                 targetEl = day;
                                 break;
                             }
                         }
                     }
-
-                    // 3. スクロール実行
                     if (targetEl) {
-                        // ★ここを変更: 'center' -> 'start' (画面上部に合わせる)
                         targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
                 }, 300);
             }
         },
 
-        // イベント表示ロジック (デザイン維持)
+        // イベント表示ロジック
         eventContent: function(arg) {
             const event = arg.event;
             const isStart = arg.isStart;
             const isEnd = arg.isEnd;
 
+            // 時間フォーマット
             const formatTime = (d, force24 = false) => {
                 const jstDate = new Date(d.toLocaleString("en-US", {timeZone: "Asia/Tokyo"}));
                 const hours = jstDate.getHours();
@@ -134,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return jstDate.toLocaleTimeString('ja-JP', {hour: '2-digit', minute: '2-digit'});
             };
 
-            // === スマホ(リスト表示) ===
+            // === A. リスト表示 (直近ビューなど) ===
             if (arg.view.type.includes('list')) {
                 let timeHtml = '';
                 let labelHtml = '';
@@ -179,7 +156,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
             }
 
-            // === PC(月カレンダー) ===
+            // === B. グリッド表示 (カレンダービュー) ===
+            // PC・スマホ共通のバーデザイン
             let widthStyle = 'width: 100%;'; 
             if (!event.allDay && event.start) {
                 const MINUTES_IN_DAY = 1440;
@@ -284,7 +262,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     calendar.render();
 
-    // --- 常時公募の開閉 ---
+    // 常時公募
     if (alwaysOpenToggleBtn) {
         alwaysOpenToggleBtn.addEventListener('click', function() {
             const isHidden = alwaysOpenList.style.display === 'none';
@@ -297,6 +275,23 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Google Analytics (動的注入)
+    (function() {
+        // ★ここに測定IDを入れてください (例: G-ABC123456)
+        const GA_ID = 'G-XXXXXXXXXX'; 
+        if (GA_ID === 'G-XXXXXXXXXX') return; // ID未設定時は実行しない
+
+        const script = document.createElement('script');
+        script.async = true;
+        script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
+        document.head.appendChild(script);
+
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', GA_ID);
+    })();
 
     // 共通関数
     function displayEventModal(eventData) {
@@ -324,15 +319,13 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             durationContainer.style.display = 'block';
             let durationText = '';
-            const formatJST = (d) => {
-                return new Date(d.toLocaleString("en-US", {timeZone: "Asia/Tokyo"}));
-            };
+            const formatJST = (d) => new Date(d.toLocaleString("en-US", {timeZone: "Asia/Tokyo"}));
 
             if (eventData.start) {
                 const start = formatJST(new Date(eventData.start));
                 const end = eventData.end ? formatJST(new Date(eventData.end)) : null;
-                
                 const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
+                
                 if (end && start.toDateString() !== end.toDateString()) {
                     durationText = `${start.toLocaleString('ja-JP', options)} - ${end.toLocaleString('ja-JP', options)}`;
                 } else if (end) {
