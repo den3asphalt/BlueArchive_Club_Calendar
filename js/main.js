@@ -1,3 +1,27 @@
+
+// =======================================================================
+// Google Analytics (GA4) の動的読み込み
+// =======================================================================
+(function() {
+    // ★ここに取得した測定IDを入れてください
+    const GA_ID = 'G-HN3YK955QX'; 
+
+    // 1. 外部スクリプト (gtag.js) を生成してheadに追加
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
+    document.head.appendChild(script);
+
+    // 2. dataLayerの初期化と設定
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    
+    // JSで読み込むため、少しタイミングを考慮して即時実行
+    gtag('js', new Date());
+    gtag('config', GA_ID);
+})();
+
+
 // =======================================================================
 // js/main.js (直近・カレンダーボタン統一 & UI改善版)
 // =======================================================================
