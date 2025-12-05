@@ -300,23 +300,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Google Analytics (動的注入)
-    (function() {
-        // ★ここに測定IDを入れてください (例: G-ABC123456)
-        const GA_ID = 'G-XXXXXXXXXX'; 
-        if (GA_ID === 'G-XXXXXXXXXX') return; // ID未設定時は実行しない
-
-        const script = document.createElement('script');
-        script.async = true;
-        script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
-        document.head.appendChild(script);
-
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', GA_ID);
-    })();
-
     // 共通関数
     function displayEventModal(eventData) {
         const modal = document.getElementById('eventModal');
