@@ -1,569 +1,270 @@
 /* =======================================================================
-   style.css - Timeline Style Updates
+   style.css (2025-12-08 修正版)
    ======================================================================= */
 
-/* 基本リセット等は変更なし */
+/* --- Base --- */
 body {
-    margin: 0;
-    padding: 0;
+    margin: 0; padding: 0;
     font-family: 'Inter', 'Noto Sans JP', sans-serif;
-    background-color: #f8f9fa;
+    background-color: #f0f2f5;
     color: #212529;
-    line-height: 1.6;
-    font-size: 16px;
+    line-height: 1.6; font-size: 16px;
     -webkit-text-size-adjust: 100%;
 }
 
-/* ヘッダー */
+/* --- Header --- */
 header {
-    background-color: #007bff;
-    color: white;
-    padding: 15px 30px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
-    z-index: 1001;
+    background-color: #007bff; color: white;
+    padding: 12px 24px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    display: flex; align-items: center; justify-content: space-between;
+    position: relative; z-index: 1001;
 }
+.header-left-content { display: flex; align-items: center; gap: 12px; }
+.header-icon { width: 32px; height: 32px; flex-shrink: 0; object-fit: contain; }
+h1 { margin: 0; font-size: 1.6em; font-weight: 700; }
+.header-title-link { color: white; text-decoration: none; }
 
-.header-left-content {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.header-icon {
-    width: 36px;
-    height: 36px;
-    flex-shrink: 0;
-    object-fit: contain;
-}
-
-h1 {
-    margin: 0;
-    font-size: 1.8em; 
-    font-weight: 600;
-}
-
-.header-title-link {
-    color: white;
-    text-decoration: none;
-}
-
-/* ヘッダーナビゲーション (PC) */
-.header-nav {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
+/* Header Nav (PC) */
+.header-nav { display: flex; align-items: center; gap: 10px; }
 .header-nav a {
-    color: white;
-    text-decoration: none;
-    font-weight: 500;
-    padding: 5px 10px;
-    border-radius: 6px;
-    transition: background-color 0.3s ease;
+    color: white; text-decoration: none; font-weight: 500; font-size: 0.95em;
+    padding: 6px 12px; border-radius: 6px;
+    transition: background-color 0.2s ease;
 }
-
-.header-nav a:not(.report-link):hover {
-    background-color: rgba(255, 255, 255, 0.15);
-}
-
+.header-nav a:not(.report-link):hover { background-color: rgba(255, 255, 255, 0.1); }
 a.report-link {
-    background-color: #ffffff;
-    color: #007bff;
-    padding: 8px 18px;
-    border-radius: 25px;
-    font-weight: 600;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    white-space: nowrap;
+    background-color: #fff; color: #007bff;
+    padding: 6px 16px; border-radius: 20px; font-weight: 600;
+    transition: all 0.2s ease;
 }
+a.report-link:hover { background-color: #f8f9fa; transform: translateY(-1px); }
 
-a.report-link:hover {
-    background-color: #e9ecef; 
-    transform: translateY(-2px); 
-}
-
-/* ハンバーガーメニュー (スマホ用) */
+/* Hamburger (Mobile) */
 .hamburger-btn {
-    display: none;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 10px;
-    z-index: 1100;
+    display: none; background: none; border: none;
+    cursor: pointer; padding: 8px; z-index: 1100;
 }
-
 .hamburger-bar {
-    display: block;
-    width: 25px;
-    height: 3px;
-    background-color: white;
-    margin: 5px 0;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    display: block; width: 24px; height: 2px;
+    background-color: white; margin: 6px 0;
+    transition: all 0.3s ease;
 }
 
-/* メインコンテンツ */
+/* --- Main --- */
 main {
-    max-width: 1100px; 
-    margin: 40px auto; 
-    padding: 30px; 
-    background-color: #ffffff;
-    border-radius: 12px; 
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1); 
+    max-width: 1100px; margin: 30px auto; padding: 25px;
+    background-color: #ffffff; border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-/* FullCalendar カスタムスタイル */
-.fc .fc-toolbar-title {
-    font-size: 1.8em; 
-    font-weight: 600;
-    color: #007bff; 
-}
-
-.fc .fc-button-primary {
-    background-color: #007bff; 
-    border-color: #007bff;
-    color: white;
-    font-weight: 400;
-    transition: background-color 0.2s ease; 
-    padding: 8px 16px;
-}
-
-.fc .fc-button-primary:hover {
-    background-color: #0056b3; 
-    border-color: #0056b3;
-}
-
-/* イベント要素のリセット */
-.fc-event {
-    border: none !important;
-    background: transparent !important;
-    margin-bottom: 2px;
-    cursor: pointer;
-    /* デフォルトのwidth制御を無効化して、内部のinnerで制御する */
-    width: 100%; 
-}
-
-/* =========================================================
-   ★イベント内部コンテナ (UI改善版)
-   ========================================================= */
-.fc-event {
-    border: none !important;
-    background: transparent !important;
-    margin-bottom: 2px;
-    cursor: pointer;
-    width: 100%; 
-}
-
-/* 親要素のパディング打ち消し用 */
-.fc-daygrid-event {
-    margin-left: -2px !important;
-    margin-right: -2px !important;
-}
-
-/* カスタムインナー (青いバー) */
-.fc-event-inner-custom {
-    background-color: #3788d8;
-    color: #fff;
-    border-radius: 3px;
-    padding: 1px 4px; /* 上下パディングを減らしてスリムに */
-    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-    
-    /* 横並びレイアウト (Flexbox) */
-    display: flex; 
-    align-items: center;
-    gap: 6px; /* 時間とタイトルの間隔 */
-    
-    overflow: hidden;
-    white-space: nowrap;
-    min-height: 18px; /* 最低限の高さを確保 */
-    
-    /* アニメーション */
-    transition: background-color 0.2s, transform 0.1s;
-}
-
-.fc-event-inner-custom:hover {
-    background-color: #2c6cb0;
-    transform: scale(1.02); /* ホバー時に少し強調 */
-    z-index: 10;
-}
-
-/* 時間ラベル ("19:00 →" など) */
-.fc-event-time-label {
-    font-size: 0.75em; /* 小さめに */
-    font-weight: 700;  /* 太字で読みやすく */
-    opacity: 0.95;
-    flex-shrink: 0;    /* 時間は縮めない */
-    letter-spacing: -0.5px;
-}
-
-/* タイトルラベル */
-.fc-event-title-label {
-    font-size: 0.8em;
-    font-weight: 400;
-    overflow: hidden;
-    text-overflow: ellipsis; /* はみ出たら... */
-}
-
-/* スマホなどの狭い画面用調整 */
-@media (max-width: 768px) {
-    .fc-event-time-label { font-size: 0.65em; }
-    .fc-event-title-label { font-size: 0.75em; }
-    .fc-event-inner-custom { gap: 3px; padding: 1px 2px; }
-}
-
-/* 常時公募枠セクション */
-#alwaysOpenRecruitmentSection {
-    margin-top: 40px;
-    padding-top: 40px;
-    border-top: 1px solid #e9ecef;
-}
-
-#alwaysOpenRecruitmentSection h2 {
-    font-size: 1.8em; 
-    color: #007bff;
-    margin-bottom: 30px; 
-    text-align: center;
-    font-weight: 600;
-}
-
-#alwaysOpenRecruitmentList {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px; 
-    justify-content: center;
-}
-
-/* 常時公募枠カード */
-.always-open-item {
-    background-color: #ffffff; 
-    border: 1px solid #e9ecef;
-    border-radius: 10px;
-    padding: 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    cursor: pointer;
-    width: calc(33.333% - 20px);
-    box-sizing: border-box;
-}
-
-.always-open-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-    border-color: #007bff;
-}
-
-.always-open-item:active {
-    background-color: #f1f8ff;
-}
-
-.always-open-content {
-    display: flex;
+/* --- FullCalendar Toolbar Fix (強力修正) --- */
+/* ボタンが下に落ちるのを防ぐ設定 */
+.fc .fc-toolbar.fc-header-toolbar {
+    margin-bottom: 1.5em !important;
+    display: flex !important;
+    flex-wrap: wrap; 
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
-    width: 100%;
-    box-sizing: border-box;
+    gap: 10px;
 }
 
-.always-open-item h3 {
-    font-size: 1.1em; 
-    color: #343a40; 
-    margin: 0;
-    font-weight: 700;
-    flex: 1;
-    padding-right: 10px;
+.fc-toolbar-chunk {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px;
+}
+/* 左側チャンクの改行禁止 */
+.fc-toolbar-chunk:first-child {
+    flex-wrap: nowrap !important;
 }
 
-.arrow-icon {
-    font-size: 1.5rem;
-    color: #adb5bd;
-    font-weight: bold;
-    line-height: 1;
+.fc .fc-toolbar-title {
+    font-size: 1.5em; font-weight: 700; color: #007bff; margin: 0 !important;
 }
 
-/* モーダル */
+/* ボタン共通設定 */
+.fc .fc-button {
+    padding: 6px 12px !important;
+    font-weight: 500; font-size: 0.95em;
+    box-shadow: none !important;
+    border-radius: 4px;
+    display: inline-flex !important;
+    align-items: center; justify-content: center;
+    height: auto !important;
+}
+
+/* 非アクティブボタン */
+.fc .fc-button-primary {
+    background-color: #fff !important;
+    border: 1px solid #cce5ff !important;
+    color: #007bff !important;
+    opacity: 1 !important;
+}
+
+/* アクティブボタン（文字が見えるように白文字指定） */
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+    background-color: #007bff !important;
+    border-color: #007bff !important;
+    color: #ffffff !important; 
+}
+
+.fc-button-group {
+    display: inline-flex !important;
+    flex-wrap: nowrap !important;
+}
+.fc-button-group > .fc-button { border-radius: 0; margin: 0; }
+.fc-button-group > .fc-button:first-child { border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
+.fc-button-group > .fc-button:last-child { border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+
+/* 「今日」ボタン */
+.fc-today-button { margin-left: 0 !important; }
+
+/* --- Events --- */
+.fc-event {
+    cursor: pointer; border: none !important; background: transparent !important; margin-bottom: 2px;
+}
+
+.pc-event-bar {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #4FC3F7; border-left-width: 3px;
+    color: #01579B; padding: 2px 6px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    transition: all 0.2s ease;
+    display: flex; align-items: center; justify-content: space-between;
+    min-height: 22px; border-radius: 4px;
+}
+.pc-event-bar.is-start { border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
+.pc-event-bar.is-end { border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
+.pc-event-bar:not(.is-start) { border-top-left-radius: 0; border-bottom-left-radius: 0; border-left: none; margin-left: -1px; }
+.pc-event-bar:not(.is-end) { border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: none; margin-right: -1px; }
+
+.pc-event-bar:hover {
+    background: #fff; border-color: #00AEEF; z-index: 5; position: relative;
+    transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.pc-time-badge {
+    font-size: 0.75em; font-weight: 700; padding: 1px 4px; border-radius: 3px; white-space: nowrap; line-height: 1;
+}
+.pc-start-time { background-color: #E1F5FE; color: #0288D1; margin-right: 6px; }
+.pc-end-time { background-color: #FFEBEE; color: #D32F2F; margin-left: 6px; }
+.pc-event-center {
+    flex-grow: 1; text-align: center; font-weight: 600; font-size: 0.85em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* --- List View --- */
+.fc-list-day-cushion { background-color: #f0f7ff !important; }
+.fc-list-day-text { font-weight: 600; color: #0056b3; font-size: 1.05em; }
+.fc-list-event:hover td { background-color: #f8f9fa !important; }
+.fc-list-custom-content { display: flex; align-items: center; width: 100%; color: #333; padding: 6px 0; }
+.list-time-col { min-width: 80px; font-weight: 600; font-family: monospace; color: #555; font-size: 0.95em; }
+.list-title-text { margin-left: 10px; flex: 1; font-weight: 500; font-size: 1em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.list-badge { font-size: 0.75em; padding: 2px 6px; border-radius: 4px; margin-left: 8px; white-space: nowrap; font-weight: 600; }
+
+/* --- Accordion --- */
+#alwaysOpenRecruitmentSection { margin-top: 40px; padding-top: 30px; border-top: 1px solid #eee; }
+.accordion-toggle {
+    width: 100%; background-color: #f8f9fa; border: 1px solid #eee;
+    border-radius: 8px; padding: 12px 20px;
+    font-size: 1em; font-weight: 600; color: #007bff;
+    cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+}
+.accordion-toggle:hover { background-color: #e9ecef; }
+.toggle-icon { transition: transform 0.3s ease; }
+#alwaysOpenRecruitmentList { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; width: 100%; margin-top: 15px; }
+.always-open-item {
+    background-color: #fff; border: 1px solid #e9ecef; border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer;
+    width: calc(33.333% - 10px); box-sizing: border-box; transition: transform 0.2s;
+}
+.always-open-item:hover { transform: translateY(-3px); border-color: #007bff; }
+.always-open-content { display: flex; justify-content: space-between; align-items: center; padding: 15px; }
+.always-open-item h3 { font-size: 1em; color: #343a40; margin: 0; flex: 1; }
+
+/* --- Modal --- */
 .modal {
-    display: none; 
-    position: fixed; 
-    z-index: 2000; 
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto; 
-    background-color: rgba(0,0,0,0.6); 
-    backdrop-filter: blur(3px); 
+    display: none; position: fixed; z-index: 2000; left: 0; top: 0;
+    width: 100%; height: 100%; overflow: auto;
+    background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
 }
-
 .modal-content {
-    background-color: #fefefe;
-    margin: 5vh auto;
-    padding: 30px; 
-    border: none; 
-    width: 90%; 
-    max-width: 550px; 
-    border-radius: 15px; 
-    position: relative;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
-    animation: fadeIn 0.3s ease-out; 
+    background-color: #fefefe; margin: 5vh auto; padding: 30px;
+    border: none; width: 90%; max-width: 550px; border-radius: 15px;
+    position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    animation: fadeIn 0.3s ease-out;
 }
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 .close-button {
-    color: #adb5bd;
-    position: absolute; 
-    top: 15px;
-    right: 20px;
-    font-size: 28px;
-    font-weight: bold; 
-    cursor: pointer;
-    transition: color 0.2s ease;
-    padding: 5px;
+    color: #adb5bd; position: absolute; top: 15px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer;
 }
-
 .close-button:hover { color: #333; }
+.modal-content h2 { margin-top: 0; color: #007bff; border-bottom: 2px solid #e9ecef; padding-bottom: 15px; }
 
-.modal-content h2 {
-    margin-top: 0;
-    color: #007bff; 
-    border-bottom: 2px solid #e9ecef; 
-    padding-bottom: 15px;
-    margin-bottom: 20px;
-    font-size: 1.6em;
-    line-height: 1.3;
-    padding-right: 30px;
-}
-
-.modal-content p {
-    margin-bottom: 12px; 
-    font-size: 1em;
-    color: #555;
-}
-
-.modal-content strong {
-    color: #212529;
-    font-weight: 600;
-    margin-right: 5px;
-}
-
-.modal-circle-link {
-    color: #007bff;
-    text-decoration: none;
-    font-weight: 600;
-    border-bottom: 1px dashed #007bff;
-}
-.modal-circle-link:hover {
-    border-bottom-style: solid;
-}
+/* --- style.css 修正箇所 --- */
 
 .tweet-embed-container {
-    margin-top: 25px;
+    margin-top: 25px; 
     border-top: 1px solid #e9ecef; 
     padding-top: 25px;
-    min-height: 150px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+    min-height: 50px; 
+    
+    /* ★修正: フレックスボックスの設定を変更 */
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: flex-start;
+    
+    /* ★追加: コンテナ自体も幅を持つようにする */
+    width: 100%; 
+    box-sizing: border-box;
 }
 
-.loader {
-    font-size: 0.9em;
-    color: #6c757d;
-    margin: 20px 0;
+/* ★追加: JSで生成されるツイート格納用divのスタイル */
+.tweet-container-box {
+    width: 100% !important;      /* 親要素いっぱいに広げる */
+    max-width: 550px !important; /* PCで見やすすぎないように制限 */
+    display: flex;
+    justify-content: center;     /* ツイートを中央寄せ */
 }
 
 .twitter-link-btn {
-    display: inline-block;
-    margin-top: 10px;
-    color: #1d9bf0;
-    text-decoration: none;
-    font-size: 0.9rem;
-    padding: 5px 10px;
-    border: 1px solid #e9ecef;
-    border-radius: 20px;
-    transition: background 0.2s;
+    display: inline-block; margin-top: 10px; color: #1d9bf0;
+    text-decoration: none; font-size: 0.9rem; padding: 5px 10px;
+    border: 1px solid #e9ecef; border-radius: 20px;
 }
-.twitter-link-btn:hover {
-    background-color: #f8f9fa;
-}
+.loader { font-size: 0.9em; color: #6c757d; }
+.no-tweet { color: #999; font-size: 0.9em; display: flex; flex-direction: column; align-items: center; gap: 5px; }
 
-/* フッター */
+/* --- Footer --- */
 footer {
-    text-align: center;
-    padding: 30px 20px; 
-    color: rgba(255,255,255,0.8); 
-    font-size: 0.9em;
-    margin-top: 50px; 
-    background-color: #343a40;
+    text-align: center; padding: 30px 20px; color: rgba(255,255,255,0.8);
+    font-size: 0.9em; margin-top: 50px; background-color: #343a40;
 }
 
-/* スマホ向け */
+/* --- Mobile Responsive --- */
 @media (max-width: 768px) {
-    body { font-size: 15px; }
-    header { padding: 10px 15px; flex-wrap: nowrap; }
+    header { padding: 10px 15px; }
+    .header-icon { width: 28px; height: 28px; }
+    h1 { font-size: 1.3em; }
     .hamburger-btn { display: block; }
     .header-nav { display: none; }
     
     header.nav-open .header-nav {
-        display: flex; position: fixed; top: 0; right: 0; width: 75%; height: 100vh;
+        display: flex; position: fixed; top: 0; right: 0; width: 80%; height: 100vh;
         background-color: #0056b3; flex-direction: column; align-items: flex-start;
-        padding: 80px 30px; gap: 25px; box-shadow: -5px 0 15px rgba(0,0,0,0.2); overflow-y: auto;
+        padding: 60px 30px; gap: 20px; z-index: 1000;
+        box-shadow: -5px 0 15px rgba(0,0,0,0.2);
     }
-    .header-nav a { font-size: 1.1em; width: 100%; }
-    main { margin: 20px 15px; padding: 20px 10px; }
+    .header-nav a { font-size: 1.1em; width: 100%; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .header-nav a:last-child { border-bottom: none; }
+    a.report-link { background-color: transparent; color: white; padding: 10px 0; box-shadow: none; border-radius: 0; font-weight: normal;}
+
+    main { margin: 20px 10px; padding: 15px; }
     
-    .fc .fc-toolbar { flex-direction: column; gap: 10px; margin-bottom: 1em !important; }
-    .fc .fc-toolbar-title { font-size: 1.3em; margin: 0; }
-    .fc-toolbar-chunk { display: flex; justify-content: space-between; width: 100%; }
-    .fc .fc-toolbar-chunk:first-child { justify-content: center; width: 100%; }
-    
-    /* スマホではさらに小さく */
-    .fc-event-inner { padding: 1px 3px; }
-    .fc-event-time-row { font-size: 0.6em; }
-    .fc-event-title-row { font-size: 0.7em; }
-    
-    .always-open-item { width: 100%; }
-    .modal-content { width: 85%; margin: 10vh auto; padding: 25px 20px; }
-    .modal-content h2 { font-size: 1.3em; }
-}
-
-/* =========================================================
-   最終調整: FullCalendarのレンダリング補正
-   ========================================================= */
-
-/* fc-daygrid-event はイベントの外側ラッパー要素 */
-.fc-daygrid-event {
-    /* FullCalendarが適用するパディングを相殺するため、ネガティブマージンを適用 */
-    /* この値はテーマやブラウザによって調整が必要な場合があります */
-    margin-left: -1px;
-    margin-right: -1px;
-}
-
-/* fc-event-inner（青いバー本体）のカスタム調整 */
-.fc-event-inner {
-    /* 負のマージンを相殺するため、正のパディングを追加 */
-    padding-left: 6px; /* 既存の 5px から 1px 増やす */
-    padding-right: 6px;
-    
-    /* セグメント計算で margin-left が0%になる場合（00:00開始）に、
-       親要素のパディングを相殺して、バーを左端にフラッシュさせる */
-    transform: translateX(1px); /* 1pxだけ全体を左にずらして隙間を埋める */
-}
-
-/* margin-leftが計算によって適用される場合の調整 */
-.fc-event-inner[style*="margin-left:"] {
-    /* 既にJSでマージンが計算されている場合、上記 transform による追加のずれを回避 */
-    transform: none;
-}
-
-/* =========================================================
-   ★スマホ・リスト表示 & アコーディオン追加スタイル
-   ========================================================= */
-
-/* アコーディオンボタンのデザイン */
-.accordion-toggle {
-    width: 100%;
-    background-color: #fff;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    padding: 15px 20px;
-    font-size: 1.1em;
-    font-weight: 600;
-    color: #007bff;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: background-color 0.2s;
-    outline: none;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.accordion-toggle:hover {
-    background-color: #f8f9fa;
-}
-
-.toggle-icon {
-    transition: transform 0.3s ease;
-    font-size: 0.8em;
-}
-
-/* 常時公募リストが開いた時のスタイル調整 */
-#alwaysOpenRecruitmentList {
-    /* flex設定はJSで制御されますが、アニメーション用に定義 */
-    width: 100%;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: center;
-}
-
-/* スマホのリストビュー調整 */
-@media (max-width: 768px) {
-    /* リスト表示のイベント行 */
-    .fc-list-event-time {
-        display: none; /* 時間はタイトル横に出る場合が多いので、リストの左列は隠してスッキリさせる */
-    }
-    .fc-list-event-title {
-        font-size: 0.95em;
-        padding: 12px 15px !important;
-    }
-    .fc-list-day-cushion {
-        background-color: #f1f8ff !important; /* 日付ヘッダーの色を薄い青に */
-    }
-    
-    /* 常時公募はスマホでは1列にする */
-    .always-open-item {
-        width: 100%;
-    }
-}
-
-/* アコーディオンボタン */
-.accordion-toggle {
-    width: 100%;
-    background-color: #fff;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    padding: 15px 20px;
-    font-size: 1.1em;
-    font-weight: 600;
-    color: #007bff;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-.toggle-icon {
-    transition: transform 0.3s ease;
-}
-
-/* 常時公募リスト（開いたとき） */
-#alwaysOpenRecruitmentList {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: center;
-    width: 100%;
-}
-
-/* スマホリスト表示の日付ヘッダー強調 */
-@media (max-width: 768px) {
-    .fc-list-day-cushion {
-        background-color: #e3f2fd !important; /* ブルアカっぽい薄い青 */
-        border-left: 4px solid #007bff; /* 左にアクセントライン */
-    }
-    .fc-list-day-text, .fc-list-day-side-text {
-        font-weight: bold;
-        color: #0056b3;
-    }
+    .fc .fc-toolbar.fc-header-toolbar { flex-direction: column; gap: 15px; align-items: stretch; }
+    .fc-toolbar-chunk { justify-content: space-between; width: 100%; }
+    .fc .fc-toolbar-title { font-size: 1.3em; order: -1; text-align: center; width: 100%; }
 }

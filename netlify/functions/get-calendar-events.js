@@ -1,5 +1,5 @@
 // =======================================================================
-// netlify/functions/get-calendar-events.js (既存Functionの修正版)
+// netlify/functions/get-calendar-events.js (シンプル・生データパススルー版)
 // =======================================================================
 exports.handler = async function(event, context) {
     if (event.httpMethod !== 'GET') {
@@ -10,8 +10,7 @@ exports.handler = async function(event, context) {
         const DATOCMS_API_TOKEN = process.env.DATOCMS_READONLY_API_TOKEN;
         const DATOCMS_API_URL = 'https://graphql.datocms.com/';
 
-        // GraphQLクエリからcategoryを削除
-        // 500を越える場合は別途色々する必要あり
+        // categoryなどの不要なフィールドは削除済み
         const query = `
           query {
             allRecruitmentInfos(orderBy: startDateTime_ASC, first: 500) {
@@ -51,13 +50,9 @@ exports.handler = async function(event, context) {
         const calendarEvents = [];
         const alwaysOpenRecruitment = [];
 
-        // データ数表示
-        console.log(`Data length: ${datoEvents.length}`);
-
         datoEvents.forEach(item => {
             if (!item.club) return;
-
-            // formattedItemからcategoryを削除
+            
             const formattedItem = {
                 id: item.id,
                 title: item.club.clubName,
@@ -77,9 +72,6 @@ exports.handler = async function(event, context) {
             } else {
                 if (item.startDateTime) { 
                     calendarEvents.push(formattedItem);
-                }
-                else {
-                    console.warn(`Skipping event with missing startDateTime: ${item.title}`);
                 }
             }
         });
