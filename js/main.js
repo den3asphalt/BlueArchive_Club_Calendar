@@ -32,6 +32,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const calendar = new FullCalendar.Calendar(calendarEl, {
         timeZone: "local",
         locale: "ja",
+        
+        // ★追加: 表示範囲を「今日」からに設定（過去の予定を非表示にする）
+        validRange: function(nowDate) {
+            return {
+                start: nowDate
+            };
+        },
+
         initialView: initialViewType,
         contentHeight: "auto",
         displayEventTime: true,
@@ -116,26 +124,60 @@ document.addEventListener("DOMContentLoaded", function () {
                     `,
                 };
             }
-            // === Month Grid View (標準レンダリングに戻す) ===
+            // === Month Grid View (標準レンダリング) ===
             else {
-                // isStart/isEnd は「そのセグメントが」イベントの開始/終了かを示す
                 const startClass = arg.isStart ? "is-start" : "";
                 const endClass = arg.isEnd ? "is-end" : "";
 
-                // バッジ作成（00:00以外なら表示）
+                // バッジ作成
                 let leftBadge = "";
                 let rightBadge = "";
+                // 左バッジ：開始時刻 (00:00以外なら表示)
                 if (arg.isStart && startStr !== "00:00") {
                     leftBadge = `<span class="pc-time-badge pc-start-time">${startStr}</span>`;
                 }
+                // 右バッジ：終了時刻 (00:00以外なら表示)
                 if (arg.isEnd && endStr !== "00:00") {
                     rightBadge = `<span class="pc-time-badge pc-end-time">${endStr}</span>`;
                 }
 
-                // style属性での幅・マージン指定を削除
+                // ★修正: 時間に基づいて開始位置(margin-left)と幅(width)を計算
+                let style = "";
+                const totalMin = 1440; // 1日 = 1440分
+
+                // --- 開始位置の計算 ---
+                let startMin = 0;
+                if (arg.isStart) {
+                    // その日の0:00からの経過分数を計算
+                    startMin = event.start.getHours() * 60 + event.start.getMinutes();
+                }
+
+                // --- 終了位置の計算 ---
+                let endMin = totalMin;
+                // セグメントの終了かつ終了時間が指定されている場合
+                if (arg.isEnd && event.end) {
+                    const h = event.end.getHours();
+                    const m = event.end.getMinutes();
+                    // 00:00終了の場合は24:00 (1440分) として扱う
+                    if (h === 0 && m === 0) {
+                        endMin = totalMin;
+                    } else {
+                        endMin = h * 60 + m;
+                    }
+                }
+
+                // パーセント計算
+                // margin-left: 開始時間までの割合
+                const marginLeft = (startMin / totalMin) * 100;
+                // width: (終了時間 - 開始時間) の割合
+                // ※日を跨ぐイベントの場合、startMinは0(前日からの続き)やendMinは1440(翌日へ続く)になるため自動的に計算が合います
+                const width = ((endMin - startMin) / totalMin) * 100;
+
+                style = `margin-left: ${marginLeft}%; width: ${width}%;`;
+
                 return {
                     html: `
-                        <div class="pc-event-bar ${startClass} ${endClass}">
+                        <div class="pc-event-bar ${startClass} ${endClass}" style="${style}">
                             <div class="pc-event-left">${leftBadge}</div>
                             <div class="pc-event-center">${event.title}</div>
                             <div class="pc-event-right">${rightBadge}</div>
