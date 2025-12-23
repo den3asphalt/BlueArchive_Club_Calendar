@@ -29,26 +29,59 @@ document.addEventListener("DOMContentLoaded", function () {
     const isMobile = window.innerWidth < 768;
     const initialViewType = isMobile ? "listMonth" : "dayGridMonth";
 
+    // ... (前略) ...
+
     const calendar = new FullCalendar.Calendar(calendarEl, {
         timeZone: "local",
         locale: "ja",
-        
-        // ★修正1: validRangeを削除しました
-        // これにより過去の予定もカレンダー上に表示されるようになります
+
+        // ★以前の指示通り validRange は削除済み
 
         initialView: initialViewType,
         contentHeight: "auto",
         displayEventTime: true,
-        // 0時ちょうどに終わるイベントは、その日の表示に含めない
         nextDayThreshold: "00:00:00",
 
+        // =========================================================
+        // ★修正1: 自作の「今日」ボタンを作る
+        // =========================================================
+        customButtons: {
+            myTodayButton: {
+                text: "今日",
+                click: function () {
+                    calendar.today();
+
+                    setTimeout(() => {
+                        if (calendar.view.type === "listMonth") {
+                            const todayEl = document.querySelector(
+                                ".fc-list-day.fc-day-today"
+                            );
+                            if (todayEl) {
+                                // ★修正: block: 'center' を 'start' に変更
+                                // これで要素が画面の一番上に来るようにスクロールします
+                                todayEl.scrollIntoView({
+                                    behavior: "smooth",
+                                    block: "start",
+                                });
+                            }
+                        }
+                    }, 100);
+                },
+            },
+        },
+
+        // =========================================================
+        // ★修正2: ヘッダーのボタン配置を変更
+        // 標準の 'today' ではなく、自作した 'myTodayButton' を配置します
+        // =========================================================
         headerToolbar: {
-            left: "prev,next today",
+            left: "prev,next myTodayButton", // ←ここを書き換え
             center: "title",
             right: "dayGridMonth,listMonth",
         },
+
         buttonText: {
-            today: "今日",
+            // today: "今日", // ←自作ボタン側でtext指定したのでここは不要になります（残しても害はないです）
             listMonth: "リスト",
             dayGridMonth: "カレンダー",
         },
@@ -139,7 +172,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 // ★修正2: 時間に基づく幅(width)と位置(margin-left)の計算を削除しました
                 // これにより、ブロックが常にカレンダーの幅いっぱいに表示され、潰れて消える現象がなくなります。
-                
+
                 return {
                     html: `
                         <div class="pc-event-bar ${startClass} ${endClass}">
@@ -255,32 +288,35 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // エリアをクリア
-        modalTweetEmbed.innerHTML = ''; 
-        modalTweetLink.innerHTML = ''; 
-        
+        modalTweetEmbed.innerHTML = "";
+        modalTweetLink.innerHTML = "";
+
         if (props.tweetUrl) {
             modalTweetLink.innerHTML = `<p><a href="${props.tweetUrl}" target="_blank" class="twitter-link-btn">Twitterで元のツイートを見る</a></p>`;
-            
+
             const tweetIdMatch = props.tweetUrl.match(/\/status\/(\d+)/);
             if (tweetIdMatch && window.twttr && window.twttr.widgets) {
-                
-                const tweetContainer = document.createElement('div');
-                tweetContainer.className = 'tweet-container-box'; 
-                
+                const tweetContainer = document.createElement("div");
+                tweetContainer.className = "tweet-container-box";
+
                 modalTweetEmbed.appendChild(tweetContainer);
 
-                window.twttr.widgets.createTweet(
-                    tweetIdMatch[1], 
-                    tweetContainer, 
-                    { theme: 'light', conversation: 'none', dnt: true }
-                ).then(el => {
-                    if (!el) {
-                        tweetContainer.innerHTML = '<p class="no-tweet" style="text-align:center; color:#999;">ツイートを表示できません</p>';
-                    }
-                });
+                window.twttr.widgets
+                    .createTweet(tweetIdMatch[1], tweetContainer, {
+                        theme: "light",
+                        conversation: "none",
+                        dnt: true,
+                    })
+                    .then((el) => {
+                        if (!el) {
+                            tweetContainer.innerHTML =
+                                '<p class="no-tweet" style="text-align:center; color:#999;">ツイートを表示できません</p>';
+                        }
+                    });
             }
         } else {
-            modalTweetEmbed.innerHTML = '<p class="no-tweet">ツイートURLなし</p>';
+            modalTweetEmbed.innerHTML =
+                '<p class="no-tweet">ツイートURLなし</p>';
         }
 
         modal.style.display = "block";
