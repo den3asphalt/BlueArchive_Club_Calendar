@@ -344,3 +344,11 @@ footer {
     padding: 4px !important;
     line-height: 1.2;
 }
+
+/* =========================================
+   リスト表示：デフォルトの時間列を非表示にする
+   ========================================= */
+.fc-list-event-time,
+.fc-list-event-graphic {
+    display: none !important;
+}

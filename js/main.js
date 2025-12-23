@@ -120,26 +120,55 @@ document.addEventListener("DOMContentLoaded", function () {
         },
 
         // --- Custom Rendering ---
+        // --- Custom Rendering (修正版) ---
         eventContent: function (arg) {
             const event = arg.event;
             const isList = arg.view.type === "listMonth";
-            const startStr = formatTimeSimple(event.start);
-            const endStr = event.end ? formatTimeSimple(event.end) : "";
+
+            // ★修正: 時間フォーマット関数（24:00対応版）
+            const formatTimeCustom = (d, isEnd = false) => {
+                if (!d) return "";
+                const h = d.getHours();
+                const m = d.getMinutes();
+                // 終了時間が 0:00 の場合のみ "24:00" と表記する
+                if (isEnd && h === 0 && m === 0) {
+                    return "24:00";
+                }
+                return (
+                    String(h).padStart(2, "0") +
+                    ":" +
+                    String(m).padStart(2, "0")
+                );
+            };
+
+            const startStr = formatTimeCustom(event.start);
+            // 終了時間には true を渡して 24:00 変換を有効にする
+            const endStr = event.end ? formatTimeCustom(event.end, true) : "";
 
             // === List View ===
             if (isList) {
                 let timeHtml = "";
                 let labelHtml = "";
 
+                // パターンA: その日のうちに完結する、またはその日の24:00に終わる
                 if (arg.isStart && arg.isEnd) {
                     timeHtml = endStr ? `${startStr} - ${endStr}` : startStr;
-                } else if (arg.isStart) {
-                    timeHtml = startStr;
+                }
+                // パターンB: 日を跨ぐ予定の「開始日」
+                else if (arg.isStart) {
+                    // 「XX:XX - 00:00」とならないよう、「XX:XX -」とだけ表記
+                    timeHtml = `${startStr} -`;
                     labelHtml = `<span class="list-badge start-badge">開始</span>`;
-                } else if (arg.isEnd) {
-                    timeHtml = endStr;
+                }
+                // パターンC: 日を跨ぐ予定の「終了日」
+                else if (arg.isEnd) {
+                    // 「00:00 - XX:XX」とならないよう、「- XX:XX」とだけ表記
+                    timeHtml = `- ${endStr}`;
                     labelHtml = `<span class="list-badge end-badge">終了</span>`;
-                } else {
+                }
+                // パターンD: 日を跨ぐ予定の「中日（なかび）」
+                else {
+                    timeHtml = "終日"; // 00:00 - 00:00 の代わりに「終日」と表示
                     labelHtml = `<span class="list-badge during-badge">期間中</span>`;
                 }
 
@@ -153,7 +182,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     `,
                 };
             }
-            // === Month Grid View (標準レンダリング) ===
+            // === Month Grid View (PC版カレンダー) ===
             else {
                 const startClass = arg.isStart ? "is-start" : "";
                 const endClass = arg.isEnd ? "is-end" : "";
@@ -161,17 +190,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 // バッジ作成
                 let leftBadge = "";
                 let rightBadge = "";
+
                 // 左バッジ：開始時刻 (00:00以外なら表示)
                 if (arg.isStart && startStr !== "00:00") {
                     leftBadge = `<span class="pc-time-badge pc-start-time">${startStr}</span>`;
                 }
-                // 右バッジ：終了時刻 (00:00以外なら表示)
+                // 右バッジ：終了時刻 (00:00以外、かつ開始バッジと被らない場合のみ)
+                // 24:00対応により、00:00終了のイベントも「24:00」バッジが表示されるようになります
                 if (arg.isEnd && endStr !== "00:00") {
                     rightBadge = `<span class="pc-time-badge pc-end-time">${endStr}</span>`;
                 }
-
-                // ★修正2: 時間に基づく幅(width)と位置(margin-left)の計算を削除しました
-                // これにより、ブロックが常にカレンダーの幅いっぱいに表示され、潰れて消える現象がなくなります。
 
                 return {
                     html: `
@@ -184,7 +212,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 };
             }
         },
-
         eventClick: function (info) {
             info.jsEvent.preventDefault();
             displayEventModal(info.event);
