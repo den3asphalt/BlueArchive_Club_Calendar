@@ -1,5 +1,5 @@
 // =======================================================================
-// js/main.js (UI改善・標準レンダリング復帰版)
+// js/main.js (修正版：過去予定表示＆ブロック表示修正)
 // =======================================================================
 document.addEventListener("DOMContentLoaded", function () {
     const calendarEl = document.getElementById("calendar");
@@ -33,12 +33,8 @@ document.addEventListener("DOMContentLoaded", function () {
         timeZone: "local",
         locale: "ja",
         
-        // ★追加: 表示範囲を「今日」からに設定（過去の予定を非表示にする）
-        validRange: function(nowDate) {
-            return {
-                start: nowDate
-            };
-        },
+        // ★修正1: validRangeを削除しました
+        // これにより過去の予定もカレンダー上に表示されるようになります
 
         initialView: initialViewType,
         contentHeight: "auto",
@@ -141,43 +137,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     rightBadge = `<span class="pc-time-badge pc-end-time">${endStr}</span>`;
                 }
 
-                // ★修正: 時間に基づいて開始位置(margin-left)と幅(width)を計算
-                let style = "";
-                const totalMin = 1440; // 1日 = 1440分
-
-                // --- 開始位置の計算 ---
-                let startMin = 0;
-                if (arg.isStart) {
-                    // その日の0:00からの経過分数を計算
-                    startMin = event.start.getHours() * 60 + event.start.getMinutes();
-                }
-
-                // --- 終了位置の計算 ---
-                let endMin = totalMin;
-                // セグメントの終了かつ終了時間が指定されている場合
-                if (arg.isEnd && event.end) {
-                    const h = event.end.getHours();
-                    const m = event.end.getMinutes();
-                    // 00:00終了の場合は24:00 (1440分) として扱う
-                    if (h === 0 && m === 0) {
-                        endMin = totalMin;
-                    } else {
-                        endMin = h * 60 + m;
-                    }
-                }
-
-                // パーセント計算
-                // margin-left: 開始時間までの割合
-                const marginLeft = (startMin / totalMin) * 100;
-                // width: (終了時間 - 開始時間) の割合
-                // ※日を跨ぐイベントの場合、startMinは0(前日からの続き)やendMinは1440(翌日へ続く)になるため自動的に計算が合います
-                const width = ((endMin - startMin) / totalMin) * 100;
-
-                style = `margin-left: ${marginLeft}%; width: ${width}%;`;
-
+                // ★修正2: 時間に基づく幅(width)と位置(margin-left)の計算を削除しました
+                // これにより、ブロックが常にカレンダーの幅いっぱいに表示され、潰れて消える現象がなくなります。
+                
                 return {
                     html: `
-                        <div class="pc-event-bar ${startClass} ${endClass}" style="${style}">
+                        <div class="pc-event-bar ${startClass} ${endClass}">
                             <div class="pc-event-left">${leftBadge}</div>
                             <div class="pc-event-center">${event.title}</div>
                             <div class="pc-event-right">${rightBadge}</div>
@@ -299,34 +264,24 @@ document.addEventListener("DOMContentLoaded", function () {
             const tweetIdMatch = props.tweetUrl.match(/\/status\/(\d+)/);
             if (tweetIdMatch && window.twttr && window.twttr.widgets) {
                 
-                // ★修正: 「読み込み中」の作成処理は全削除しました
-
-                // ツイート表示専用の箱を作成
                 const tweetContainer = document.createElement('div');
-                
-                // ★修正: CSSで幅を広げるためのクラスを付与
                 tweetContainer.className = 'tweet-container-box'; 
                 
                 modalTweetEmbed.appendChild(tweetContainer);
 
-                // ツイート作成
                 window.twttr.widgets.createTweet(
                     tweetIdMatch[1], 
                     tweetContainer, 
                     { theme: 'light', conversation: 'none', dnt: true }
                 ).then(el => {
                     if (!el) {
-                        // ツイート生成失敗（Not Foundなど）
                         tweetContainer.innerHTML = '<p class="no-tweet" style="text-align:center; color:#999;">ツイートを表示できません</p>';
                     }
                 });
-                // catch等は不要（何も表示しなければいいので）ですが、念のためログだけ
             }
         } else {
             modalTweetEmbed.innerHTML = '<p class="no-tweet">ツイートURLなし</p>';
         }
-
-        // ... (後略) ...
 
         modal.style.display = "block";
     }
