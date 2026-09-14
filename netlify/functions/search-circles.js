@@ -64,13 +64,11 @@ exports.handler = async function(event, context) {
 
         // Step 2: 一致したサークルのすべての公募履歴を取得
         const clubIds = clubs.map(c => c.id);
-        const placeholders = clubIds.map(() => '?').join(',');
-        const clubIdStrings = clubIds.map(id => `'${id}'`).join(',');
 
         const historyQuery = `
-          query GetRecruitmentHistory {
+          query GetRecruitmentHistory($clubIds: [ItemId!]!) {
             allRecruitmentInfos(
-              filter: { club: { id: { in: [${clubIdStrings}] } } }
+              filter: { club: { id: { in: $clubIds } } }
               orderBy: startDateTime_DESC
               first: 500
             ) {
@@ -94,7 +92,10 @@ exports.handler = async function(event, context) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${DATOCMS_API_TOKEN}`,
             },
-            body: JSON.stringify({ query: historyQuery }),
+            body: JSON.stringify({
+                query: historyQuery,
+                variables: { clubIds }
+            }),
         });
 
         if (!historyResponse.ok) {
