@@ -19,10 +19,10 @@ exports.handler = async function(event, context) {
         const DATOCMS_API_TOKEN = process.env.DATOCMS_READONLY_API_TOKEN;
         const DATOCMS_API_URL = 'https://graphql.datocms.com/';
 
-        // Step 1: サークル名で検索
+        // Step 1: 全サークルを取得（フィルタなし）
         const searchQuery = `
-          query SearchClubs($filter: String) {
-            allClubs(filter: { clubName: { icontains: $filter } }, first: 20) {
+          query SearchClubs {
+            allClubs(first: 100) {
               id
               clubName
               leaderTwitter
@@ -37,22 +37,26 @@ exports.handler = async function(event, context) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${DATOCMS_API_TOKEN}`,
             },
-            body: JSON.stringify({
-                query: searchQuery,
-                variables: { filter: searchTerm.trim() }
-            }),
+            body: JSON.stringify({ query: searchQuery }),
         });
 
         if (!searchResponse.ok) {
+            const errBody = await searchResponse.text();
+            console.error("Search response error body:", errBody);
             throw new Error(`DatoCMS API error: ${searchResponse.status}`);
         }
 
         const searchData = await searchResponse.json();
         if (searchData.errors) {
+            console.error("Search GraphQL errors:", JSON.stringify(searchData.errors));
             throw new Error(`GraphQL error: ${JSON.stringify(searchData.errors)}`);
         }
 
-        const clubs = searchData.data.allClubs;
+        // サーバーサイドでサークル名をフィルタ
+        const allClubs = searchData.data.allClubs;
+        const clubs = allClubs.filter(club =>
+            club.clubName && club.clubName.toLowerCase().includes(searchTerm.trim().toLowerCase())
+        );
 
         if (!clubs || clubs.length === 0) {
             return {
@@ -99,11 +103,14 @@ exports.handler = async function(event, context) {
         });
 
         if (!historyResponse.ok) {
+            const errBody = await historyResponse.text();
+            console.error("History response error body:", errBody);
             throw new Error(`DatoCMS API error: ${historyResponse.status}`);
         }
 
         const historyData = await historyResponse.json();
         if (historyData.errors) {
+            console.error("History GraphQL errors:", JSON.stringify(historyData.errors));
             throw new Error(`GraphQL error: ${JSON.stringify(historyData.errors)}`);
         }
 
