@@ -58,6 +58,270 @@ main {
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
+/* =======================================================================
+   サークル検索 UI
+   ======================================================================= */
+
+/* 検索フォーム */
+#circleSearchSection {
+    margin-bottom: 20px;
+    position: relative;
+}
+#circleSearchForm {
+    display: flex;
+    gap: 10px;
+}
+#circleSearchInput {
+    flex: 1;
+    padding: 10px 16px;
+    border: 2px solid #cce5ff;
+    border-radius: 8px;
+    font-size: 1em;
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+#circleSearchInput:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+#circleSearchBtn {
+    padding: 10px 24px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+}
+#circleSearchBtn:hover {
+    background-color: #0056b3;
+}
+
+/* 検索候補（サジェスト） */
+.search-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-top: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 100;
+    max-height: 300px;
+    overflow-y: auto;
+}
+.suggestion-item {
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 0.95em;
+    transition: background-color 0.15s ease;
+}
+.suggestion-item:hover {
+    background-color: #f0f7ff;
+}
+.suggestion-item:not(:last-child) {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* 検索結果セクション */
+#searchResultSection {
+    min-height: 400px;
+}
+.back-to-calendar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 0.9em;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: all 0.2s ease;
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    color: #333;
+}
+.back-to-calendar-btn:hover {
+    background-color: #e9ecef;
+    border-color: #007bff;
+    color: #007bff;
+}
+
+/* 検索結果レイアウト（左右2カラム） */
+.search-results-layout {
+    display: flex;
+    gap: 24px;
+    min-height: 400px;
+}
+.circle-list-panel {
+    width: 280px;
+    flex-shrink: 0;
+    border-right: 2px solid #e9ecef;
+    padding-right: 20px;
+}
+.history-panel {
+    flex: 1;
+    min-width: 0;
+}
+
+.search-panel-title {
+    font-size: 1.15em;
+    color: #007bff;
+    margin: 0 0 15px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+/* サークルリスト */
+.circle-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.circle-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-bottom: 4px;
+}
+.circle-list-item:hover {
+    background-color: #f0f7ff;
+}
+.circle-list-item.active {
+    background-color: #e1f5fe;
+    border-left: 3px solid #007bff;
+    font-weight: 600;
+}
+.circle-list-name {
+    font-size: 0.95em;
+    color: #333;
+}
+.circle-list-count {
+    font-size: 0.8em;
+    color: #999;
+    background: #f8f9fa;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+/* 公募履歴リスト */
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.history-item {
+    padding: 14px 16px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #fff;
+}
+.history-item:hover {
+    border-color: #007bff;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+    transform: translateY(-1px);
+}
+.history-item-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+.history-type {
+    flex-shrink: 0;
+}
+.type-badge {
+    font-size: 0.75em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+.type-badge.always-open {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+.type-badge.normal {
+    background-color: #e3f2fd;
+    color: #1565c0;
+}
+.history-title {
+    font-weight: 600;
+    font-size: 0.95em;
+    color: #333;
+}
+.history-dates {
+    font-size: 0.85em;
+    color: #6c757d;
+    margin-left: 36px;
+}
+.no-history {
+    text-align: center;
+    color: #999;
+    padding: 40px 20px;
+}
+.search-empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+}
+.search-empty-state p {
+    margin: 8px 0;
+}
+
+/* ローディング */
+.loading-indicator {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+}
+
+/* 検索UI: スマホ向け */
+@media (max-width: 768px) {
+    .search-results-layout {
+        flex-direction: column;
+    }
+    .circle-list-panel {
+        width: 100%;
+        border-right: none;
+        border-bottom: 2px solid #e9ecef;
+        padding-right: 0;
+        padding-bottom: 15px;
+        margin-bottom: 15px;
+    }
+    .circle-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .circle-list-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        padding: 8px 10px;
+        margin-bottom: 0;
+    }
+    .circle-list-item.active {
+        border-left: none;
+        border-bottom: 3px solid #007bff;
+    }
+    .history-dates {
+        margin-left: 0;
+    }
+}
+
 /* --- FullCalendar Toolbar Fix (強力修正) --- */
 /* ボタンが下に落ちるのを防ぐ設定 */
 .fc .fc-toolbar.fc-header-toolbar {

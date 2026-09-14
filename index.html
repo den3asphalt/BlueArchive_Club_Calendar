@@ -4,6 +4,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>公募カレンダー</title>
+    <!-- OGP -->
+    <meta property="og:title" content="ブルーアーカイブ サークル公募カレンダー">
+    <meta property="og:description" content="ブルーアーカイブのサークル公募情報をカレンダー形式で閲覧できるサイト">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://den3a.github.io/BlueArchive_Club_Calendar/img/icon.png">
+    <meta property="og:site_name" content="ブルーアーカイブ サークル公募カレンダー">
+    <meta property="og:locale" content="ja_JP">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ブルーアーカイブ サークル公募カレンダー">
+    <meta name="twitter:description" content="ブルーアーカイブのサークル公募情報をカレンダー形式で閲覧できるサイト">
+    <meta name="twitter:image" content="https://den3a.github.io/BlueArchive_Club_Calendar/img/icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Noto+Sans+JP:wght@300;400;600&display=swap" rel="stylesheet">
@@ -32,6 +44,23 @@
     </nav>
 </header>
 <main>
+    <!-- サークル検索 -->
+    <section id="circleSearchSection">
+        <form id="circleSearchForm" autocomplete="off">
+            <input type="text" id="circleSearchInput" placeholder="サークル名で検索..." aria-label="サークル名検索">
+            <button type="submit" id="circleSearchBtn">検索</button>
+        </form>
+        <div id="searchSuggestions" class="search-suggestions" style="display:none;"></div>
+    </section>
+
+    <!-- 検索結果 -->
+    <section id="searchResultSection" style="display:none;">
+        <button id="backToCalendarBtn" class="back-to-calendar-btn">← カレンダーに戻る</button>
+        <div id="searchResultContainer">
+            <div class="loading-indicator"><p>検索中...</p></div>
+        </div>
+    </section>
+
     <div id='calendar'></div>
     <section id="alwaysOpenRecruitmentSection" style="display: none;">
         <button id="alwaysOpenToggleBtn" class="accordion-toggle">

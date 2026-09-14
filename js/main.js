@@ -13,6 +13,18 @@ document.addEventListener("DOMContentLoaded", function () {
     const alwaysOpenCount = document.getElementById("alwaysOpenCount");
     const alwaysOpenIcon = document.querySelector(".toggle-icon");
 
+    // --- Circle Search Elements ---
+    const circleSearchForm = document.getElementById("circleSearchForm");
+    const circleSearchInput = document.getElementById("circleSearchInput");
+    const circleSearchBtn = document.getElementById("circleSearchBtn");
+    const searchSuggestions = document.getElementById("searchSuggestions");
+    const searchResultSection = document.getElementById("searchResultSection");
+    const searchResultContainer = document.getElementById(
+        "searchResultContainer"
+    );
+    const backToCalendarBtn = document.getElementById("backToCalendarBtn");
+    let searchTimeout = null;
+
     // Hamburger Menu
     const hamburgerBtn = document.getElementById("hamburger-btn");
     const header = document.querySelector("header");
@@ -23,6 +35,290 @@ document.addEventListener("DOMContentLoaded", function () {
                 hamburgerBtn.getAttribute("aria-expanded") === "true";
             hamburgerBtn.setAttribute("aria-expanded", !isExpanded);
         });
+    }
+
+    // --- Circle Search ---
+    if (circleSearchForm) {
+        circleSearchForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const query = circleSearchInput.value.trim();
+            if (query.length < 1) return;
+            hideSuggestions();
+            performCircleSearch(query);
+        });
+    }
+
+    if (circleSearchInput) {
+        circleSearchInput.addEventListener("input", function () {
+            clearTimeout(searchTimeout);
+            const query = circleSearchInput.value.trim();
+            if (query.length < 2) {
+                hideSuggestions();
+                return;
+            }
+            searchTimeout = setTimeout(() => {
+                fetchCircleSuggestions(query);
+            }, 300);
+        });
+
+        // クリックoutsideで候補を閉じる
+        document.addEventListener("click", function (e) {
+            if (
+                !circleSearchInput.contains(e.target) &&
+                !searchSuggestions.contains(e.target)
+            ) {
+                hideSuggestions();
+            }
+        });
+    }
+
+    if (backToCalendarBtn) {
+        backToCalendarBtn.addEventListener("click", function () {
+            searchResultSection.style.display = "none";
+            calendarEl.style.display = "block";
+            if (alwaysOpenSection) alwaysOpenSection.style.display = "";
+            document.getElementById("circleSearchSection").style.display = "";
+            // カレンダーのサイズを再計算
+            setTimeout(() => calendar.render(), 50);
+        });
+    }
+
+    async function fetchCircleSuggestions(query) {
+        try {
+            const resp = await fetch(
+                `/.netlify/functions/search-circles?q=${encodeURIComponent(query)}`
+            );
+            if (!resp.ok) return;
+            const data = await resp.json();
+            if (data.error || !data.clubs || data.clubs.length === 0) {
+                hideSuggestions();
+                return;
+            }
+            showSuggestions(data.clubs.slice(0, 8));
+        } catch (err) {
+            console.error("Suggestions fetch error:", err);
+        }
+    }
+
+    function showSuggestions(clubs) {
+        searchSuggestions.innerHTML = "";
+        clubs.forEach((club) => {
+            const div = document.createElement("div");
+            div.classList.add("suggestion-item");
+            div.textContent = club.clubName;
+            div.addEventListener("click", () => {
+                circleSearchInput.value = club.clubName;
+                hideSuggestions();
+                performCircleSearch(club.clubName);
+            });
+            searchSuggestions.appendChild(div);
+        });
+        searchSuggestions.style.display = "block";
+    }
+
+    function hideSuggestions() {
+        searchSuggestions.style.display = "none";
+        searchSuggestions.innerHTML = "";
+    }
+
+    async function performCircleSearch(query) {
+        // カレンダーを非表示、検索結果を表示
+        calendarEl.style.display = "none";
+        if (alwaysOpenSection) alwaysOpenSection.style.display = "none";
+        document.getElementById("circleSearchSection").style.display = "none";
+        searchResultSection.style.display = "block";
+        searchResultContainer.innerHTML =
+            '<div class="loading-indicator"><p>検索中...</p></div>';
+
+        try {
+            const resp = await fetch(
+                `/.netlify/functions/search-circles?q=${encodeURIComponent(query)}`
+            );
+            if (!resp.ok) {
+                throw new Error(`HTTP error! status: ${resp.status}`);
+            }
+            const data = await resp.json();
+            if (data.error) throw new Error(data.error);
+            renderSearchResults(data.clubs, data.recruitmentHistory);
+        } catch (err) {
+            console.error("Search error:", err);
+            searchResultContainer.innerHTML = `<p style="color:red;text-align:center;">検索に失敗しました: ${err.message}</p>`;
+        }
+    }
+
+    function renderSearchResults(clubs, recruitmentHistory) {
+        if (!clubs || clubs.length === 0) {
+            searchResultContainer.innerHTML = `
+                <div class="search-empty-state">
+                    <p>「${circleSearchInput.value.trim()}」に一致するサークルは見つかりませんでした。</p>
+                    <p>別のキーワードで試してください。</p>
+                </div>`;
+            return;
+        }
+
+        let html = '<div class="search-results-layout">';
+
+        // 左側: サークル一覧
+        html += '<div class="circle-list-panel"><h2 class="search-panel-title">検索結果（サークル）</h2><ul class="circle-list">';
+        clubs.forEach((club) => {
+            const count = recruitmentHistory.filter(
+                (r) => r.club && r.club.id === club.id
+            ).length;
+            html += `<li class="circle-list-item" data-club-id="${club.id}">
+                <span class="circle-list-name">${club.clubName}</span>
+                <span class="circle-list-count">${count}件</span>
+            </li>`;
+        });
+        html += "</ul></div>";
+
+        // 右側: 選択したサークルの公募履歴（デフォルトは最初のサークル）
+        const defaultClub = clubs[0];
+        const defaultHistory = recruitmentHistory.filter(
+            (r) => r.club && r.club.id === defaultClub.id
+        );
+        html += `<div class="history-panel">
+            <h2 class="search-panel-title" id="historyPanelTitle">${defaultClub.clubName} の公募履歴</h2>
+            <div id="historyList" class="history-list">`;
+
+        if (defaultHistory.length === 0) {
+            html += '<p class="no-history">公募履歴が見つかりませんでした。</p>';
+        } else {
+            defaultHistory.forEach((item) => {
+                const startDate = formatSearchDate(item.startDateTime);
+                const endDate = formatSearchDate(item.endDateTime, true);
+                const typeLabel =
+                    item.recruitmentType === "常時公募"
+                        ? '<span class="type-badge always-open">常時公募</span>'
+                        : '<span class="type-badge normal">期間限定</span>';
+
+                html += `<div class="history-item" data-event-id="${item.id}" data-club-id="${item.club.id}">
+                    <div class="history-item-main">
+                        <span class="history-type">${typeLabel}</span>
+                        <span class="history-title">${item.club.clubName}</span>
+                    </div>
+                    <div class="history-dates">
+                        <span class="history-start">${startDate}</span>
+                        ${item.endDateTime ? ` - <span class="history-end">${endDate}</span>` : ""}
+                    </div>
+                </div>`;
+            });
+        }
+
+        html += "</div></div>";
+        html += "</div>";
+
+        searchResultContainer.innerHTML = html;
+
+        // サークルリストのクリックイベント
+        document.querySelectorAll(".circle-list-item").forEach((li) => {
+            li.addEventListener("click", function () {
+                const clubId = this.dataset.clubId;
+                const club = clubs.find((c) => c.id === clubId);
+                const history = recruitmentHistory.filter(
+                    (r) => r.club && r.club.id === clubId
+                );
+
+                // アクティブ状態を更新
+                document
+                    .querySelectorAll(".circle-list-item")
+                    .forEach((el) => el.classList.remove("active"));
+                this.classList.add("active");
+
+                // 履歴パネルを更新
+                document.getElementById("historyPanelTitle").textContent =
+                    club.clubName + " の公募履歴";
+                const historyList = document.getElementById("historyList");
+
+                if (history.length === 0) {
+                    historyList.innerHTML =
+                        '<p class="no-history">公募履歴が見つかりませんでした。</p>';
+                    return;
+                }
+
+                let historyHtml = "";
+                history.forEach((item) => {
+                    const startDate = formatSearchDate(item.startDateTime);
+                    const endDate = formatSearchDate(item.endDateTime, true);
+                    const typeLabel =
+                        item.recruitmentType === "常時公募"
+                            ? '<span class="type-badge always-open">常時公募</span>'
+                            : '<span class="type-badge normal">期間限定</span>';
+
+                    historyHtml += `<div class="history-item" data-event-id="${item.id}" data-club-id="${item.club.id}">
+                        <div class="history-item-main">
+                            <span class="history-type">${typeLabel}</span>
+                            <span class="history-title">${item.club.clubName}</span>
+                        </div>
+                        <div class="history-dates">
+                            <span class="history-start">${startDate}</span>
+                            ${item.endDateTime ? ` - <span class="history-end">${endDate}</span>` : ""}
+                        </div>
+                    </div>`;
+                });
+                historyList.innerHTML = historyHtml;
+
+                // 履歴アイテムのクリックイベント（モーダル表示）
+                historyList.querySelectorAll(".history-item").forEach(
+                    (itemEl) => {
+                        itemEl.addEventListener("click", () => {
+                            const eventId = itemEl.dataset.eventId;
+                            const eventData = recruitmentHistory.find(
+                                (r) => r.id === eventId
+                            );
+                            if (eventData) {
+                                const modalEventData = {
+                                    ...eventData,
+                                    start: new Date(eventData.startDateTime),
+                                    end: eventData.endDateTime
+                                        ? new Date(eventData.endDateTime)
+                                        : null,
+                                    title: eventData.club.clubName,
+                                };
+                                displayEventModal(modalEventData);
+                            }
+                        });
+                    }
+                );
+            });
+        });
+
+        // デフォルト選択を最初のサークルに
+        const firstItem = document.querySelector(".circle-list-item");
+        if (firstItem) firstItem.classList.add("active");
+
+        // 履歴アイテムのクリックイベント（初回分）
+        document.querySelectorAll(".history-item").forEach((itemEl) => {
+            itemEl.addEventListener("click", () => {
+                const eventId = itemEl.dataset.eventId;
+                const eventData = recruitmentHistory.find(
+                    (r) => r.id === eventId
+                );
+                if (eventData) {
+                    const modalEventData = {
+                        ...eventData,
+                        start: new Date(eventData.startDateTime),
+                        end: eventData.endDateTime
+                            ? new Date(eventData.endDateTime)
+                            : null,
+                        title: eventData.club.clubName,
+                    };
+                    displayEventModal(modalEventData);
+                }
+            });
+        });
+    }
+
+    function formatSearchDate(dateStr, isEnd = false) {
+        if (!dateStr) return "";
+        const d = new Date(dateStr);
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const dd = String(d.getDate()).padStart(2, "0");
+        const hh = String(d.getHours()).padStart(2, "0");
+        const min = String(d.getMinutes()).padStart(2, "0");
+        if (isEnd && d.getHours() === 0 && d.getMinutes() === 0) {
+            return `${mm}/${dd} 24:00`;
+        }
+        return `${mm}/${dd} ${hh}:${min}`;
     }
 
     // --- Calendar Configuration ---
