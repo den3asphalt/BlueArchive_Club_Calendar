@@ -38,6 +38,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // --- Circle Search ---
+
+    // URLパラメータ ?search=サークル名 で自動検索
+    const urlParams = new URLSearchParams(window.location.search);
+    const autoSearchQuery = urlParams.get('search');
+    if (autoSearchQuery && autoSearchQuery.length >= 1) {
+        if (circleSearchInput) circleSearchInput.value = autoSearchQuery;
+        performCircleSearch(autoSearchQuery);
+    }
+
     if (circleSearchForm) {
         circleSearchForm.addEventListener("submit", function (e) {
             e.preventDefault();

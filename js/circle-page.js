@@ -27,10 +27,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.title = `${circle.clubName} - サークル詳細`;
 
         // カテゴリ表示のコードを削除
+        const searchLink = `/?search=${encodeURIComponent(circle.clubName)}`;
         container.innerHTML = `
             <h1>${circle.clubName}</h1>
             <div class="circle-info">
-                <p><strong>リーダーTwitter:</strong> 
+                <p><strong>リーダーTwitter:</strong>
                     ${circle.leaderTwitter ? `<a href="${circle.leaderTwitter}" target="_blank" rel="noopener noreferrer">${circle.leaderTwitter}</a>` : '未設定'}
                 </p>
                 <div class="memo-section">
@@ -40,6 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                 </div>
             </div>
+            <a href="${searchLink}" class="past-recruitment-link">🔍 過去の公募状況を見る</a>
         `;
 
     } catch (error) {

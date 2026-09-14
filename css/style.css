@@ -845,3 +845,34 @@ footer {
 .fc-list-event-graphic {
     display: none !important;
 }
+
+/* =======================================================================
+   サークル詳細ページ：過去の公募状況リンク
+   ======================================================================= */
+.past-recruitment-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    padding: 12px 24px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95em;
+    transition: all 0.2s ease;
+}
+.past-recruitment-link:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.25);
+}
+
+@media (max-width: 768px) {
+    .past-recruitment-link {
+        width: 100%;
+        justify-content: center;
+        padding: 14px 20px;
+    }
+}
