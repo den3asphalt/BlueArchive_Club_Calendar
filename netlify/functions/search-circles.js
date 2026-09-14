@@ -21,8 +21,8 @@ exports.handler = async function(event, context) {
 
         // Step 1: サークル名で検索
         const searchQuery = `
-          query SearchClubs($filter: ClubClubNameFilter) {
-            allClubs(filter: { clubName: { contains: $filter } }, first: 20) {
+          query SearchClubs($filter: String) {
+            allClubs(filter: { clubName: { icontains: $filter } }, first: 20) {
               id
               clubName
               leaderTwitter
