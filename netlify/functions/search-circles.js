@@ -66,13 +66,12 @@ exports.handler = async function(event, context) {
             };
         }
 
-        // Step 2: 一致したサークルのすべての公募履歴を取得
-        const clubIds = clubs.map(c => c.id);
+        // Step 2: 全公募履歴を取得（DatoCMSのLinkFilterはidでフィルタできないためJS側でフィルタ）
+        const clubIds = new Set(clubs.map(c => c.id));
 
         const historyQuery = `
-          query GetRecruitmentHistory($clubIds: [ItemId!]!) {
+          query GetRecruitmentHistory {
             allRecruitmentInfos(
-              filter: { club: { id: { in: $clubIds } } }
               orderBy: startDateTime_DESC
               first: 500
             ) {
@@ -96,10 +95,7 @@ exports.handler = async function(event, context) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${DATOCMS_API_TOKEN}`,
             },
-            body: JSON.stringify({
-                query: historyQuery,
-                variables: { clubIds }
-            }),
+            body: JSON.stringify({ query: historyQuery }),
         });
 
         if (!historyResponse.ok) {
@@ -114,7 +110,11 @@ exports.handler = async function(event, context) {
             throw new Error(`GraphQL error: ${JSON.stringify(historyData.errors)}`);
         }
 
-        const recruitmentHistory = historyData.data.allRecruitmentInfos || [];
+        const allRecruitmentInfos = historyData.data.allRecruitmentInfos || [];
+        // 一致したサークルの公募履歴にフィルタ
+        const recruitmentHistory = allRecruitmentInfos.filter(
+            item => item.club && clubIds.has(item.club.id)
+        );
 
         return {
             statusCode: 200,
