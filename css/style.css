@@ -3,6 +3,8 @@
    ======================================================================= */
 
 /* --- Base --- */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
     margin: 0; padding: 0;
     font-family: 'Inter', 'Noto Sans JP', sans-serif;
@@ -10,6 +12,20 @@ body {
     color: #212529;
     line-height: 1.6; font-size: 16px;
     -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* スクロールバーカスタマイズ (Webkit) */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c1c9d4; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #a0aab5; }
+
+/* フォーカスリング統一 */
+*:focus-visible {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+    border-radius: 4px;
 }
 
 /* --- Header --- */
@@ -109,24 +125,27 @@ main {
     right: 0;
     background: white;
     border: 1px solid #e9ecef;
-    border-radius: 8px;
-    margin-top: 4px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    margin-top: 6px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
     z-index: 100;
-    max-height: 300px;
+    max-height: 260px;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 .suggestion-item {
-    padding: 10px 16px;
+    padding: 13px 16px;
     cursor: pointer;
     font-size: 0.95em;
     transition: background-color 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
 }
+.suggestion-item:active,
 .suggestion-item:hover {
     background-color: #f0f7ff;
 }
 .suggestion-item:not(:last-child) {
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f5f5f5;
 }
 
 /* 検索結果セクション */
@@ -269,8 +288,9 @@ main {
 }
 .no-history {
     text-align: center;
-    color: #999;
-    padding: 40px 20px;
+    color: #adb5bd;
+    padding: 50px 20px;
+    font-size: 0.92em;
 }
 .search-empty-state {
     text-align: center;
@@ -280,12 +300,20 @@ main {
 .search-empty-state p {
     margin: 8px 0;
 }
+.search-empty-state p:first-child {
+    font-size: 2em;
+    margin-bottom: 12px;
+}
 
 /* ローディング */
 .loading-indicator {
     text-align: center;
     padding: 60px 20px;
     color: #6c757d;
+    font-size: 0.92em;
+}
+.loading-indicator p::before {
+    content: '⏳ ';
 }
 
 /* 検索UI: スマホ向け */
@@ -518,69 +546,270 @@ main {
 
 /* --- Footer --- */
 footer {
-    text-align: center; padding: 30px 20px; color: rgba(255,255,255,0.8);
-    font-size: 0.9em; margin-top: 50px; background-color: #343a40;
+    text-align: center; padding: 30px 20px; color: rgba(255,255,255,0.7);
+    font-size: 0.88em; margin-top: 50px;
+    background: linear-gradient(180deg, #343a40 0%, #1a1e21 100%);
+}
+@media (max-width: 768px) {
+    footer { padding: 24px 16px; margin-top: 30px; font-size: 0.82em; }
 }
 
-/* --- Mobile Responsive --- */
+/* =======================================================================
+   Mobile Responsive (スマホ全面刷新)
+   ======================================================================= */
 @media (max-width: 768px) {
-    header { padding: 10px 15px; }
+
+    /* ---- Header ---- */
+    header {
+        padding: 10px 15px;
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    }
     .header-icon { width: 28px; height: 28px; }
-    h1 { font-size: 1.3em; }
+    h1 { font-size: 1.2em; }
     .hamburger-btn { display: block; }
     .header-nav { display: none; }
-    
-    header.nav-open .header-nav {
-        display: flex; position: fixed; top: 0; right: 0; width: 80%; height: 100vh;
-        background-color: #0056b3; flex-direction: column; align-items: flex-start;
-        padding: 60px 30px; gap: 20px; z-index: 1000;
-        box-shadow: -5px 0 15px rgba(0,0,0,0.2);
-    }
-    .header-nav a { font-size: 1.1em; width: 100%; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
-    .header-nav a:last-child { border-bottom: none; }
-    a.report-link { background-color: transparent; color: white; padding: 10px 0; box-shadow: none; border-radius: 0; font-weight: normal;}
 
-    main { margin: 20px 10px; padding: 15px; }
-    
-    .fc .fc-toolbar.fc-header-toolbar { flex-direction: column; gap: 15px; align-items: stretch; }
-    .fc-toolbar-chunk { justify-content: space-between; width: 100%; }
-    .fc .fc-toolbar-title { font-size: 1.3em; order: -1; text-align: center; width: 100%; }
+    header.nav-open .header-nav {
+        display: flex;
+        position: fixed; top: 0; right: 0;
+        width: 75%; max-width: 280px; height: 100vh;
+        background: linear-gradient(180deg, #0056b3 0%, #003d80 100%);
+        flex-direction: column; align-items: stretch;
+        padding: 70px 24px 30px; gap: 0; z-index: 1000;
+        box-shadow: -8px 0 30px rgba(0,0,0,0.3);
+        animation: slideIn 0.3s ease-out;
+    }
+    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+    .header-nav a {
+        font-size: 1em; width: 100%;
+        padding: 14px 12px; border-radius: 8px;
+        margin-bottom: 4px;
+        border-bottom: none;
+        transition: background-color 0.15s;
+    }
+    .header-nav a:active { background-color: rgba(255,255,255,0.15); }
+    .header-nav a:last-child { margin-bottom: 0; }
+    a.report-link {
+        background-color: rgba(255,255,255,0.15);
+        color: white; padding: 14px 12px;
+        box-shadow: none; border-radius: 8px;
+        font-weight: 600; text-align: center;
+        margin-top: 10px;
+    }
+
+    /* ---- Main ---- */
+    main {
+        margin: 12px 8px; padding: 14px 12px;
+        border-radius: 16px;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+    }
+
+    /* ---- Search Bar ---- */
+    #circleSearchForm { gap: 8px; }
+    #circleSearchInput {
+        padding: 12px 14px; font-size: 16px; /* iOS zoom防止 */
+        border-radius: 12px;
+    }
+    #circleSearchBtn {
+        padding: 12px 20px; border-radius: 12px;
+        font-size: 16px;
+    }
+
+    /* ---- Search Results Layout ---- */
+    .search-results-layout {
+        flex-direction: column; gap: 16px;
+    }
+    .circle-list-panel {
+        width: 100%; border-right: none;
+        border-bottom: 1px solid #e9ecef;
+        padding-right: 0; padding-bottom: 14px;
+        margin-bottom: 0;
+    }
+    .search-panel-title {
+        font-size: 1em; margin-bottom: 10px; padding-bottom: 8px;
+    }
+
+    /* サークルチップ（ピル型） */
+    .circle-list {
+        display: flex; flex-wrap: wrap; gap: 6px;
+    }
+    .circle-list-item {
+        display: inline-flex; align-items: center; gap: 4px;
+        padding: 8px 14px; border-radius: 20px;
+        background: #f8f9fa; border: 1px solid #dee2e6;
+        font-size: 0.88em; color: #495057;
+        margin-bottom: 0; cursor: pointer;
+        transition: all 0.15s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .circle-list-item:active {
+        transform: scale(0.96);
+    }
+    .circle-list-item.active {
+        background: #e1f5fe; border-color: #007bff;
+        color: #007bff; font-weight: 600;
+        border-left: none; border-bottom: none;
+        box-shadow: 0 1px 4px rgba(0,123,255,0.15);
+    }
+    .circle-list-count {
+        font-size: 0.75em; background: rgba(0,123,255,0.1);
+        color: #007bff; padding: 1px 6px;
+    }
+    .circle-list-item:not(.active) .circle-list-count {
+        background: #e9ecef; color: #868e96;
+    }
+
+    /* ---- History Cards (タイムライン風) ---- */
+    .history-list { gap: 10px; }
+    .history-item {
+        position: relative;
+        padding: 14px 14px 14px 18px;
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        transition: all 0.2s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .history-item::before {
+        content: '';
+        position: absolute;
+        left: 6px; top: 14px;
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: #007bff;
+        border: 2px solid #e1f5fe;
+    }
+    .history-item:active {
+        transform: scale(0.98);
+        box-shadow: 0 2px 8px rgba(0,123,255,0.15);
+    }
+    .history-item-main {
+        gap: 8px; margin-bottom: 5px;
+    }
+    .history-title { font-size: 0.92em; }
+    .type-badge {
+        font-size: 0.7em; padding: 2px 7px;
+        border-radius: 6px;
+    }
+    .history-dates {
+        font-size: 0.8em; color: #868e96;
+        margin-left: 0;
+        font-family: 'SF Mono', 'Roboto Mono', monospace;
+        letter-spacing: -0.02em;
+        line-height: 1.5;
+    }
+
+    /* ---- Back button ---- */
+    .back-to-calendar-btn {
+        padding: 10px 16px; border-radius: 10px;
+        font-size: 0.88em; width: 100%;
+        justify-content: center;
+        margin-bottom: 14px;
+    }
+
+    /* ---- Calendar Toolbar ---- */
+    .fc .fc-toolbar.fc-header-toolbar {
+        flex-direction: column; gap: 12px;
+        align-items: stretch; padding: 0 4px;
+    }
+    .fc-toolbar-chunk {
+        justify-content: center; width: 100%;
+        flex-wrap: wrap; gap: 6px;
+    }
+    .fc-toolbar-chunk:first-child {
+        flex-wrap: wrap !important;
+    }
+    .fc .fc-toolbar-title {
+        font-size: 1.2em; order: -1;
+        text-align: center; width: 100%;
+        padding: 4px 0;
+    }
+    .fc .fc-button {
+        padding: 8px 14px !important;
+        font-size: 0.88em !important;
+        min-height: 38px; /* タッチターゲット */
+    }
+
+    /* カレンダー本体 */
+    .fc .fc-daygrid-day-number {
+        font-size: 0.85em !important;
+        padding: 6px !important;
+    }
+
+    /* ---- Always Open Section ---- */
+    .accordion-toggle {
+        padding: 14px 18px; border-radius: 12px;
+        font-size: 0.92em;
+    }
+    .always-open-item {
+        width: 100%; box-sizing: border-box;
+    }
+    #alwaysOpenRecruitmentList {
+        flex-direction: column; gap: 10px;
+    }
+
+    /* ---- Modal (ボトムシート風) ---- */
+    .modal {
+        padding: 0;
+        background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+        margin: 0; width: 100%; max-width: 100%;
+        height: 85vh; max-height: 85vh;
+        border-radius: 20px 20px 0 0;
+        padding: 20px 20px 30px;
+        overflow-y: auto;
+        animation: slideUp 0.35s ease-out;
+    }
+    @keyframes slideUp {
+        from { transform: translateY(100%); }
+        to   { transform: translateY(0); }
+    }
+    .close-button {
+        top: 12px; right: 16px;
+        width: 36px; height: 36px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 50%; background: #f0f2f5;
+        font-size: 20px;
+    }
+    .modal-content h2 {
+        font-size: 1.15em; padding-bottom: 12px;
+    }
+    .modal-content p {
+        font-size: 0.92em; line-height: 1.7;
+    }
 }
 
 /* =========================================
-   スマホ用リスト表示の強力補正 (style.cssの末尾に追加)
+   小画面スマホ補正 (540px以下)
    ========================================= */
 @media (max-width: 540px) {
-    
-    /* リストのセル自体の余白を詰める */
-    .fc-list-table td {
-        padding: 6px 4px !important;
-    }
 
-    /* 時間表示の幅を固定せず、文字を小さく詰める */
+    main { margin: 8px 4px; padding: 10px 8px; }
+
+    .fc-list-table td { padding: 5px 3px !important; }
+
     .list-time-col {
-        min-width: auto !important; /* 80px固定を解除して中身に合わせる */
-        width: auto !important;
-        font-size: 0.8rem !important; /* 文字を小さく */
-        margin-right: 4px;
-        flex-shrink: 0; /* 時間は潰れないようにする */
+        min-width: auto !important; width: auto !important;
+        font-size: 0.75rem !important; margin-right: 3px; flex-shrink: 0;
     }
-
-    /* 「開始」「終了」バッジを小さく */
     .list-badge {
-        font-size: 0.7rem !important;
-        padding: 1px 3px !important;
-        margin-left: 4px !important;
-        border-radius: 3px;
+        font-size: 0.65rem !important; padding: 1px 3px !important;
+        margin-left: 3px !important; border-radius: 3px;
+    }
+    .list-title-text {
+        font-size: 0.8rem !important; margin-left: 4px !important;
+        max-width: none !important; line-height: 1.3;
     }
 
-    /* タイトル文字を小さくし、無理な改行を防ぐ */
-    .list-title-text {
-        font-size: 0.85rem !important; /* 文字を小さく */
-        margin-left: 5px !important;
-        max-width: none !important; /* 幅制限を解除してスペース一杯に使う */
-        line-height: 1.3;
-    }
+    .fc .fc-button { padding: 7px 10px !important; font-size: 0.82em !important; }
+
+    /* イベントバーをもう少しコンパクトに */
+    .pc-event-bar { padding: 2px 4px; min-height: 18px; }
+    .pc-event-center { font-size: 0.78em; }
+    .pc-time-badge { font-size: 0.68em; }
 }
 
 /* =========================================
